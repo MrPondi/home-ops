@@ -1,0 +1,10 @@
+name: home-ops
+description: Proxmox deployment for talos k8s
+runtime:
+  name: python
+  options:
+    toolchain: uv
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: python
