@@ -29,16 +29,15 @@ nodes:
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "bc:24:11:68:28:1c"
-        vlans:
-          - vlanId: 30
-            addresses:
-              - "10.0.30.21/24"
-            mtu: 1500
-            routes:
-              - network: "0.0.0.0/0"
-                gateway: "10.0.30.1"
-            vip:
-              ip: "10.0.30.10"
+        dhcp: false
+        addresses:
+          - "10.0.30.21/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "10.0.30.1"
+        mtu: 1500
+        vip:
+          ip: "10.0.30.10"
   - hostname: "orion-worker-01"
     ipAddress: "10.0.30.31"
     installDisk: "/dev/sda"
@@ -49,14 +48,13 @@ nodes:
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "bc:24:11:cd:f8:09"
-        vlans:
-          - vlanId: 30
-            addresses:
-              - "10.0.30.31/24"
-            mtu: 1500
-            routes:
-              - network: "0.0.0.0/0"
-                gateway: "10.0.30.1"
+        dhcp: false
+        addresses:
+          - "10.0.30.31/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "10.0.30.1"
+        mtu: 1500
 
 # Global patches
 patches:
