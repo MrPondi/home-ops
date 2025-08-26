@@ -1,8 +1,0 @@
-config:
-  proxmoxve:endpoint: https://10.0.10.10:8006/api2/json
-  proxmoxve:insecure: "true"
-  proxmoxve:username: terraform-prov@pve
-  proxmoxve:password:
-    secure: AAABAHjm6H4Uew1LaK4zMoNwL4hH/atp+XLWRdd+Iw3j2UCYhD6036nkUouMWGBaJfrgTw==
-  # proxmoxve:apiToken:
-  #   secure: AAABAEtVoA3KAYIU/88STj0VE8vonwbmRq2Ed93ivOgsgJxhYNmGYeYphcZ8z2e3Tgf1H0BhIQ4y9B8CA6pDptnu+OhmwfwSgDhGaCKcK/K/H7YyV540UaDAsh6b1mQ=
