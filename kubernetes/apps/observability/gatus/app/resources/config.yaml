@@ -1,0 +1,26 @@
+---
+web:
+  port: ${GATUS_WEB_PORT}
+
+metrics: true
+
+ui:
+  title: Status | Gatus
+  header: Status
+  logo: https://avatars.githubusercontent.com/u/109785648
+  link: https://github.com/MrPondi
+
+connectivity:
+  checker:
+    target: 1.1.1.1:53
+    interval: 1m
+
+endpoints:
+  - name: flux-webhook
+    group: external
+    url: https://flux-webhook.${SECRET_DOMAIN}
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 404"
