@@ -15,6 +15,10 @@ connectivity:
     target: 1.1.1.1:53
     interval: 1m
 
+alerting:
+  discord:
+    webhook-url: ${GATUS_DISCORD_WEBHOOK_URL}
+
 endpoints:
   - name: flux-webhook
     group: external
