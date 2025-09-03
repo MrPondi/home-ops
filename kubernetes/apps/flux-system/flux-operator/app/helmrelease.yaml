@@ -5,7 +5,7 @@ kind: OCIRepository
 metadata:
   name: flux-operator
 spec:
-  interval: 5m
+  interval: 15m
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
@@ -31,6 +31,6 @@ spec:
     remediation:
       strategy: rollback
       retries: 3
-  valuesFrom:
-    - kind: ConfigMap
-      name: flux-operator-values
+  values:
+    serviceMonitor:
+      create: true
