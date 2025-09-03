@@ -3,8 +3,11 @@ _.python.venv = { path = "{{config_root}}/.venv", create = true }
 KUBECONFIG = "{{config_root}}/kubeconfig"
 SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
 TALOSCONFIG = "{{config_root}}/talos/clusterconfig/talosconfig"
+LEFTHOOK_OUTPUT = "false"
+
 
 [tools]
+"lefthook" = "1.12.3"
 "python" = "3.13"
 "pipx:makejinja" = "2.8.1"
 "aqua:budimanjojo/talhelper" = "3.0.34"
@@ -24,3 +27,4 @@ TALOSCONFIG = "{{config_root}}/talos/clusterconfig/talosconfig"
 "aqua:mikefarah/yq" = "4.47.1"
 "aqua:siderolabs/talos" = "1.10.6"
 "aqua:yannh/kubeconform" = "0.7.0"
+"ubi:google/yamlfmt" = "0.17.2"

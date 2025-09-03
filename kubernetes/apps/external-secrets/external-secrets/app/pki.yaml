@@ -21,7 +21,7 @@ spec:
   # this is discouraged but required by ios
   commonName: external-secrets-ca
   secretName: external-secrets-ca
-  duration: 43800h  # 5y
+  duration: 43800h # 5y
   issuerRef:
     name: external-secrets-selfsign
     kind: Issuer
