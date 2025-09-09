@@ -6,4 +6,4 @@ namespace: observability
 components:
   - ../../components/common
 resources:
-  - ./longhorn-release/ks.yaml
+  - ./longhorn/ks.yaml
