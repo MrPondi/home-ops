@@ -1,0 +1,46 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: longhorn
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    persistence:
+      defaultDataLocality: best-effort
+    defaultSettings:
+      createDefaultDiskLabeledNodes: false
+      defaultDataLocality: best-effort
+      defaultLonghornStaticStorageClass: longhorn
+      defaultReplicaCount: 1
+      guaranteedEngineManagerCPU: 20
+      guaranteedReplicaManagerCPU: 20
+      nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+      orphanAutoDeletion: true
+      replicaAutoBalance: true
+      storageMinimalAvailablePercentage: 5
+      storageReservedPercentageForDefaultDisk: 5
+    ingress:
+      enabled: false
+    metrics:
+      serviceMonitor:
+        enabled: true
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
