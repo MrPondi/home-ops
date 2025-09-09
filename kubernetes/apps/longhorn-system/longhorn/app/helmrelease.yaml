@@ -31,6 +31,16 @@ spec:
       replicaAutoBalance: true
       storageMinimalAvailablePercentage: 5
       storageReservedPercentageForDefaultDisk: 5
+      defaultDisksConfig: |-
+        [
+          {
+            "name": "sdb",
+            "path": "/dev/sdb",
+            "allowScheduling": true,
+            "type": "block"
+            "storageReserved": 0
+            }
+        ]
     ingress:
       enabled: false
     metrics:
