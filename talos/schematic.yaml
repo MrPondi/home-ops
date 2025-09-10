@@ -1,0 +1,9 @@
+---
+customization:
+  extraKernelArgs:
+    - ip=::10.0.30.1:255.255.255.0::eth0:off:10.0.30.1:1.1.1.1
+  systemExtensions:
+    officialExtensions:
+      - siderolabs/iscsi-tools
+      - siderolabs/qemu-guest-agent
+      - siderolabs/util-linux-tools
