@@ -19,16 +19,20 @@ spec:
   values:
     persistence:
       defaultDataLocality: best-effort
+      dataEngine: v2
     defaultSettings:
       createDefaultDiskLabeledNodes: false
+      defaultDataPath: /dev/sdb
       defaultDataLocality: best-effort
-      defaultLonghornStaticStorageClass: longhorn
       replicaAutoBalance: true
       defaultReplicaCount: 1
+      defaultLonghornStaticStorageClass: longhorn
       storageMinimalAvailablePercentage: 5
       storageReservedPercentageForDefaultDisk: 5
       nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
       orphanResourceAutoDeletion: true
+      v1DataEngine: false
+      v2DataEngine: true
     ingress:
       enabled: false
     metrics:

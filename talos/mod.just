@@ -22,7 +22,7 @@ download-image version schematic:
 
 [doc('Generate config for Talos cluster')]
 gen-config:
-    talhelper genconfig &>/dev/null
+    talhelper genconfig
 
 [doc('Generate kubeconfig for Talos cluster')]
 gen-kubeconfig:
