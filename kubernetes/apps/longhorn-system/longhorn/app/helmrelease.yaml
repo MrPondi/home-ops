@@ -46,16 +46,3 @@ spec:
     metrics:
       serviceMonitor:
         enabled: true
-    route:
-      dashboard:
-        hostnames:
-          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
-        parentRefs:
-          - name: internal
-            namespace: kube-system
-            sectionName: https
-        rules:
-          - backendRefs:
-              - name: longhorn-frontend
-                namespace: longhorn-system
-                port: 80
