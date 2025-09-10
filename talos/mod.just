@@ -10,7 +10,7 @@ default:
 
 [doc('Apply Talos config to a node')]
 apply-node node *args:
-    talhelper gencommand apply --node "{{ node }}" --extra-flags "{{ args }}"
+    talhelper gencommand apply --node "{{ node }}" --extra-flags "{{ args }}" | bash
 
 [doc('Download Talos machine image')]
 download-image version schematic:
@@ -59,6 +59,11 @@ upgrade-k8s version="":
 [doc('Upgrade Talos version on a node')]
 upgrade-node node:
     talosctl -n "{{ node }}" upgrade -i "$(just talos machine-image {{ node }})" -m powercycle --timeout=10m
+
+[doc('Reset the entire cluster')]
+reset-cluster:
+    gum confirm "This will destroy your cluster and reset the nodes back to maintenance mode... continue?" --default="No" && \
+        talhelper gencommand reset --extra-flags="--reboot --system-labels-to-wipe STATE --system-labels-to-wipe EPHEMERAL --graceful=false --wait=false" | bash
 
 [private]
 machine-controller node:
