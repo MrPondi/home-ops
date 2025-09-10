@@ -11,7 +11,7 @@ nodes := `talosctl config info -o yaml | yq -e '.nodes | join (" ")'`
 default: talhelper talos kubernetes controller-kubeconfig wait namespaces sops-secrets crds apps cilium-kubeconfig
 
 [doc('Prepare talhelper')]
-[working-directory: '../talos']
+[working-directory('../talos')]
 talhelper:
     just log info "Running stage..." "stage" "$0"
     if ! [ -f talsecret.sops.yaml ]; then \

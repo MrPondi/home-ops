@@ -4,7 +4,7 @@ set quiet := true
 set shell := ['bash', '-euo', 'pipefail', '-c']
 
 mod bootstrap
-mod kubernetes
+mod kube 'kubernetes/mod.just'
 mod talos
 
 [private]

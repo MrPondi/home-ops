@@ -49,10 +49,10 @@ shutdown-node node:
 
 [doc('Upgrade Kubernetes version on the cluster')]
 upgrade-k8s version="":
-    if [ -z {{version}} ]; then \
+    if [ -z {{ version }} ]; then \
         version=$(yq '.kubernetesVersion' {{ talos_dir }}/talenv.yaml); \
     else \
-        version='{{version}}'; \
+        version='{{ version }}'; \
     fi; \
     talosctl -n "{{ controller }}" upgrade-k8s --to $version
 
