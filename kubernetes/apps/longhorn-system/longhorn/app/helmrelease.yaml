@@ -23,24 +23,12 @@ spec:
       createDefaultDiskLabeledNodes: false
       defaultDataLocality: best-effort
       defaultLonghornStaticStorageClass: longhorn
-      defaultReplicaCount: 1
-      guaranteedEngineManagerCPU: 20
-      guaranteedReplicaManagerCPU: 20
-      nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
-      orphanAutoDeletion: true
       replicaAutoBalance: true
+      defaultReplicaCount: 1
       storageMinimalAvailablePercentage: 5
       storageReservedPercentageForDefaultDisk: 5
-      defaultDisksConfig: |-
-        [
-          {
-            "name": "sdb",
-            "path": "/dev/sdb",
-            "allowScheduling": true,
-            "type": "block"
-            "storageReserved": 0
-            }
-        ]
+      nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+      orphanResourceAutoDeletion: true
     ingress:
       enabled: false
     metrics:
