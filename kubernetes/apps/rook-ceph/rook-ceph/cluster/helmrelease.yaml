@@ -75,6 +75,8 @@ spec:
             enabled: true
           - name: rook
             enabled: true
+      network:
+        provider: host
       storage:
         useAllNodes: true
         useAllDevices: false
