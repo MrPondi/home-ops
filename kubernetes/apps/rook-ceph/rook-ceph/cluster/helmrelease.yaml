@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rook-ceph-cluster
+spec:
+  interval: 1h
+  timeout: 15m
+  chartRef:
+    kind: OCIRepository
+    name: rook-ceph-cluster
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    route:
+      dashboard:
+        host:
+          name: "rook.${SECRET_DOMAIN}"
+          path: /
+          pathType: PathPrefix
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
+    cephClusterSpec:
+      mon:
+        count: 1
+      mgr:
+        count: 1
+      dashboard:
+        enabled: true
+        urlPrefix: /
+        ssl: false
+      placement:
+        all:
+          tolerations:
+            - effect: NoSchedule
+              operator: Exists
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+      storage:
+        useAllNodes: true
+        useAllDevices: false
+        deviceFilter: sdb
+        config:
+          osdsPerDevice: "1"
+    cephBlockPools:
+      - name: ceph-blockpool
+        spec:
+          failureDomain: host
+          replicated:
+            size: 1 # disable replication
+            requireSafeReplicaSize: false
+        storageClass:
+          enabled: true
+          name: ceph-block
+          isDefault: true
+          reclaimPolicy: Delete
+          allowVolumeExpansion: true
+          volumeBindingMode: Immediate
+    cephFileSystems: []
+    cephObjectStores: []
