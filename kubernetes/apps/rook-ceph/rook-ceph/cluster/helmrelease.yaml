@@ -52,6 +52,7 @@ spec:
         enabled: true
         urlPrefix: /
         ssl: false
+        # prometheusEndpoint: http://prometheus-operated.observability.svc.cluster.local:9090
       placement:
         all:
           tolerations:
@@ -61,11 +62,19 @@ spec:
             - maxSkew: 1
               topologyKey: kubernetes.io/hostname
               whenUnsatisfiable: DoNotSchedule
-              # prometheusEndpoint: http://prometheus-operated.observability.svc.cluster.local:9090
       mon:
         count: 1 # no replicas
       mgr:
         count: 1 # no replicas
+        modules:
+          - name: diskprediction_local
+            enabled: true
+          - name: insights
+            enabled: true
+          - name: pg_autoscaler
+            enabled: true
+          - name: rook
+            enabled: true
       storage:
         useAllNodes: true
         useAllDevices: false
