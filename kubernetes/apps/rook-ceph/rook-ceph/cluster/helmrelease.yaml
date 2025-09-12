@@ -34,6 +34,13 @@ spec:
             namespace: kube-system
             sectionName: https
     cephClusterSpec:
+      cephConfig:
+        global:
+          bdev_enable_discard: "true" # quote
+          bdev_async_discard_threads: "1" # quote
+          osd_class_update_on_start: "false" # quote
+          device_failure_prediction_mode: local # requires mgr module
+          osd_pool_default_size: "1" # Stop complaining about replica count
       cleanupPolicy:
         wipeDevicesFromOtherClusters: true
       crashCollector:
