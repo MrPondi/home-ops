@@ -7,9 +7,6 @@ metadata:
   namespace: &namespace external-secrets
 spec:
   targetNamespace: *namespace
-  dependsOn:
-    - name: cert-manager-selfsigned
-      namespace: cert-manager
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
