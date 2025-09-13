@@ -5,5 +5,4 @@ kind: Kustomization
 resources:
   - ./certificate.yaml
   - ./helmrelease.yaml
-  - ./pki.yaml
   - ./ocirepository.yaml

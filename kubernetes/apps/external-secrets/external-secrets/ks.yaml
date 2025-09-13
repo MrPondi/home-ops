@@ -8,7 +8,7 @@ metadata:
 spec:
   targetNamespace: *namespace
   dependsOn:
-    - name: cert-manager
+    - name: cert-manager-selfsigned
       namespace: cert-manager
   commonMetadata:
     labels:
