@@ -194,15 +194,15 @@ There are **5 stages** outlined below for completing this project, make sure you
    📍 _The variables are only placeholders, replace them with your actual values_
 
     ```sh
-    nmap -Pn -n -p 443 ${cluster_gateway_addr} ${cloudflare_gateway_addr} -vv
+    nmap -Pn -n -p 443 10.0.30.12 10.0.30.13 -vv
     ```
 
-4. Check you can resolve DNS for `echo`, this should resolve to `${cloudflare_gateway_addr}`:
+4. Check you can resolve DNS for `echo`, this should resolve to `10.0.30.13`:
 
    📍 _The variables are only placeholders, replace them with your actual values_
 
     ```sh
-    dig @${cluster_dns_gateway_addr} echo.${cloudflare_domain}
+    dig @10.0.30.1 echo.pondi.dev
     ```
 
 5. Check the status of your wildcard `Certificate`:
