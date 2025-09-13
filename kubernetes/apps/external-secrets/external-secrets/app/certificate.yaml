@@ -8,6 +8,7 @@ spec:
   secretName: *name
   commonName: bitwarden-sdk-server.external-secrets.svc.cluster.local
   dnsNames:
+    - bitwarden-sdk-server.external-secrets
     - bitwarden-sdk-server.external-secrets.svc
     - bitwarden-sdk-server.external-secrets.svc.cluster.local
     - localhost
