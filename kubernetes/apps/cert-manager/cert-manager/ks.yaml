@@ -42,7 +42,7 @@ spec:
     - apiVersion: cert-manager.io/v1
       kind: Issuer
       name: external-secrets-ca
-      namespace: cert-manager
+      namespace: external-secrets
   healthCheckExprs:
     - apiVersion: cert-manager.io/v1
       kind: Issuer
