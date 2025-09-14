@@ -22,10 +22,10 @@ spec:
   commonName: external-secrets-ca
   secretName: external-secrets-ca
   duration: 43800h # 5y
+  isCA: true
   issuerRef:
     name: external-secrets-selfsign
     kind: Issuer
-  isCA: true
 
 # Create an Issuer that uses the above generated CA certificate to issue certs.
 ---
