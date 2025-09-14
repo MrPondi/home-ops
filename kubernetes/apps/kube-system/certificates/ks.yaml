@@ -12,11 +12,6 @@ spec:
   dependsOn:
     - name: external-secrets-store
       namespace: external-secrets
-  healthCheckExprs:
-    - apiVersion: external-secrets.io/v1
-      kind: ExternalSecret
-      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'SecretSyncedError')
-      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'SecretSynced')
   interval: 1h
   path: ./kubernetes/apps/kube-system/certificates/import
   postBuild:
