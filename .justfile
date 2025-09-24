@@ -15,6 +15,10 @@ default:
 log lvl msg *args:
     gum log -t rfc3339 -s -l "{{ lvl }}" "{{ msg }}" {{ args }}
 
+[private]
+template file *args:
+    minijinja-cli "{{ file }}" {{ args }}
+
 [doc('Force Flux to pull in changes from your Git repository')]
 reconcile:
     flux --namespace flux-system reconcile kustomization flux-system --with-source
