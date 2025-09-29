@@ -10,7 +10,11 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   components:
+    - ../../../../components/defaults
     - ../../../../components/gatus/external
+  dependsOn:
+    - name: cloudflare-tunnel
+      namespace: network
   interval: 1h
   path: ./kubernetes/apps/network/echo/app
   postBuild:
