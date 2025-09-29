@@ -27,11 +27,15 @@ spec:
         serviceMonitor:
           enabled: true
 
+      service:
+        servicePortHttp: 9000
+        servicePortHttps: 9443
+
       route:
         main:
           enabled: true
           hostnames:
-            - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+            - "auth.${SECRET_DOMAIN}"
           parentRefs:
             - name: internal
               namespace: kube-system
