@@ -19,7 +19,7 @@ spec:
   path: ./kubernetes/apps/observability/kube-prometheus-stack/app
   postBuild:
     substitute:
-      APP: kube-prometheus-stack
+      APP: *app
       GATUS_SUBDOMAIN: prometheus
     substituteFrom:
       - name: cluster-secrets
