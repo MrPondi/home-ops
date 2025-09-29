@@ -9,11 +9,13 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/defaults
   dependsOn:
     - name: external-secrets-store
       namespace: external-secrets
   interval: 1h
-  path: ./kubernetes/apps/network/cloudflare-dns
+  path: ./kubernetes/apps/network/cloudflare-dns/app
   postBuild:
     substituteFrom:
       - name: cluster-secrets
