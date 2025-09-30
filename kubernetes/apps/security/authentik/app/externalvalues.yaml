@@ -1,0 +1,25 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: authentik-values
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: bitwarden-secretsmanager
+    kind: ClusterSecretStore
+  target:
+    name: "authentik-values-secret"
+    template:
+      data:
+        values.yaml: |
+          postgresql:
+            auth:
+              password: "{{ .AUTHENTIK_POSTGRESQL__PASSWORD }}"
+          authentik:
+            postgresql:
+              password: "{{ .AUTHENTIK_POSTGRESQL__PASSWORD }}"
+  data:
+    - secretKey: AUTHENTIK_POSTGRESQL__PASSWORD
+      remoteRef:
+        key: "1d658229-a07a-4613-b481-b36701078584"

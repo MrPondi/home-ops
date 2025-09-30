@@ -10,13 +10,18 @@ spec:
   chartRef:
     kind: OCIRepository
     name: authentik
+  valuesFrom:
+    - kind: Secret
+      name: &secret-values authentik-values-secret
   values:
     global:
       podAnnotations:
-        secret.reloader.stakater.com/reload: &secret authentik-secrets
+        secret.reloader.stakater.com/reload:
+          - *secret-values
+          - &secret-env "authentik-env"
       envFrom:
         - secretRef:
-            name: *secret
+            name: *secret-env
     authentik:
       error_reporting:
         enabled: false

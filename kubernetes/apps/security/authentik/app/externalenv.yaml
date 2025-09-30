@@ -2,12 +2,13 @@
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: authentik-secrets
+  name: authentik-env
 spec:
   refreshInterval: 1h
   secretStoreRef:
     name: bitwarden-secretsmanager
     kind: ClusterSecretStore
+  target:
   data:
     - secretKey: AUTHENTIK_BOOTSTRAP_EMAIL
       remoteRef:
@@ -18,6 +19,3 @@ spec:
     - secretKey: AUTHENTIK_SECRET_KEY
       remoteRef:
         key: "411b4f3e-2a1e-4877-8f21-b3670105994b"
-    - secretKey: AUTHENTIK_POSTGRESQL__PASSWORD
-      remoteRef:
-        key: "1d658229-a07a-4613-b481-b36701078584"
