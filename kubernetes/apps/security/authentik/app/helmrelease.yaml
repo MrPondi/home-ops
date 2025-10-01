@@ -10,46 +10,60 @@ spec:
   chartRef:
     kind: OCIRepository
     name: authentik
-  valuesFrom:
-    - kind: Secret
-      name: &secret-values authentik-values-secret
   values:
     global:
-      podAnnotations:
-        secret.reloader.stakater.com/reload:
-          - *secret-values
-          - &secret-env "authentik-env"
+      deploymentAnnotations:
+        secret.reloader.stakater.com/reload: &secret authentik-secret
       envFrom:
         - secretRef:
-            name: *secret-env
+            name: *secret
+      deploymentStrategy:
+        type: RollingUpdate
+
     authentik:
       error_reporting:
         enabled: false
 
     server:
+      volumeMounts:
+        - mountPath: /media
+          name: authentik
+
+      initContainers:
+        - name: init-db
+          image: ghcr.io/onedr0p/postgres-init:16
+          envFrom:
+            - secretRef:
+                name: *secret
+
       metrics:
         enabled: true
         serviceMonitor:
           enabled: true
 
-      service:
-        servicePortHttp: 9000
-        servicePortHttps: 9443
-
-      route:
-        main:
-          enabled: true
-          hostnames:
-            - "auth.${SECRET_DOMAIN}"
-          parentRefs:
-            - name: internal
-              namespace: kube-system
-              sectionName: https
-
     postgresql:
-      enabled: true
+      enabled: false
+
     redis:
       enabled: true
+      master:
+        persistence:
+          enabled: false
+
+    service:
+      app:
+        ports:
+          http:
+            port: 9000
+
+    route:
+      app:
+        hostnames:
+          - "auth.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: https
 
     prometheus:
       rules:

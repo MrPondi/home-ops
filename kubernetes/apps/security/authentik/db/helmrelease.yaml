@@ -1,0 +1,38 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bitnami/charts/refs/heads/main/bitnami/postgresql/values.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik-db
+spec:
+  interval: 1h
+  timeout: 15m
+  chartRef:
+    kind: OCIRepository
+    name: authentik-db
+  values:
+    auth:
+      username: authentik
+      database: authentik
+      existingSecret: authentik-db-secret
+
+    primary:
+      persistence:
+        enabled: true
+        existingClaim: "authentik-db" # Your pre-existing PVC
+
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 250m
+        limits:
+          memory: 512Mi
+
+    # Disable metrics if not needed
+    metrics:
+      enabled: false
+
+    # PostgreSQL configuration
+    postgresql:
+      maxConnections: 200
+      sharedBuffers: 256MB
