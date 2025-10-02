@@ -7,10 +7,8 @@ components:
   - ../../components/common
 resources:
   - ./amd-device-plugin/ks.yaml
-  - ./certificates/ks.yaml
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
-  - ./gateway-api-crds/ks.yaml
   - ./metrics-server/ks.yaml
   - ./reloader/ks.yaml
   - ./spegel/ks.yaml
