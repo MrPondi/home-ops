@@ -20,14 +20,6 @@ alerting:
     webhook-url: ${GATUS_DISCORD_WEBHOOK_URL}
 
 endpoints:
-  - name: flux-webhook
-    group: external
-    url: https://flux-webhook.pondi.dev
-    interval: 1m
-    client:
-      dns-resolver: tcp://1.1.1.1:53
-    conditions:
-      - "[STATUS] == 404"
   - name: Centrum Robotów
     group: business
     url: https://centrumrobotow.com

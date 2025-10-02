@@ -5,11 +5,10 @@ kind: HelmRelease
 metadata:
   name: authentik
 spec:
-  interval: 1h
-  timeout: 15m
   chartRef:
     kind: OCIRepository
     name: authentik
+  interval: 1h
   values:
     global:
       deploymentAnnotations:
