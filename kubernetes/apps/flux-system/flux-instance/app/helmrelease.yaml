@@ -28,7 +28,7 @@ spec:
         kind: GitRepository
         url: "ssh://git@github.com/MrPondi/home-ops.git"
         pullSecret: github-deploy-key
-        ref: "refs/heads/main"
+        ref: "refs/heads/upstream-changes"
         path: kubernetes/flux/cluster
       commonMetadata:
         labels:
