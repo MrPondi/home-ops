@@ -84,8 +84,8 @@ sops-secrets:
 
     secrets=( \
     "{{ justfile_directory() }}/bootstrap/github-deploy-key.sops.yaml" \
-    "{{ justfile_directory() }}/kubernetes/components/common/sops/cluster-secrets.sops.yaml" \
-    "{{ justfile_directory() }}/kubernetes/components/common/sops/sops-age.sops.yaml" \
+    "{{ justfile_directory() }}/bootstrap/sops-age.sops.yaml" \
+    "{{ justfile_directory() }}/kubernetes/components/namespace/sops/cluster-secrets.sops.yaml" \
     ); \
     for secret in "${secrets[@]}"; do \
         resource_name=$(basename "$secret" ".sops.yaml"); \
