@@ -9,8 +9,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  components:
-    - ../../../../components/defaults
   dependsOn:
     - name: external-secrets-store
       namespace: external-secrets
@@ -41,7 +39,6 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   components:
-    - ../../../../components/defaults
     - ../../../../components/gatus/guarded
   dependsOn:
     - name: rook-ceph
