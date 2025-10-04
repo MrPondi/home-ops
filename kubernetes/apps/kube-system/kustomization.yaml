@@ -4,13 +4,13 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: kube-system
 components:
-  - ../../components/common
+  - ../../components/namespace
+replacements:
+  - path: ../../components/replacements/ks.yaml
 resources:
   - ./amd-device-plugin/ks.yaml
-  - ./certificates/ks.yaml
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
-  - ./gateway-api-crds/ks.yaml
   - ./metrics-server/ks.yaml
   - ./reloader/ks.yaml
   - ./spegel/ks.yaml

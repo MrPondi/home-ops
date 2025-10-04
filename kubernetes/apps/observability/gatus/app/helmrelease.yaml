@@ -5,38 +5,34 @@ kind: HelmRelease
 metadata:
   name: gatus
 spec:
-  interval: 1h
   chartRef:
     kind: OCIRepository
     name: gatus
+  interval: 1h
   values:
     controllers:
       gatus:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          init-config:
+          gatus-sidecar:
             image:
-              repository: ghcr.io/home-operations/k8s-sidecar
-              tag: 1.30.10@sha256:dd3b1f0c4e6b4512b2deb50c58acf65fd0f0927120a59a95eec854d32a6c9ce3
-            env:
-              FOLDER: /config
-              LABEL: gatus.io/enabled
-              NAMESPACE: ALL
-              RESOURCE: both
-              UNIQUE_FILENAMES: true
-              METHOD: WATCH
-            restartPolicy: Always
+              repository: ghcr.io/home-operations/gatus-sidecar
+              tag: 0.0.4@sha256:be7ec7fe1f6efc6090856a1ba4d1b9b023c38a0895314c8bc46d4343b91f2b22
+            args:
+              - --auto-group=true
+              - --auto-routes=false
             resources:
               requests:
                 cpu: 10m
               limits:
-                memory: 128Mi
+                memory: 64Mi
+            restartPolicy: Always
         containers:
           app:
             image:
               repository: ghcr.io/twin/gatus
-              tag: v5.25.0@sha256:4dfe1e0bef060df1b1e7f193ad9a89010d9e1c0fda7f673891c73d65f1312a5b
+              tag: v5.25.2@sha256:9ff09fe5eb5e96b7f2126dc95b375a87a7bc16380d5cb9d798af4e0ef36f0049
             env:
               TZ: Europe/Warsaw
               GATUS_CONFIG_PATH: /config
@@ -83,12 +79,16 @@ spec:
           - port: http
     route:
       app:
+        annotations:
+          gatus.home-operations.com/enabled: "true"
+          gatus.home-operations.com/endpoint: |-
+            conditions: ["[STATUS] == 200"]
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
           - "status.${SECRET_DOMAIN}"
         parentRefs:
-          - name: external
-            namespace: kube-system
+          - name: envoy-external
+            namespace: network
             sectionName: https
     rbac:
       roles:
@@ -98,12 +98,27 @@ spec:
             - apiGroups:
                 - ""
               resources:
-                - "configmaps"
-                - "secrets"
+                - services
               verbs:
-                - "get"
-                - "watch"
-                - "list"
+                - get
+                - watch
+                - list
+            - apiGroups:
+                - gateway.networking.k8s.io
+              resources:
+                - httproutes
+              verbs:
+                - get
+                - watch
+                - list
+            - apiGroups:
+                - networking.k8s.io
+              resources:
+                - ingresses
+              verbs:
+                - get
+                - watch
+                - list
       bindings:
         gatus:
           type: ClusterRoleBinding
@@ -122,4 +137,3 @@ spec:
         globalMounts:
           - path: /config/config.yaml
             subPath: config.yaml
-            readOnly: true

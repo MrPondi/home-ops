@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: amd-device-plugin
 spec:
-  interval: 1h
   chartRef:
     kind: OCIRepository
     name: amd-device-plugin
+  interval: 1h
   values:
     controllers:
       amd-device-plugin:
