@@ -3,30 +3,21 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app volsync
-  namespace: &namespace volsync-system
+  name: volsync
 spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *app
   dependsOn:
     - name: openebs
       namespace: openebs-system
     - name: snapshot-controller
       namespace: kube-system
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: *app
-      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/volsync-system/volsync/app
   postBuild:
     substitute:
-      APP: *app
+      APP: volsync
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: *namespace
+  wait: true
