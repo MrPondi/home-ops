@@ -74,7 +74,7 @@ sync-oci:
     done
 
 [doc('View a secret')]
-view-secret namespace secret:
+view-secret namespace secret="":
     kubectl view-secret -n {{ namespace }} {{ secret }}
 
 [private]
