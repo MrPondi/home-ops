@@ -9,6 +9,11 @@ ui:
   header: Status
   logo: https://avatars.githubusercontent.com/u/109785648
   link: https://github.com/MrPondi
+  buttons:
+    - name: Github
+      link: https://github.com/MrPondi
+    - name: Homelab
+      link: https://github.com/MrPondi/home-ops
 
 connectivity:
   checker:
@@ -20,14 +25,6 @@ alerting:
     webhook-url: ${GATUS_DISCORD_WEBHOOK_URL}
 
 endpoints:
-  - name: flux-webhook
-    group: external
-    url: https://flux-webhook.pondi.dev
-    interval: 1m
-    client:
-      dns-resolver: tcp://1.1.1.1:53
-    conditions:
-      - "[STATUS] == 404"
   - name: Centrum Robotów
     group: business
     url: https://centrumrobotow.com
@@ -36,6 +33,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Centrum Robotów Koszących
     group: business
     url: https://centrumrobotowkoszacych.pl
@@ -44,6 +42,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Freshandeco
     group: business
     url: https://freshandeco.pl
@@ -52,6 +51,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Kosiarki Luba
     group: business
     url: https://kosiarkiluba.pl
@@ -60,6 +60,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Kosiarki do Trawy
     group: business
     url: https://kosiarkidotrawy.pl
@@ -68,6 +69,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Lorenz Estate
     group: business
     url: https://lorenzestate.com
@@ -76,6 +78,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Luba Polska
     group: business
     url: https://luba-polska.pl
@@ -84,6 +87,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Luba Mini
     group: business
     url: https://lubamini.pl
@@ -92,6 +96,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Parzonka.com
     group: business
     url: https://parzonka.com
@@ -100,6 +105,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Prestige.Garden
     group: business
     url: https://prestige.garden
@@ -108,6 +114,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Roboty Bezprzewodowe
     group: business
     url: https://robotybezprzewodowe.pl
@@ -116,6 +123,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Roboty Koszace
     group: business
     url: https://robotykoszace.eu
@@ -124,6 +132,7 @@ endpoints:
       dns-resolver: tcp://1.1.1.1:53
     conditions:
       - "[STATUS] == 200"
+
   - name: Yuka Polska
     group: business
     url: https://yuka-polska.pl
