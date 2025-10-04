@@ -27,9 +27,6 @@ spec:
         pullSecret: github-deploy-key
         ref: "refs/heads/upstream-changes"
         path: kubernetes/flux/cluster
-      commonMetadata:
-        labels:
-          app.kubernetes.io/name: flux
       kustomize:
         patches:
           - # Increase the number of workers
