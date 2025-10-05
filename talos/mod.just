@@ -26,6 +26,16 @@ download-image version="" node=controller:
         "https://factory.talos.dev/image/$schematic/$version/nocloud-amd64.iso"; \
     just log info "Downloaded Talos" version $version schematic $schematic
 
+[doc('Generate Talos machine image link')]
+get-image version="" node=controller:
+    if [ -z {{ version }} ]; then \
+        version=$(yq '.talosVersion' {{ talos_dir }}/talenv.yaml); \
+    else \
+        version='{{ version }}'; \
+    fi; \
+    schematic=$(just talos gen-schematic-id true {{ node }}); \
+    echo "https://factory.talos.dev/image/$schematic/$version/nocloud-amd64.iso"; \
+
 [doc('Generate config for Talos cluster')]
 gen-config:
     talhelper genconfig

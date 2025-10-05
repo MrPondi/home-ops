@@ -8,7 +8,7 @@ components:
 replacements:
   - path: ../../components/replacements/ks.yaml
 resources:
-  - ./amd-device-plugin/ks.yaml
+  # - ./amd-device-plugin/ks.yaml
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
   - ./metrics-server/ks.yaml
