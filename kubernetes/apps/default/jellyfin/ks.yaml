@@ -11,6 +11,8 @@ spec:
   dependsOn:
     - name: amd-device-plugin
       namespace: kube-system
+    - name: cloudflare-tunnel
+      namespace: network
     - name: rook-ceph-cluster
       namespace: rook-ceph
   interval: 1h
