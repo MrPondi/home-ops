@@ -11,3 +11,4 @@ resources:
   - ./gatus/ks.yaml
   - ./keda/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
+  - ./spoodermon/ks.yaml
