@@ -52,7 +52,7 @@ spec:
             bearerTokenSecret:
               name: &secret alertmanager-secret
               key: SPOODERMON_HEARTBEAT_TOKEN
-          url: "spoodermon.${SECRET_DOMAIN}/api/v1/endpoints/Heartbeat/external"
+          url: "https://spoodermon.${SECRET_DOMAIN}/api/v1/endpoints/_heartbeat/external?success=true"
     - name: pushover
       pushoverConfigs:
         - html: true

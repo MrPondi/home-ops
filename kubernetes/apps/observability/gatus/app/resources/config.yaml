@@ -9,6 +9,7 @@ ui:
   header: Status
   logo: https://avatars.githubusercontent.com/u/109785648
   link: https://github.com/MrPondi
+  default-sort-by: group
   buttons:
     - name: Github
       link: https://github.com/MrPondi
