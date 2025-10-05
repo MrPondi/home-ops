@@ -27,7 +27,7 @@ nodes:
     installDisk: "/dev/sda"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/8300f75b2a814d6f6e67f1c690d5e2e1feffaaa63bbab6d4946afc7d80210a28
+    talosImageURL: factory.talos.dev/installer/bfcdcc4aefa30b2da7014993374109c98a0c2e9cc8a54ba1c01923eb7c8abe17
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -41,23 +41,6 @@ nodes:
         mtu: 1500
         vip:
           ip: "10.0.30.10"
-          # - hostname: "orion-worker-01"
-          #   ipAddress: "10.0.30.31"
-          #   installDisk: "/dev/sda"
-          #   machineSpec:
-          #     secureboot: false
-          #   talosImageURL: factory.talos.dev/installer/d0c4d36428c0e3b79a0795c6dbd8c25afdcffaa1a6b806c5a783f688fb693b56
-          #   controlPlane: false
-          #   networkInterfaces:
-          #     - deviceSelector:
-          #         hardwareAddr: "bc:24:11:cd:f8:09"
-          #       dhcp: false
-          #       addresses:
-          #         - "10.0.30.31/24"
-          #       routes:
-          #         - network: "0.0.0.0/0"
-          #           gateway: "10.0.30.1"
-          #       mtu: 1500
 
 # Global patches
 patches:
