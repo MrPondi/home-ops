@@ -5,11 +5,10 @@ kind: HelmRelease
 metadata:
   name: rook-ceph-cluster
 spec:
-  interval: 1h
-  timeout: 15m
   chartRef:
     kind: OCIRepository
     name: rook-ceph-cluster
+  interval: 1h
   values:
     # monitoring:
     #   enabled: true
@@ -18,13 +17,21 @@ spec:
       enabled: true
     route:
       dashboard:
+        annotations:
+          gatus.home-operations.com/enabled: "true"
+          gatus.home-operations.com/endpoint: |-
+            conditions: ["len([BODY]) == 0"]
+            dns:
+              query-name: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+              query-type: A
+            url: 1.1.1.1
         host:
           name: "rook.${SECRET_DOMAIN}"
           path: /
           pathType: PathPrefix
         parentRefs:
-          - name: internal
-            namespace: kube-system
+          - name: envoy-internal
+            namespace: network
             sectionName: https
     cephClusterSpec:
       cephConfig:

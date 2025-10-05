@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: cilium
 spec:
-  interval: 1h
   chartRef:
     kind: OCIRepository
     name: cilium
+  interval: 1h
   values:
     autoDirectNodeRoutes: true
     bpf:
@@ -29,12 +29,7 @@ spec:
     endpointRoutes:
       enabled: true
     envoy:
-      rollOutPods: true
-      prometheus:
-        serviceMonitor:
-          enabled: true
-    gatewayAPI:
-      enabled: true
+      enabled: false
     hubble:
       enabled: false
     ipam:

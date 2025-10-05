@@ -5,10 +5,10 @@ kind: HelmRelease
 metadata:
   name: echo
 spec:
-  interval: 1h
   chartRef:
     kind: OCIRepository
     name: echo
+  interval: 1h
   values:
     controllers:
       echo:
@@ -64,8 +64,8 @@ spec:
         hostnames:
           - "{{ .Release.Name }}.${SECRET_DOMAIN}"
         parentRefs:
-          - name: external
-            namespace: kube-system
+          - name: envoy-external
+            namespace: network
             sectionName: https
         rules:
           - backendRefs:
