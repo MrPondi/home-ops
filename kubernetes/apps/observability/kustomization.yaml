@@ -16,3 +16,4 @@ resources:
   - ./loki/ks.yaml
   - ./silence-operator/ks.yaml
   - ./spoodermon/ks.yaml
+  - ./unpoller/ks.yaml

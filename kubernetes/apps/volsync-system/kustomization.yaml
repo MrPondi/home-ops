@@ -8,5 +8,5 @@ components:
 replacements:
   - path: ../../components/replacements/ks.yaml
 resources:
-  - ./kopia/ks.yaml
+  # - ./kopia/ks.yaml
   - ./volsync/ks.yaml
