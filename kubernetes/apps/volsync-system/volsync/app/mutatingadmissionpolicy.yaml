@@ -108,8 +108,8 @@ spec:
               value: Object.spec.template.spec.volumes{
                 name: "repository",
                 nfs: Object.spec.template.spec.volumes.nfs{
-                  server: "qnap.internal",
-                  path: "/VolsyncKopia"
+                  server: "qnap.local",
+                  path: "/mnt/terra/VolsyncKopia"
                 }
               }
             }
