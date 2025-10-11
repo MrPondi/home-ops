@@ -8,7 +8,7 @@ LEFTHOOK_OUTPUT = "false"
 
 [tools]
 "lefthook" = "1.13.6"
-"python" = "3.13"
+"python" = "3.14.0"
 "uv" = "latest"
 "pipx:flux-local" = "latest"
 "aqua:budimanjojo/talhelper" = "3.0.37"
