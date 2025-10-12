@@ -27,7 +27,7 @@ nodes:
     installDisk: "/dev/sda"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/bfcdcc4aefa30b2da7014993374109c98a0c2e9cc8a54ba1c01923eb7c8abe17
+    talosImageURL: factory.talos.dev/installer/d0c4d36428c0e3b79a0795c6dbd8c25afdcffaa1a6b806c5a783f688fb693b56
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
