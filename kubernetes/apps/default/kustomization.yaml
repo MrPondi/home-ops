@@ -7,6 +7,6 @@ components:
   - ../../components/namespace
 replacements:
   - path: ../../components/replacements/ks.yaml
-resources:
-  - ./jellyfin/ks.yaml
-  - ./home-assistant/ks.yaml
+resources: []
+  # - ./jellyfin/ks.yaml
+  # - ./home-assistant/ks.yaml

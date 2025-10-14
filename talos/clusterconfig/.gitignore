@@ -1,3 +1,2 @@
-kubernetes-orion-cp-01.yaml
-kubernetes-orion-worker-01.yaml
 talosconfig
+kubernetes-k8s-01.yaml
