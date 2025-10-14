@@ -22,7 +22,7 @@ cniConfig:
   name: none
 
 nodes:
-  - hostname: "orion-cp-01"
+  - hostname: "k8s-01"
     ipAddress: "10.0.30.21"
     installDisk: "/dev/sda"
     machineSpec:
