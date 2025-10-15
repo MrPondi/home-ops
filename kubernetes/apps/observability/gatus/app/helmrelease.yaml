@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       gatus:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -64,6 +65,12 @@ spec:
                 cpu: 100m
               limits:
                 memory: 256Mi
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              storageClass: ceph-block
+              accessMode: ReadWriteOnce
+              size: 5Gi
     defaultPodOptions:
       hostUsers: false
     service:
@@ -78,11 +85,10 @@ spec:
     route:
       app:
         annotations:
-          gatus.home-operations.com/endpoint: |-
-            conditions: ["[STATUS] == 200"]
+          gatus.home-operations.com/enabled: "false"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
-          - "status.pondi.dev"
+          - status.pondi.dev
         parentRefs:
           - name: envoy-external
             namespace: network
@@ -109,14 +115,6 @@ spec:
                 - get
                 - watch
                 - list
-            - apiGroups:
-                - networking.k8s.io
-              resources:
-                - ingresses
-              verbs:
-                - get
-                - watch
-                - list
       bindings:
         gatus:
           type: ClusterRoleBinding
@@ -127,8 +125,6 @@ spec:
     serviceAccount:
       gatus: {}
     persistence:
-      config:
-        type: emptyDir
       config-file:
         type: configMap
         name: "{{ .Release.Name }}-configmap"
