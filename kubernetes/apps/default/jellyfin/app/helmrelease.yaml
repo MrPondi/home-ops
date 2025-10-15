@@ -86,14 +86,5 @@ spec:
         globalMounts:
           - path: /media
             readOnly: true
-      tmpfs:
+      tmp:
         type: emptyDir
-        advancedMounts:
-          jellyfin:
-            app:
-              - path: /cache
-                subPath: cache
-              - path: /config/log
-                subPath: log
-              - path: /tmp
-                subPath: tmp
