@@ -65,16 +65,16 @@ wait:
 [doc('Apply Kubernetes namespaces')]
 namespaces:
     just log info "Running stage..." "stage" "$0"
-    find "{{ kubernetes_dir }}/apps" -mindepth 1 -maxdepth 1 -type d -printf "%f\n" | while IFS= read -r ns; do \
-        if ! kubectl create namespace "$ns" --dry-run=client -o yaml | kubectl apply --server-side --field-manager flux-client-side-apply -f -; then \
-            just log fatal "Failed to apply namespace" "stage" "$0" "namespace" "$ns"; \
+    find "{{ kubernetes_dir }}/apps" -mindepth 1 -maxdepth 1 -type d | while IFS= read -r dir; do \
+        if ! kustomize build "$dir" | yq ea -e 'select(.kind == "Namespace")' | kubectl apply --server-side --field-manager bootstrap --force-conflicts -f -; then \
+            just log fatal "Failed to apply namespace" "stage" "$0" "namespace" "$(basename "$dir")"; \
         fi; \
     done
 
 [doc('Apply Kubernetes resources')]
 resources:
     just log info "Running stage..." "stage" "$0"
-    if ! just template "{{ bootstrap_dir }}/resources.yaml.j2" | kubectl apply --server-side --field-manager flux-client-side-apply -f -; then \
+    if ! just template "{{ bootstrap_dir }}/resources.yaml.j2" | kubectl apply --server-side --field-manager bootstrap --force-conflicts -f -; then \
         just log fatal "Failed to apply resources" "stage" "$0"; \
     fi
 
@@ -82,24 +82,9 @@ resources:
 sops-secrets:
     just log info "Running stage..." "stage" "$0"
 
-    secrets=( \
-    "{{ justfile_directory() }}/bootstrap/github-deploy-key.sops.yaml" \
-    "{{ justfile_directory() }}/bootstrap/sops-age.sops.yaml" \
-    "{{ justfile_directory() }}/kubernetes/components/namespace/sops/cluster-secrets.sops.yaml" \
-    ); \
-    for secret in "${secrets[@]}"; do \
-        resource_name=$(basename "$secret" ".sops.yaml"); \
-        if sops exec-file "$secret" "kubectl --namespace flux-system diff --filename {}" &>/dev/null; then \
-            just log info "Sops secret resource is up-to-date: $resource_name"; \
-            continue; \
-        fi; \
-        if sops exec-file "$secret" "kubectl --namespace flux-system apply --server-side --field-manager flux-client-side-apply --filename {}" &>/dev/null; then \
-            just log info "Sops secret resource applied successfully: $resource_name"; \
-        else \
-            just log fatal "Failed to apply sops secret resource: $resource_name" "stage" "$0"; \
-            exit 1; \
-        fi; \
-    done
+    if ! sops exec-file "{{ bootstrap_dir }}/secrets.sops.yaml" kubectl apply --server-side --field-manager bootstrap --force-conflicts --filename {}" &>/dev/null; then \
+        just log fatal "Failed to apply sops secrets" "stage" "$0"; \
+    fi
 
 [doc('Apply Helmfile CRDs')]
 crds:
@@ -110,7 +95,7 @@ crds:
     if echo "${crds}" | kubectl diff -f - &>/dev/null; then \
         just log info "CRDs are up-to-date"; \
     else \
-        if ! echo "${crds}" | kubectl apply --server-side --field-manager flux-client-side-apply -f -; then \
+        if ! echo "${crds}" | kubectl apply --server-side --field-manager bootstrap --force-conflicts -f -; then \
             just log fatal "Failed to apply crds" "stage" "$0"; \
         fi; \
     fi
