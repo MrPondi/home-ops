@@ -6,7 +6,7 @@ metadata:
   name: grafana
 spec:
   hostnames:
-    - "grafana.${SECRET_DOMAIN}"
+    - "grafana.pondi.dev"
   parentRefs:
     - name: envoy-internal
       namespace: network
