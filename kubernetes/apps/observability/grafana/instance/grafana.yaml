@@ -24,7 +24,7 @@ spec:
     security:
       admin_user: admin
     server:
-      root_url: "https://grafana.${SECRET_DOMAIN}"
+      root_url: "https://grafana.pondi.dev"
   deployment:
     metadata:
       annotations:

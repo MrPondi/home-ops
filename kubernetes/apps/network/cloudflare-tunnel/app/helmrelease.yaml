@@ -73,13 +73,13 @@ spec:
         data:
           config.yaml: |-
             ingress:
-              - hostname: ${SECRET_DOMAIN}
+              - hostname: pondi.dev
                 originRequest:
-                  originServerName: ${SECRET_DOMAIN}
+                  originServerName: pondi.dev
                 service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:443
-              - hostname: "*.${SECRET_DOMAIN}"
+              - hostname: "*.pondi.dev"
                 originRequest:
-                  originServerName: external.${SECRET_DOMAIN}
+                  originServerName: external.pondi.dev
                 service: https://envoy-external.{{ .Release.Namespace }}.svc.cluster.local:443
               - service: http_status:404
     persistence:

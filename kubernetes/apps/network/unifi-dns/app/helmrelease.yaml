@@ -45,7 +45,7 @@ spec:
     txtPrefix: k8s.main.
     txtOwnerId: main
     domainFilters:
-      - "${SECRET_DOMAIN}"
+      - "pondi.dev"
     serviceMonitor:
       enabled: true
     podAnnotations:
