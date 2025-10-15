@@ -19,3 +19,6 @@ spec:
       enabled: true
       servicemonitor:
         enabled: true
+    webhook:
+      podDisruptionBudget:
+        enabled: true

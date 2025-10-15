@@ -10,26 +10,18 @@ spec:
     name: external-secrets
   interval: 1h
   values:
-    installCRDs: true
     leaderElect: true
     bitwarden-sdk-server:
       enabled: true
-    image:
-      repository: ghcr.io/external-secrets/external-secrets
-    webhook:
-      image:
-        repository: ghcr.io/external-secrets/external-secrets
-      serviceMonitor:
-        enabled: true
-        interval: 1m
-    certController:
-      image:
-        repository: ghcr.io/external-secrets/external-secrets
-      serviceMonitor:
-        enabled: true
-        interval: 1m
     serviceMonitor:
       enabled: true
-      interval: 1m
     grafanaDashboard:
       enabled: true
+      annotations:
+        grafana_folder: external-secrets
+    certController:
+      serviceMonitor:
+        enabled: true
+    webhook:
+      serviceMonitor:
+        enabled: true

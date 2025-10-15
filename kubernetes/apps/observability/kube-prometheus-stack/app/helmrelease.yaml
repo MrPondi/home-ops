@@ -12,12 +12,11 @@ spec:
   values:
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
-      enabled: true
       route:
         main:
           enabled: true
           hostnames:
-            - "alertmanager.pondi.dev"
+            - alertmanager.pondi.dev
           parentRefs:
             - name: envoy-internal
               namespace: network
@@ -27,7 +26,7 @@ spec:
           name: alertmanager
           global:
             resolveTimeout: 5m
-        externalUrl: "https://alertmanager.pondi.dev"
+        externalUrl: https://alertmanager.pondi.dev
         storage:
           volumeClaimTemplate:
             spec:
@@ -46,13 +45,13 @@ spec:
         main:
           enabled: true
           hostnames:
-            - "prometheus.pondi.dev"
+            - prometheus.pondi.dev
           parentRefs:
             - name: envoy-internal
               namespace: network
               sectionName: https
       prometheusSpec:
-        externalUrl: "https://prometheus.pondi.dev"
+        externalUrl: https://prometheus.pondi.dev
         version: v2.55.1 # override 'unsupported Prometheus version' error
         image:
           registry: docker.io
@@ -113,6 +112,15 @@ spec:
     grafana:
       enabled: false
       forceDeployDashboards: true
+      operator:
+        dashboardsConfigMapRefEnabled: true
+        folder: observability
+        matchLabels:
+          grafana.internal/instance: grafana
+      sidecar:
+        dashboards:
+          label: grafana_dashboard_ignored # GrafanaDashboard is used instead, don't conflict with k8s-sidecar
+          labelValue: "1"
     additionalPrometheusRulesMap:
       dockerhub-rules:
         groups:
