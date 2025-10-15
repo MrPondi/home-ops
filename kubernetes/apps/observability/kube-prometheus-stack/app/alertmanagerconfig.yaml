@@ -51,8 +51,10 @@ spec:
         - httpConfig:
             bearerTokenSecret:
               name: &secret alertmanager-secret
-              key: SPOODERMON_HEARTBEAT_TOKEN
-          url: "https://spoodermon.pondi.dev/api/v1/endpoints/_heartbeat/external?success=true"
+              key: BUDDY_HEARTBEAT_TOKEN
+          urlSecret:
+            name: *secret
+            key: BUDDY_HEARTBEAT_URL
     - name: pushover
       pushoverConfigs:
         - html: true
