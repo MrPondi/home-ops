@@ -23,7 +23,7 @@ spec:
         apiVersion: kustomize.toolkit.fluxcd.io/v1
         kind: Kustomization
         metadata:
-          name: not-used
+          name: _
         spec:
           decryption:
             provider: sops
@@ -33,7 +33,7 @@ spec:
                 apiVersion: helm.toolkit.fluxcd.io/v2
                 kind: HelmRelease
                 metadata:
-                  name: not-used
+                  name: _
                 spec:
                   install:
                     crds: CreateReplace
@@ -61,12 +61,13 @@ spec:
         apiVersion: kustomize.toolkit.fluxcd.io/v1
         kind: Kustomization
         metadata:
-          name: not-used
+          name: _
         spec:
           postBuild:
             substituteFrom:
               - kind: Secret
                 name: cluster-secrets
+                namespace: flux-system
       target:
         group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
