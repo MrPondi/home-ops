@@ -95,6 +95,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
       device   = "hostpci${hostpci.key}"
       id       = hostpci.value.id
       pcie     = true
+      rombar   = true
       rom_file = hostpci.value.rom_file
     }
   }
