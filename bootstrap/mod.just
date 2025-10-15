@@ -82,7 +82,7 @@ resources:
 sops-secrets:
     just log info "Running stage..." "stage" "$0"
 
-    if ! sops exec-file "{{ bootstrap_dir }}/secrets.sops.yaml" kubectl apply --server-side --field-manager bootstrap --force-conflicts --filename {}" &>/dev/null; then \
+    if ! sops exec-file "{{ bootstrap_dir }}/secrets.sops.yaml" "kubectl apply --server-side --field-manager bootstrap --force-conflicts --filename {}" &>/dev/null; then \
         just log fatal "Failed to apply sops secrets" "stage" "$0"; \
     fi
 
