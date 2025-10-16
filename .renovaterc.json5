@@ -22,7 +22,7 @@
   suppressNotifications: [
     "prEditedNotification",
     "prIgnoreNotification",
-  ]
+  ],
   ignorePaths: [
     "**/*.sops.*",
     "**/resources/**",
