@@ -8,7 +8,7 @@ spec:
   staticConfigs:
     - targets:
         - qnap.internal:9100
-        - ${VPS_IP}:9100
+        - contabo.external:9100
   metricsPath: /metrics
   relabelings:
     - action: replace
