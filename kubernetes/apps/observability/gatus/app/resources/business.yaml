@@ -1,0 +1,166 @@
+---
+alerting:
+  ntfy:
+    topic: ${BUSINESS_NTFY_TOPIC}
+    default-alert:
+      description: health-check failed
+      failure-threshold: 3
+      minimum-reminder-interval: 1h
+      send-on-resolved: true
+      success-threshold: 2
+    priority: 4
+    resolved-priority: 0
+    click: https://${STATUS_HOSTNAME}
+
+endpoints:
+  - name: Centrum Robotów
+    group: business
+    url: https://centrumrobotow.com
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Centrum Robotów Koszących
+    group: business
+    url: https://centrumrobotowkoszacych.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Freshandeco
+    group: business
+    url: https://freshandeco.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Kosiarki Luba
+    group: business
+    url: https://kosiarkiluba.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Kosiarki do Trawy
+    group: business
+    url: https://kosiarkidotrawy.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Lorenz Estate
+    group: business
+    url: https://lorenzestate.com
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Luba Polska
+    group: business
+    url: https://luba-polska.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Luba Mini
+    group: business
+    url: https://lubamini.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Parzonka.com
+    group: business
+    url: https://parzonka.com
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Prestige.Garden
+    group: business
+    url: https://prestige.garden
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Roboty Bezprzewodowe
+    group: business
+    url: https://robotybezprzewodowe.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Roboty Koszace
+    group: business
+    url: https://robotykoszace.eu
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Yuka Polska
+    group: business
+    url: https://yuka-polska.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Koncert Kopernika
+    group: business
+    url: https://koncertkopernika.org
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"

@@ -28,7 +28,7 @@ endpoints:
 
   - name: Status Page
     group: buddy
-    url: https://${BUDDY_STATUS_HOSTNAME}
+    url: https://${STATUS_HOSTNAME}
     interval: 1m
     ui:
       hide-url: true

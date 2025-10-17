@@ -12,6 +12,7 @@ configMapGenerator:
     files:
       - buddy.yaml=./resources/buddy.yaml
       - config.yaml=./resources/config.yaml
+      - business.yaml=./resources/business.yaml
 generatorOptions:
   disableNameSuffixHash: true
   annotations:

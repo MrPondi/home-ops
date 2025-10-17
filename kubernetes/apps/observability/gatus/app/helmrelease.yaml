@@ -133,3 +133,5 @@ spec:
             subPath: buddy.yaml
           - path: /config/config.yaml
             subPath: config.yaml
+          - path: /config/business.yaml
+            subPath: business.yaml
