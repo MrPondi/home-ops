@@ -156,6 +156,17 @@ endpoints:
     alerts:
       - type: ntfy
 
+  - name: Neo Mow Polska
+    group: business
+    url: https://neomow.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
   - name: Koncert Kopernika
     group: business
     url: https://koncertkopernika.org
