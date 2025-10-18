@@ -34,8 +34,6 @@ spec:
       exclusive: false
     dashboards:
       enabled: true
-      annotations:
-        grafana_folder: kube-system
     endpointRoutes:
       enabled: true
     envoy:
@@ -58,8 +56,6 @@ spec:
     operator:
       dashboards:
         enabled: true
-        annotations:
-          grafana_folder: kube-system
       prometheus:
         enabled: true
         serviceMonitor:
