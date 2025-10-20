@@ -7,7 +7,7 @@ LEFTHOOK_OUTPUT = "false"
 
 
 [tools]
-"lefthook" = "1.13.6"
+"lefthook" = "2.0.0"
 "python" = "3.14.0"
 "uv" = "latest"
 "pipx:flux-local" = "latest"
