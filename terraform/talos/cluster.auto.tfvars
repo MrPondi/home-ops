@@ -23,10 +23,9 @@ nodes = [
     disk_size = "50G",
     additional_disk_size = "400G",
     pci_devices = [ {
-      id       = "0000:01:00.0"
-      rom_file = "vbios_9955hx.bin"
+      id       = "0000:0a:00.0"
     }, {
-      id       = "0000:01:00.1"
+      id       = "0000:09:00.0"
     }]
   }
 ]
