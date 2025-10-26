@@ -1,16 +1,11 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/budimanjojo/talhelper/master/pkg/config/schemas/talconfig.json
 ---
-clusterName: kubernetes
+clusterName: main
 
 talosVersion: "${talosVersion}"
 kubernetesVersion: "${kubernetesVersion}"
 
-endpoint: https://10.0.30.10:6443
-additionalApiServerCertSans: &sans
-  - "127.0.0.1"
-  - "10.0.30.10"
-  - "k8s.pondi.dev"
-additionalMachineCertSans: *sans
+endpoint: https://k8s.internal:6443
 
 clusterPodNets:
   - "10.42.0.0/16"
@@ -44,12 +39,13 @@ nodes:
 
 # Global patches
 patches:
-  - "@./patches/global/machine-disks.yaml"
+  # - "@./patches/global/machine-disks.yaml"
   - "@./patches/global/machine-files.yaml"
   - "@./patches/global/machine-kubelet.yaml"
+  - "@./patches/global/machine-labels.yaml"
   - "@./patches/global/machine-network.yaml"
   - "@./patches/global/machine-sysctls.yaml"
-  - "@./patches/global/machine-time.yaml"
+  # - "@./patches/global/machine-time.yaml"
 
 # Controller patches
 controlPlane:

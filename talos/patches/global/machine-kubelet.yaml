@@ -2,6 +2,9 @@
 machine:
   kubelet:
     extraConfig:
+      featureGates:
+        ImageVolume: true
+        ResourceHealthStatus: true
       serializeImagePulls: false
     nodeIP:
       validSubnets:
