@@ -20,12 +20,12 @@ nodes = [
     mac_address = "BC:24:11:68:28:1C",
     cores = 16,
     memory = 1024*32,
-    disk_size = "50G",
+    disk_size = "100G",
     additional_disk_size = "400G",
     pci_devices = [ {
-      id       = "0000:0a:00.0"
+      id       = "0000:0a:00"
     }, {
-      id       = "0000:09:00.0"
+      id       = "0000:09:00"
     }]
   }
 ]

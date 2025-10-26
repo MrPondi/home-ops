@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: media
+
+components:
+  - ../../components/alerts
+
+resources:
+  - ./namespace.yaml
+  - ./autobrr/ks.yaml
+  - ./bazarr/ks.yaml
+  - ./cross-seed/ks.yaml
+  - ./jellyfin/ks.yaml
+  - ./jellyseerr/ks.yaml
+  - ./prowlarr/ks.yaml
+  - ./qbittorrent/ks.yaml
+  - ./qui/ks.yaml
+  - ./radarr/ks.yaml
+  - ./recyclarr/ks.yaml
+  - ./sonarr/ks.yaml
