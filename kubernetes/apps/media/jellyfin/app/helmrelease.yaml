@@ -85,10 +85,9 @@ spec:
       media:
         type: nfs
         server: qnap.internal
-        path: /mnt/terra/Media
+        path: /mnt/terra/Media/media
         globalMounts:
           - path: /media
-            subPath: media
             readOnly: true
       tmp:
         type: emptyDir
