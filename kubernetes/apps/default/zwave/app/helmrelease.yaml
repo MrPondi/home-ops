@@ -39,7 +39,7 @@ spec:
               limits:
                 memory: 512Mi
         pod:
-          hostUsers: false
+          hostUsers: true
     service:
       app:
         ports:
@@ -63,7 +63,7 @@ spec:
         type: emptyDir
       zwave-usb:
         type: hostPath
-        hostPath: /dev/serial/by-id/usb-Silicon_Labs_CP2102N_USB_to_UART_Bridge_Controller_208d946fa979ed11ba4ad30ffef7b791-if00-port0
+        hostPath: /dev/ttyUSB0
         hostPathType: CharDevice
         globalMounts:
           - path: /dev/zwave
