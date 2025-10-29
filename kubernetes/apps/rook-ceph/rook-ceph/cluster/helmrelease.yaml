@@ -17,6 +17,9 @@ spec:
       enabled: true
     route:
       dashboard:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            name: rook ceph
         host:
           name: "rook.pondi.dev"
           path: /

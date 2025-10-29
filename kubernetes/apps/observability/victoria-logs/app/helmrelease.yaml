@@ -19,6 +19,9 @@ spec:
         size: 20Gi
       route:
         enabled: true
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            name: victoria logs
         hostnames:
           - victoria-logs.pondi.dev
         parentRefs:
