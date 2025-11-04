@@ -46,13 +46,16 @@ spec:
             image:
               repository: python
               tag: 3.14-slim@sha256:e3782138420d9e87c16497320817db6ca8689e354d6150426dd6fc261f3fd682
+            env:
+              - name: PYTHONPATH
+                value: "/packages"
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - "sh"
-              - "-c"
-              - "PYTHONPATH=/packages python3 /app/main.py"
+              - "python"
+              - "-u"
+              - "/app/main.py"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
