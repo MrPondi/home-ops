@@ -52,7 +52,7 @@ spec:
             command:
               - "sh"
               - "-c"
-              - "PYTHONPATH=/packages python3 /app/main.py; sleep 3600"
+              - "PYTHONPATH=/packages python3 /app/main.py"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -110,9 +110,10 @@ spec:
           - path: /app
       secret-file:
         type: secret
-        name: college-timetable-secret
+        name: college-timetable-script
         globalMounts:
           - path: /app/main.py
+            subPath: main.py
       requirements-file:
         type: configMap
         identifier: requirements
