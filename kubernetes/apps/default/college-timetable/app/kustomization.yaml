@@ -5,5 +5,12 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
-  - ./main.sops.yaml
   - ./ocirepository.yaml
+configMapGenerator:
+  - name: college-timetable-configmap
+    files:
+      - config.py=./resources/config.py
+      - fetcher.py=./resources/fetcher.py
+      - parser.py=./resources/parser.py
+      - sync.py=./resources/sync.py
+      - populate_lecturers.py=./resources/populate_lecturers.py

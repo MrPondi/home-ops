@@ -11,10 +11,10 @@ spec:
   interval: 1h
   values:
     controllers:
-      college-timetable:
+      update-lecturers:
         type: cronjob
         cronjob:
-          schedule: 0 * * * *
+          schedule: 0 0 * * 1
           backoffLimit: 0
           concurrencyPolicy: Forbid
           successfulJobsHistory: 1
@@ -28,10 +28,13 @@ spec:
             command:
               - "pip3"
               - "install"
-              - "-r"
-              - "/config/requirements.txt"
               - "--target"
               - "/packages"
+              - "beautifulsoup4"
+              - "caldav"
+              - "httpx"
+              - "icalendar"
+              - "rich"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -55,7 +58,67 @@ spec:
             command:
               - "python"
               - "-u"
-              - "/app/main.py"
+              - "/app/populate_lecturers.py"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+        pod:
+          restartPolicy: Never
+
+      college-timetable:
+        type: cronjob
+        cronjob:
+          schedule: 0 * * * *
+          backoffLimit: 0
+          concurrencyPolicy: Forbid
+          successfulJobsHistory: 1
+          failedJobsHistory: 1
+          ttlSecondsAfterFinished: 86400
+        initContainers:
+          pip-install:
+            image:
+              repository: python
+              tag: 3.14-slim@sha256:e3782138420d9e87c16497320817db6ca8689e354d6150426dd6fc261f3fd682
+            command:
+              - "pip3"
+              - "install"
+              - "--target"
+              - "/packages"
+              - "beautifulsoup4"
+              - "caldav"
+              - "httpx"
+              - "icalendar"
+              - "rich"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+        containers:
+          app:
+            image:
+              repository: python
+              tag: 3.14-slim@sha256:e3782138420d9e87c16497320817db6ca8689e354d6150426dd6fc261f3fd682
+            env:
+              - name: PYTHONPATH
+                value: "/packages"
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            command:
+              - "python"
+              - "-u"
+              - "/app/sync.py"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -74,54 +137,28 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
-    configMaps:
-      requirements:
-        data:
-          requirements.txt: |-
-            anyio==4.11.0
-            beautifulsoup4==4.14.2
-            bs4==0.0.2
-            caldav==2.0.1
-            certifi==2025.10.5
-            charset-normalizer==3.4.4
-            click==8.3.0
-            colorama==0.4.6
-            h11==0.16.0
-            httpcore==1.0.9
-            httpx==0.28.1
-            icalendar==6.3.1
-            idna==3.11
-            lxml==6.0.2
-            python-dateutil==2.9.0.post0
-            recurring-ical-events==3.8.0
-            requests==2.32.5
-            six==1.17.0
-            sniffio==1.3.1
-            soupsieve==2.8
-            typing-extensions==4.15.0
-            tzdata==2025.2
-            urllib3==2.5.0
-            x-wr-timezone==2.0.1
     persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /data
       packages:
         type: emptyDir
         globalMounts:
           - path: /packages
-      app:
-        type: emptyDir
-        globalMounts:
-          - path: /app
-      secret-file:
-        type: secret
-        name: college-timetable-script
-        globalMounts:
-          - path: /app/main.py
-            subPath: main.py
-      requirements-file:
+      script:
         type: configMap
-        identifier: requirements
+        name: "{{ .Release.Name }}-configmap"
         globalMounts:
-          - path: /config/requirements.txt
-            subPath: requirements.txt
+          - path: /app/config.py
+            subPath: config.py
+          - path: /app/fetcher.py
+            subPath: fetcher.py
+          - path: /app/parser.py
+            subPath: parser.py
+          - path: /app/sync.py
+            subPath: sync.py
+          - path: /app/populate_lecturers.py
+            subPath: populate_lecturers.py
       tmp:
         type: emptyDir

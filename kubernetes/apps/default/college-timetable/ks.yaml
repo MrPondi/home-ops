@@ -5,8 +5,17 @@ kind: Kustomization
 metadata:
   name: college-timetable
 spec:
+  components:
+    - ../../../../components/volsync
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/default/college-timetable/app
+  postBuild:
+    substitute:
+      APP: college-timetable
+      VOLSYNC_CAPACITY: 256Mi
   prune: true
   sourceRef:
     kind: GitRepository
