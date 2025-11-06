@@ -8,8 +8,8 @@ import json
 import sys
 from pathlib import Path
 
-from src.config import Config
-from src.fetcher import PlanFetcher
+from config import Config
+from fetcher import PlanFetcher
 
 
 def populate_lecturers_template():
