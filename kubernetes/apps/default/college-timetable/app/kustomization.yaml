@@ -14,3 +14,5 @@ configMapGenerator:
       - parser.py=./resources/parser.py
       - sync.py=./resources/sync.py
       - populate_lecturers.py=./resources/populate_lecturers.py
+generatorOptions:
+  disableNameSuffixHash: true
