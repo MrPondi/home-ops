@@ -8,6 +8,9 @@ import json
 import sys
 from pathlib import Path
 
+from bs4 import BeautifulSoup
+from rich.progress import track
+
 from config import Config
 from fetcher import PlanFetcher
 
@@ -41,35 +44,59 @@ def populate_lecturers_template():
                 }
             print(f"Loaded {len(existing_mappings)} existing mappings")
         except json.JSONDecodeError:
-            print("Warning: Could not parse existing lecturers.json")
+            print(f"Warning: Could not parse existing file {lecturers_path}")
 
     # Merge: keep existing mappings, add new acronyms with placeholder
     output = {}
-    output["_comment"] = "Fill in the full names for each lecturer acronym"
-    output["_instructions"] = "Format: 'Acronym': 'Full Name (Title if applicable)'"
 
-    new_count = 0
-    for acronym in sorted(lecturers):
-        if acronym in existing_mappings:
-            output[acronym] = existing_mappings[acronym]
+    new_count, update_count = 0, 0
+    for acronym, lecturer_id in track(
+        sorted(lecturers.items()), description="Processing acronyms ..."
+    ):
+        full_name = get_lecturer_full_name(lecturer_id, fetcher)
+        if acronym in existing_mappings and existing_mappings[acronym] != full_name:
+            print(
+                f"Replacing existing mapping for {acronym}: {existing_mappings[acronym]} -> {full_name}"
+            )
+            update_count += 1
         else:
-            output[acronym] = f"TODO: Fill in full name for {acronym}"
+            print(f"Adding new mapping: {acronym} -> {full_name}")
             new_count += 1
+        output[acronym] = full_name
 
     # Write to file
     with open(lecturers_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
     print(f"\n✓ Updated {lecturers_path}")
-    print(f"  - Existing mappings: {len(existing_mappings)}")
-    print(f"  - New acronyms to fill: {new_count}")
-    print(f"  - Total entries: {len(output) - 2}")  # -2 for comment fields
+    print(f"  - Unchanged mappings: {len(existing_mappings) - update_count}")
+    print(f"  - Updated acronyms: {update_count}")
+    print(f"  - New acronyms: {new_count}")
+    print(f"  - Total entries: {len(output)}")
 
-    if new_count > 0:
-        print(f"\n⚠ Please edit {lecturers_path} and fill in the full names")
-        print("   Look for entries starting with 'TODO:'")
-    else:
-        print("\n✓ All lecturer acronyms already have mappings!")
+
+def get_lecturer_full_name(id: int, fetcher: PlanFetcher) -> str:
+    """
+    Fetch and parse the legend to get the full name of a lecturer by their ID.
+
+    Args:
+        id (int): The ID of the lecturer.
+        fetcher (PlanFetcher): The PlanFetcher instance to use for fetching data.
+
+    Returns:
+        str: The full name of the lecturer, or "Unknown" if not found.
+    """
+    ics_file = fetcher.fetch_plan(
+        id, 10, {"winW": 2544, "winH": 1263, "loadBG": 000000}
+    ).decode("iso-8859-2")
+
+    soup = BeautifulSoup(ics_file, "html.parser")
+    return (
+        soup.select("html body div div.title")[1]
+        .text.strip()
+        .split(" - ")[1]
+        .rsplit(", ", 3)[0]
+    )
 
 
 def validate_lecturers_file():
@@ -79,14 +106,14 @@ def validate_lecturers_file():
     lecturers_path = Path(config.lecturers_json_path)
 
     if not lecturers_path.exists():
-        print(f"❌ File not found: {lecturers_path}")
+        print(f"File not found: {lecturers_path}")
         return False
 
     try:
         with open(lecturers_path, "r", encoding="utf-8") as f:
             data = json.load(f)
     except json.JSONDecodeError as e:
-        print(f"❌ Invalid JSON: {e}")
+        print(f"Invalid JSON: {e}")
         return False
 
     # Check for TODO entries
@@ -95,7 +122,7 @@ def validate_lecturers_file():
     ]
 
     if todo_entries:
-        print(f"⚠ Found {len(todo_entries)} incomplete entries:")
+        print(f"Found {len(todo_entries)} incomplete entries:")
         for entry in todo_entries[:5]:  # Show first 5
             print(f"  - {entry}: {data[entry]}")
         if len(todo_entries) > 5:
@@ -103,7 +130,7 @@ def validate_lecturers_file():
         return False
 
     valid_entries = [k for k in data.keys() if not k.startswith("_")]
-    print(f"✓ Valid lecturers.json with {len(valid_entries)} mappings")
+    print(f"✅ Valid lecturers.json with {len(valid_entries)} mappings")
     return True
 
 
@@ -117,13 +144,6 @@ def main():
         print("Lecturer Mapping Helper")
         print("=" * 60)
         populate_lecturers_template()
-        print("\n" + "=" * 60)
-        print("Next steps:")
-        print("1. Open lecturers.json")
-        print("2. Replace 'TODO: ...' entries with actual full names")
-        print("3. Run: python populate_lecturers.py validate")
-        print("4. Run your sync script")
-        print("=" * 60)
 
 
 if __name__ == "__main__":

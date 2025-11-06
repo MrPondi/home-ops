@@ -19,7 +19,7 @@ from fetcher import PlanFetcher
 from parser import EventParser
 
 logging.basicConfig(
-    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -301,7 +301,7 @@ class ICSCalDAVSync:
                                 lineterm="",
                             )
                         )
-                        logger.debug(f"Event update diff: {diff}")
+                        logger.debug(f"Event update diff: \n{diff}")
                         if self.config.dry_run:
                             logger.info(f"[DRY RUN] Would update event: {uid}")
                         else:
