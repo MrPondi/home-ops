@@ -10,6 +10,8 @@
   color: "0e8a16"
 - name: area/mise
   color: "0e8a16"
+- name: area/just
+  color: "0e8a16"
 - name: area/renovate
   color: "0e8a16"
 - name: area/talos
