@@ -24,7 +24,7 @@ spec:
           pip-install:
             image:
               repository: python
-              tag: 3.14-slim@sha256:e3782138420d9e87c16497320817db6ca8689e354d6150426dd6fc261f3fd682
+              tag: 3.14-slim@sha256:9813eecff3a08a6ac88aea5b43663c82a931fd9557f6aceaa847f0d8ce738978
             command:
               - "pip3"
               - "install"
@@ -48,7 +48,7 @@ spec:
           app:
             image:
               repository: python
-              tag: 3.14-slim@sha256:e3782138420d9e87c16497320817db6ca8689e354d6150426dd6fc261f3fd682
+              tag: 3.14-slim@sha256:9813eecff3a08a6ac88aea5b43663c82a931fd9557f6aceaa847f0d8ce738978
             env:
               - name: PYTHONPATH
                 value: "/packages"
@@ -84,7 +84,7 @@ spec:
           pip-install:
             image:
               repository: python
-              tag: 3.14-slim@sha256:e3782138420d9e87c16497320817db6ca8689e354d6150426dd6fc261f3fd682
+              tag: 3.14-slim@sha256:9813eecff3a08a6ac88aea5b43663c82a931fd9557f6aceaa847f0d8ce738978
             command:
               - "pip3"
               - "install"
@@ -108,7 +108,7 @@ spec:
           app:
             image:
               repository: python
-              tag: 3.14-slim@sha256:e3782138420d9e87c16497320817db6ca8689e354d6150426dd6fc261f3fd682
+              tag: 3.14-slim@sha256:9813eecff3a08a6ac88aea5b43663c82a931fd9557f6aceaa847f0d8ce738978
             env:
               - name: PYTHONPATH
                 value: "/packages"
