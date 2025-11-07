@@ -19,6 +19,11 @@ area/mise:
   - changed-files:
       - any-glob-to-any-file:
           - .mise.toml
+area/just:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .justfile
+          - .just
 area/renovate:
   - changed-files:
       - any-glob-to-any-file:
