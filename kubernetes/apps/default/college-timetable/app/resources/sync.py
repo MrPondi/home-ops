@@ -8,18 +8,19 @@ import difflib
 import hashlib
 import logging
 import re
+import sys
+from parser import EventParser
 from typing import Dict, Tuple
 
 import caldav
+from caldav.lib.error import AuthorizationError
 from icalendar import Calendar
 from rich.progress import track
 
 from config import Config
-from fetcher import PlanFetcher
-from parser import EventParser
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -36,10 +37,13 @@ class ICSCalDAVSync:
         self.client = caldav.DAVClient(
             url=config.caldav_url, username=config.username, password=config.password
         )
-        self.principal = self.client.principal()
+        try:
+            self.principal = self.client.principal()
+        except AuthorizationError as e:
+            logger.error(f"Failed access caldav server: {str(e).split(', reason ')[1]}")
+            sys.exit(1)
         self.calendars = None
-        self.fetcher = PlanFetcher(config.course_id)
-        self.parser = EventParser(config.lecturers_json_path)
+        self.parser = EventParser(config)
 
     def get_or_create_calendars(self) -> list[caldav.Calendar]:
         """Get existing calendars or create new ones."""
@@ -65,104 +69,6 @@ class ICSCalDAVSync:
                     found_calendars.append(new_cal)
 
         return found_calendars
-
-    def parse_ics_file(
-        self, server_events: Dict[int, Dict[str, Tuple[caldav.Event, str]]]
-    ) -> Dict[int, Dict[str, Tuple[str, str, str]]]:
-        """
-        Parse ICS file and extract events.
-
-        Returns:
-            Dict mapping calendar_index -> {UID: (event_data, content_hash)}
-        """
-        events = {i: {} for i in range(len(self.config.calendar_names))}
-
-        logger.info("Fetching ICS file")
-        ical_content = self.fetcher.fetch_ics()
-        cal = Calendar.from_ical(ical_content)
-
-        logger.info("Getting timetable HTML")
-        timetable_html = self.fetcher.fetch_timetable_html()
-
-        logger.debug("Parsing short names")
-        shortnames = self.fetcher.get_all_short_names(
-            timetable_html, self.config.skip_holidays
-        )
-
-        logger.debug("Parsing lecturers")
-        lecturers = self.fetcher.get_all_lecturers(timetable_html)
-
-        for component in cal.walk():
-            if component.name != "VEVENT":
-                continue
-
-            # Parse the event
-            parsed_event = self.parser.parse_event(
-                component, shortnames, lecturers, self.config.skip_holidays
-            )
-
-            if not parsed_event:
-                continue  # Event was skipped
-
-            # Determine which calendar this event belongs to
-            if len(self.config.calendar_names) > 1 and parsed_event["type"] != "wyk":
-                calendar_idx = 1
-            else:
-                calendar_idx = 0
-
-            # Update component with parsed data
-            component["summary"] = parsed_event["summary"]
-            component.add("description", parsed_event["description"])
-            component.add("location", self.config.default_location)
-
-            uid = str(component.get("uid"))
-
-            component_hash = component.copy()
-            if uid in set(server_events[calendar_idx].keys()):
-                for server_component in Calendar.from_ical(
-                    server_events[calendar_idx][uid][0].data.strip("\n")
-                ).walk():
-                    if server_component.name == "VEVENT":
-                        component_hash["dtstamp"] = server_component.get(
-                            "dtstamp", component["dtstart"]
-                        )
-                        component_hash["sequence"] = server_component.get("sequence", 1)
-                        component["sequence"] = server_component.get("sequence", 0) + 1
-                        break
-            else:
-                component_hash["dtstamp"] = component["dtstart"]
-
-            event_str = component.to_ical().decode("utf-8")
-            event_str_hash = component_hash.to_ical().decode("utf-8")
-
-            # Wrap in VCALENDAR if not already
-            if not event_str.startswith("BEGIN:VCALENDAR"):
-                vcal = Calendar()
-                vcal.add("prodid", "-//ATS4 Sync//PL")
-                vcal.add("version", "2.0")
-                vcal_hash = vcal.copy()
-                vcal.add_component(component)
-                vcal_hash.add_component(component_hash)
-                event_str = vcal.to_ical().decode("utf-8")
-                event_str_hash = vcal_hash.to_ical().decode("utf-8")
-
-            event_str = re.sub(r"\r\n?", "\n", event_str).strip()
-            # Canonicalize the event string for hashing
-            event_str_hash = re.sub(r"(?:\r?\n)[ \t]", "", event_str_hash)
-            event_str_hash = re.sub(r"\r\n?", "\n", event_str_hash).strip()
-
-            # Create hash for change detection
-            content_hash = hashlib.md5(event_str_hash.encode()).hexdigest()
-
-            events[calendar_idx][uid] = (
-                event_str.strip(),
-                event_str_hash.strip(),
-                content_hash,
-            )
-
-        total_events = sum(len(e) for e in events.values())
-        logger.info(f"Parsed {total_events} events from ICS file")
-        return events
 
     def get_server_events(self) -> Dict[int, Dict[str, Tuple[caldav.Event, str]]]:
         """
@@ -225,7 +131,7 @@ class ICSCalDAVSync:
         server_events = self.get_server_events()
 
         # Parse local ICS file
-        local_events = self.parse_ics_file(server_events)
+        local_events = self.parser.parse_ics_file(server_events)
 
         # Sync each calendar
         for i in range(len(self.calendars)):
@@ -262,24 +168,25 @@ class ICSCalDAVSync:
                 description=f"Creating events in {self.config.calendar_names[i]}",
             ):
                 try:
-                    event_data, event_diff_data, _ = local_cal_events[uid]
-                    if summary := next(
+                    event = local_cal_events[uid]
+                    summary = next(
                         (
                             line.split("SUMMARY:")[1]
-                            for line in event_diff_data.splitlines()
+                            for line in event.event_str_hash.splitlines()
                             if line.startswith("SUMMARY:")
                         ),
-                        "<not found>",
-                    ):
-                        logger.debug(f"Creating event: {summary}")
+                        "",
+                    )
                     if self.config.dry_run:
-                        logger.debug(f"[DRY RUN] Would create event: {uid}")
+                        logger.debug(f"[DRY RUN] Would create event: {summary} ({uid})")
                     else:
-                        self.calendars[i].save_event(event_data)
-                        logger.debug(f"✓ Created event: {uid}")
+                        self.calendars[i].save_event(event.event_str)
+                        logger.debug(f"✓ Created event: {summary} ({uid})")
                     stats["created"] += 1
                 except Exception as e:
                     logger.error(f"✗ Error creating event {uid}: {e}")
+                    event_data = local_cal_events[uid].event_str
+                    logger.debug(f"Event data:\n{event_data}")
                     stats["errors"] += 1
 
             # Check and update existing events
@@ -288,24 +195,22 @@ class ICSCalDAVSync:
                 description=f"Checking updates in {self.config.calendar_names[i]}",
             ):
                 try:
-                    local_data, local_diff_data, local_hash = local_cal_events[uid]
+                    local_event = local_cal_events[uid]
                     server_event, server_hash = server_cal_events[uid]
 
-                    if local_hash != server_hash:
+                    if local_event.event_str_hash != server_hash:
                         diff = "\n".join(
                             difflib.unified_diff(
                                 server_event.data.splitlines(),
-                                local_diff_data.splitlines(),
-                                fromfile="server_event",
-                                tofile="local_event",
+                                local_event.event_str_hash.splitlines(),
                                 lineterm="",
                             )
                         )
-                        logger.debug(f"Event update diff: \n{diff}")
+                        logger.debug(f"Event update diff: {diff}")
                         if self.config.dry_run:
                             logger.info(f"[DRY RUN] Would update event: {uid}")
                         else:
-                            server_event.data = local_data
+                            server_event.data = local_event.event_str
                             server_event.save()
                             logger.debug(f"✓ Updated event: {uid}")
                         stats["updated"] += 1
@@ -322,20 +227,19 @@ class ICSCalDAVSync:
             ):
                 try:
                     server_event, _ = server_cal_events[uid]
-                    if summary := next(
+                    summary = next(
                         (
                             line.split("SUMMARY:")[1]
                             for line in server_event.data.splitlines()
                             if line.startswith("SUMMARY:")
                         ),
-                        "<not found>",
-                    ):
-                        logger.debug(f"Deleting event: {summary}")
+                        "",
+                    )
                     if self.config.dry_run:
-                        logger.info(f"[DRY RUN] Would delete event: {uid}")
+                        logger.info(f"[DRY RUN] Would delete event: {summary} ({uid})")
                     else:
                         server_event.delete()
-                        logger.debug(f"✓ Deleted event: {uid}")
+                        logger.debug(f"✓ Deleted event: {summary} ({uid})")
                     stats["deleted"] += 1
                 except Exception as e:
                     logger.error(f"✗ Error deleting event {uid}: {e}")

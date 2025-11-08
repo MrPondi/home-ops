@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
 Helper script to populate lecturers.json with all lecturer acronyms found in the schedule.
-Run this once to get a template with all acronyms, then manually fill in the full names.
 """
 
 import json
-import sys
 from pathlib import Path
 
 from bs4 import BeautifulSoup
@@ -46,7 +44,7 @@ def populate_lecturers_template():
         except json.JSONDecodeError:
             print(f"Warning: Could not parse existing file {lecturers_path}")
 
-    # Merge: keep existing mappings, add new acronyms with placeholder
+    # Merge: keep existing mappings
     output = {}
 
     new_count, update_count = 0, 0
@@ -63,7 +61,9 @@ def populate_lecturers_template():
             print(f"Adding new mapping: {acronym} -> {full_name}")
             new_count += 1
         output[acronym] = full_name
+        existing_mappings.pop(acronym, None)
 
+    output.update(existing_mappings)  # Add unchanged mappings at the end
     # Write to file
     with open(lecturers_path, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
@@ -95,55 +95,18 @@ def get_lecturer_full_name(id: int, fetcher: PlanFetcher) -> str:
         soup.select("html body div div.title")[1]
         .text.strip()
         .split(" - ")[1]
-        .rsplit(", ", 3)[0]
+        .rsplit(", ", 2)[0]
     )
-
-
-def validate_lecturers_file():
-    """Validate lecturers.json file"""
-
-    config = Config.from_env()
-    lecturers_path = Path(config.lecturers_json_path)
-
-    if not lecturers_path.exists():
-        print(f"File not found: {lecturers_path}")
-        return False
-
-    try:
-        with open(lecturers_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-    except json.JSONDecodeError as e:
-        print(f"Invalid JSON: {e}")
-        return False
-
-    # Check for TODO entries
-    todo_entries = [
-        k for k, v in data.items() if isinstance(v, str) and v.startswith("TODO:")
-    ]
-
-    if todo_entries:
-        print(f"Found {len(todo_entries)} incomplete entries:")
-        for entry in todo_entries[:5]:  # Show first 5
-            print(f"  - {entry}: {data[entry]}")
-        if len(todo_entries) > 5:
-            print(f"  ... and {len(todo_entries) - 5} more")
-        return False
-
-    valid_entries = [k for k in data.keys() if not k.startswith("_")]
-    print(f"✅ Valid lecturers.json with {len(valid_entries)} mappings")
-    return True
 
 
 def main():
     """Main entry point"""
 
-    if len(sys.argv) > 1 and sys.argv[1] == "validate":
-        validate_lecturers_file()
-    else:
-        print("=" * 60)
-        print("Lecturer Mapping Helper")
-        print("=" * 60)
-        populate_lecturers_template()
+    print("=" * 60)
+    print("Lecturer Mapper")
+    print("=" * 60)
+
+    populate_lecturers_template()
 
 
 if __name__ == "__main__":
