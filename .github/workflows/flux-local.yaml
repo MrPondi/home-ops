@@ -19,16 +19,19 @@ jobs:
     name: Flux Local - Filter
     runs-on: ubuntu-latest
     outputs:
-      changed-files: ${{ steps.changed-files.outputs.changed_files }}
+      any_changed: ${{ steps.changed-files.outputs.any_changed }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
       - name: Get Changed Files
         id: changed-files
-        uses: bjw-s-labs/action-changed-files@1a5aeab1bfa64d0c4e786f501d5a3f1fad4a24da # v0.4.1
+        uses: tj-actions/changed-files@24d32ffd492484c1d75e0c0b894501ddb9d30d62 # v47.0.0
         with:
-          patterns: kubernetes/**/*
+          files: kubernetes/**
 
   test:
-    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    if: ${{ needs.filter.outputs.any_changed == 'true' }}
     needs: filter
     name: Flux Local - Test
     runs-on: ubuntu-latest
@@ -47,7 +50,7 @@ jobs:
             --verbose
 
   diff:
-    if: ${{ needs.filter.outputs.changed-files != '[]' }}
+    if: ${{ needs.filter.outputs.any_changed == 'true' }}
     needs: filter
     name: Flux Local - Diff
     runs-on: ubuntu-latest
