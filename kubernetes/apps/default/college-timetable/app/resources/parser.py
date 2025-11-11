@@ -164,7 +164,7 @@ class EventParser:
 
         for lecturer_acronym in lecturers:
             # Use consistent mapping source
-            full_name = timetable_data.lecturers.get(lecturer_acronym, lecturer_acronym)
+            full_name = self.lecturers_map.get(lecturer_acronym, lecturer_acronym)
             result["lecturer"].append(full_name)
 
         # Extract all locations
