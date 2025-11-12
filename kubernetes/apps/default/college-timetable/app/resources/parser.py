@@ -8,9 +8,9 @@ import logging
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Set
 
-import caldav
+from caldav import Event
 from icalendar import Calendar, Component
 
 from config import Config
@@ -35,6 +35,13 @@ class ParsedIcsEvent:
     event_str: str
     event_str_hash: str
     content_hash: str
+
+
+@dataclass
+class ParsedServerEvent(ParsedIcsEvent):
+    """Represents a parsed calendar event along with its Event object."""
+
+    event: Event
 
 
 @dataclass
@@ -275,7 +282,7 @@ class EventParser:
 
     def parse_ics_file(
         self,
-        server_events: Dict[int, Dict[str, Tuple[caldav.Event, str]]],
+        server_events: Dict[int, Dict[str, ParsedServerEvent]],
     ) -> Dict[int, Dict[str, ParsedIcsEvent]]:
         """
         Parse ICS file and extract events.
@@ -340,7 +347,7 @@ class EventParser:
         self,
         component,
         timetable_data: TimetableData,
-        server_events: Dict[int, Dict[str, Tuple[caldav.Event, str]]],
+        server_events: Dict[int, Dict[str, ParsedServerEvent]],
         events: Dict[int, Dict[str, ParsedIcsEvent]],
     ) -> None:
         """Process a single event component."""
@@ -393,7 +400,7 @@ class EventParser:
         component,
         uid: str,
         calendar_idx: int,
-        server_events: Dict[int, Dict[str, Tuple[caldav.Event, str]]],
+        server_events: Dict[int, Dict[str, ParsedServerEvent]],
     ) -> ParsedIcsEvent:
         """
         Create a ParsedEvent with proper versioning and hashing.
@@ -438,10 +445,10 @@ class EventParser:
         component_hash,
         uid: str,
         calendar_idx: int,
-        server_events: Dict[int, Dict[str, Tuple[caldav.Event, str]]],
+        server_events: Dict[int, Dict[str, ParsedServerEvent]],
     ) -> None:
         """Apply metadata from existing server event (sequence number, dtstamp)."""
-        server_event_data = server_events[calendar_idx][uid][0].data.strip("\n")
+        server_event_data = server_events[calendar_idx][uid].event_str.strip("\n")
         server_cal = Calendar.from_ical(server_event_data)
 
         for server_component in server_cal.walk():

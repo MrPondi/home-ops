@@ -9,8 +9,7 @@ import hashlib
 import logging
 import re
 import sys
-from parser import EventParser
-from typing import Dict, Tuple
+from typing import Dict
 
 import caldav
 from caldav.lib.error import AuthorizationError
@@ -18,6 +17,7 @@ from icalendar import Calendar
 from rich.progress import track
 
 from config import Config
+from parser import EventParser, ParsedServerEvent
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -70,12 +70,12 @@ class ICSCalDAVSync:
 
         return found_calendars
 
-    def get_server_events(self) -> Dict[int, Dict[str, Tuple[caldav.Event, str]]]:
+    def get_server_events(self) -> Dict[int, Dict[str, ParsedServerEvent]]:
         """
         Get all events from CalDAV server.
 
         Returns:
-            Dict mapping calendar_index -> {UID: (event_object, content_hash)}
+            Dict mapping calendar_index -> {UID: ParsedServerEvent}
         """
         if not self.calendars:
             raise ValueError("Calendars not initialized")
@@ -98,7 +98,12 @@ class ICSCalDAVSync:
 
                             content_hash = hashlib.md5(ical_data.encode()).hexdigest()
                             uid = str(component.get("uid"))
-                            server_events[idx][uid] = (event, content_hash)
+                            server_events[idx][uid] = ParsedServerEvent(
+                                event=event,
+                                event_str=event.data,
+                                event_str_hash=ical_data,
+                                content_hash=content_hash,
+                            )
                             break
                 except Exception as e:
                     logger.error(f"Error reading server event: {e}")
@@ -186,7 +191,7 @@ class ICSCalDAVSync:
                 except Exception as e:
                     logger.error(f"✗ Error creating event {uid}: {e}")
                     event_data = local_cal_events[uid].event_str
-                    logger.debug(f"Event data:\n{event_data}")
+                    logger.debug(f"Event data:\n{repr(event_data)}")
                     stats["errors"] += 1
 
             # Check and update existing events
@@ -196,12 +201,12 @@ class ICSCalDAVSync:
             ):
                 try:
                     local_event = local_cal_events[uid]
-                    server_event, server_hash = server_cal_events[uid]
+                    server_event = server_cal_events[uid]
 
-                    if local_event.event_str_hash != server_hash:
+                    if local_event.content_hash != server_event.content_hash:
                         diff = "\n".join(
                             difflib.unified_diff(
-                                server_event.data.splitlines(),
+                                server_event.event_str_hash.splitlines(),
                                 local_event.event_str_hash.splitlines(),
                                 lineterm="",
                             )
@@ -210,8 +215,8 @@ class ICSCalDAVSync:
                         if self.config.dry_run:
                             logger.info(f"[DRY RUN] Would update event: {uid}")
                         else:
-                            server_event.data = local_event.event_str
-                            server_event.save()
+                            server_event.event_str = local_event.event_str
+                            server_event.event.save()
                             logger.debug(f"✓ Updated event: {uid}")
                         stats["updated"] += 1
                     else:
@@ -226,11 +231,11 @@ class ICSCalDAVSync:
                 description=f"Deleting events from {self.config.calendar_names[i]}",
             ):
                 try:
-                    server_event, _ = server_cal_events[uid]
+                    server_event = server_cal_events[uid]
                     summary = next(
                         (
                             line.split("SUMMARY:")[1]
-                            for line in server_event.data.splitlines()
+                            for line in server_event.event_str_hash.splitlines()
                             if line.startswith("SUMMARY:")
                         ),
                         "",
@@ -238,11 +243,13 @@ class ICSCalDAVSync:
                     if self.config.dry_run:
                         logger.info(f"[DRY RUN] Would delete event: {summary} ({uid})")
                     else:
-                        server_event.delete()
+                        server_event.event.delete()
                         logger.debug(f"✓ Deleted event: {summary} ({uid})")
                     stats["deleted"] += 1
                 except Exception as e:
                     logger.error(f"✗ Error deleting event {uid}: {e}")
+                    event_data = server_cal_events[uid].event_str
+                    logger.debug(f"Event data:\n{repr(event_data)}")
                     stats["errors"] += 1
 
         # Print summary

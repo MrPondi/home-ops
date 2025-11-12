@@ -52,11 +52,12 @@ def populate_lecturers_template():
         sorted(lecturers.items()), description="Processing acronyms ..."
     ):
         full_name = get_lecturer_full_name(lecturer_id, fetcher)
-        if acronym in existing_mappings and existing_mappings[acronym] != full_name:
-            print(
-                f"Replacing existing mapping for {acronym}: {existing_mappings[acronym]} -> {full_name}"
-            )
-            update_count += 1
+        if acronym in existing_mappings:
+            if existing_mappings[acronym] != full_name:
+                print(
+                    f"Replacing existing mapping for {acronym}: {existing_mappings[acronym]} -> {full_name}"
+                )
+                update_count += 1
         else:
             print(f"Adding new mapping: {acronym} -> {full_name}")
             new_count += 1
@@ -91,12 +92,16 @@ def get_lecturer_full_name(id: int, fetcher: PlanFetcher) -> str:
     ).decode("iso-8859-2")
 
     soup = BeautifulSoup(ics_file, "html.parser")
-    return (
+    fullname = (
         soup.select("html body div div.title")[1]
         .text.strip()
         .split(" - ")[1]
         .rsplit(", ", 2)[0]
     )
+    if ", prof." in fullname:
+        fullname = f"prof. {fullname.split(', prof. ', 1)[1]}"
+
+    return fullname if fullname else "Unknown"
 
 
 def main():

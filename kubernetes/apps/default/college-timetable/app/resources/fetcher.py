@@ -5,6 +5,8 @@ Handles fetching data from the plan.polsl.pl website.
 import logging
 import re
 import ssl
+import time
+from functools import wraps
 from typing import Dict, Optional, Set
 
 import httpx
@@ -23,6 +25,44 @@ class PlanFetcher:
         self.course_id = course_id
         self.ssl_context = ssl.create_default_context()
         self.ssl_context.set_ciphers("DEFAULT@SECLEVEL=1")
+        self.max_retries: int = 3
+        self.base_delay: float = 1.0
+
+    def _retry_with_backoff(self, func):
+        """Decorator that implements exponential backoff retry logic"""
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+
+            for attempt in range(self.max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except (
+                    httpx.ReadTimeout,
+                    httpx.ConnectTimeout,
+                    httpx.TimeoutException,
+                ) as e:
+                    last_exception = e
+                    if attempt < self.max_retries - 1:
+                        # Exponential backoff: 1s, 2s, 4s, etc.
+                        delay = self.base_delay * (2**attempt)
+                        print(
+                            f"Timeout on attempt {attempt + 1}/{self.max_retries}. "
+                            f"Retrying in {delay:.1f}s..."
+                        )
+                        time.sleep(delay)
+                    else:
+                        print(f"All {self.max_retries} attempts failed.")
+                except httpx.HTTPStatusError:
+                    # Don't retry on HTTP errors (4xx, 5xx)
+                    raise
+
+            # If we get here, all retries failed
+            if last_exception is not None:
+                raise last_exception
+
+        return wrapper
 
     def fetch_plan(
         self,
@@ -31,7 +71,7 @@ class PlanFetcher:
         additional_params: dict = {},
     ) -> bytes:
         """
-        Fetch plan data from the server.
+        Fetch plan data from the server with automatic retries.
 
         Args:
             id: Course or lecturer ID (defaults to course_id)
@@ -40,31 +80,34 @@ class PlanFetcher:
 
         Returns:
             Raw response content as bytes
+
+        Raises:
+            httpx.TimeoutException: If all retry attempts fail
+            httpx.HTTPStatusError: If server returns error status
         """
         if id is None:
             id = self.course_id
 
-        params = {
-            "type": type,
-            "id": id,
-        }
+        @self._retry_with_backoff
+        def _fetch():
+            params = {
+                "type": type,
+                "id": id,
+            }
+            if additional_params:
+                params.update(additional_params)
 
-        if additional_params:
-            params.update(additional_params)
+            with httpx.Client(verify=self.ssl_context, timeout=30.0) as client:
+                response = client.get(self.BASE_URL, params=params)
+                response.raise_for_status()
+                return response.content
 
-        with httpx.Client(verify=self.ssl_context, timeout=30.0) as client:
-            response = client.get(self.BASE_URL, params=params)
-            response.raise_for_status()
-            return response.content
+        return _fetch()
 
     def fetch_ics(self) -> str:
         """Fetch the ICS file for the course"""
         content = self.fetch_plan(self.course_id, 0, {"cvsfile": "true", "wd": 1})
 
-        # with open("timetable.ics", "wb") as f:
-        #     f.write(content)
-
-        # content = open("timetable.ics", "rb").read()
         return content.decode("utf-8")
 
     def fetch_timetable_html(self) -> str:
