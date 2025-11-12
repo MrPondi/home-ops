@@ -28,6 +28,7 @@ spec:
             command:
               - "pip3"
               - "install"
+              - "--no-cache-dir"
               - "--target"
               - "/packages"
               - "beautifulsoup4"
@@ -88,6 +89,7 @@ spec:
             command:
               - "pip3"
               - "install"
+              - "--no-cache-dir"
               - "--target"
               - "/packages"
               - "beautifulsoup4"
