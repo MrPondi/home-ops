@@ -13,7 +13,7 @@ resources:
   - ./bazarr/ks.yaml
   # - ./cross-seed/ks.yaml
   - ./jellyfin/ks.yaml
-  - ./jellyseerr/ks.yaml
+  - ./seerr/ks.yaml
   - ./prowlarr/ks.yaml
   # - ./qbittorrent/ks.yaml
   - ./qui/ks.yaml
