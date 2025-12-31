@@ -71,3 +71,10 @@ spec:
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
+      media:
+        type: nfs
+        server: qnap.internal
+        path: /mnt/terra/Media
+        globalMounts:
+          - path: /media/downloads
+            subPath: downloads
