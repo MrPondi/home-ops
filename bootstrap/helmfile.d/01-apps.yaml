@@ -43,23 +43,33 @@ releases:
     needs:
       - kube-system/cilium
 
-  - name: spegel
-    namespace: kube-system
-    chart: oci://ghcr.io/spegel-org/helm-charts/spegel
-    version: 0.6.0
-    values:
-      - ./templates/values.yaml.gotmpl
-    needs:
-      - kube-system/coredns
-
   - name: cert-manager
     namespace: cert-manager
     chart: oci://quay.io/jetstack/charts/cert-manager
     version: v1.19.2
     values:
       - ./templates/values.yaml.gotmpl
-    needs:
-      - kube-system/spegel
+    hooks:
+      - # Wait for ExternalSecrets CRDs to be available
+        command: bash
+        args:
+          - -c
+          - until kubectl get crd certificates.cert-manager.io &>/dev/null; do sleep 5; done
+        events:
+          - postsync
+        showlogs: true
+      - # Apply Certificate required for ExternalSecrets Bitwarden sdk
+        command: kubectl
+        args:
+          - apply
+          - --namespace=external-secrets
+          - --server-side
+          - --field-manager=kustomize-controller
+          - --filename=../../kubernetes/apps/external-secrets/external-secrets/app/pki.yaml
+          - --filename=../../kubernetes/apps/external-secrets/external-secrets/app/certificate.yaml
+        events:
+          - postsync
+        showlogs: true
 
   - name: external-secrets
     namespace: external-secrets

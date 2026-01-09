@@ -43,7 +43,6 @@ If you’d like to build something similar, the [onedr0p/cluster-template](https
 - [external-dns](https://github.com/kubernetes-sigs/external-dns): Automated DNS record synchronization for ingress resources.
 - [external-secrets](https://github.com/external-secrets/external-secrets): Kubernetes secrets management integrated with [Bitwarden Secrets Manager](https://bitwarden.com/products/secrets-manager/).
 - [rook](https://github.com/rook/rook): Cloud-native distributed storage orchestrator for persistent storage.
-- [spegel](https://github.com/spegel-org/spegel): Stateless cluster-local OCI registry mirror for improved performance.
 - [volsync](https://github.com/backube/volsync): Advanced backup and recovery solution for persistent volume claims.
 
 ### GitOps

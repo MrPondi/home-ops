@@ -95,7 +95,7 @@ crds:
     if echo "${crds}" | kubectl diff -f - &>/dev/null; then \
         just log info "CRDs are up-to-date"; \
     else \
-        if ! echo "${crds}" | kubectl apply --server-side --field-manager bootstrap --force-conflicts -f -; then \
+        if ! echo "${crds}" | yq ea -e 'select(.kind == "CustomResourceDefinition")' | kubectl apply --server-side --field-manager bootstrap --force-conflicts -f -; then \
             just log fatal "Failed to apply crds" "stage" "$0"; \
         fi; \
     fi
