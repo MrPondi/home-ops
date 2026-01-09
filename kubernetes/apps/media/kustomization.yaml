@@ -11,11 +11,11 @@ resources:
   - ./namespace.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
-  # - ./cross-seed/ks.yaml
+  - ./cross-seed/ks.yaml
   - ./jellyfin/ks.yaml
   - ./seerr/ks.yaml
   - ./prowlarr/ks.yaml
-  # - ./qbittorrent/ks.yaml
+  - ./qbittorrent/ks.yaml
   - ./qui/ks.yaml
   - ./radarr/ks.yaml
   - ./recyclarr/ks.yaml
