@@ -110,8 +110,9 @@ spec:
       media:
         type: nfs
         server: qnap.internal
-        path: /mnt/terra/Media/downloads/qbittorrent
+        path: /mnt/terra/Media
         globalMounts:
-          - path: /media/downloads/qbittorrent
+          - path: /media/Downloads/qbittorrent
+            subPath: downloads/qbittorrent
       tmp:
         type: emptyDir
