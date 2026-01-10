@@ -10,7 +10,7 @@ alerting:
       success-threshold: 2
     priority: 4
     resolved-priority: 0
-    click: https://${STATUS_HOSTNAME}
+    click: https://gatus.pondi.dev
 
 endpoints:
   - name: Centrum Robotów
