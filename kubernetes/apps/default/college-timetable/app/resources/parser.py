@@ -7,11 +7,13 @@ import json
 import logging
 import re
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set
+from zoneinfo import ZoneInfo
 
-from caldav import Event
-from icalendar import Calendar, Component
+from caldav import Event as CaldavEvent
+from icalendar import Calendar, Component, Event
 
 from config import Config
 from fetcher import PlanFetcher
@@ -41,7 +43,7 @@ class ParsedIcsEvent:
 class ParsedServerEvent(ParsedIcsEvent):
     """Represents a parsed calendar event along with its Event object."""
 
-    event: Event
+    event: CaldavEvent
 
 
 @dataclass
@@ -57,7 +59,7 @@ class TimetableData:
 class EventParser:
     """Parses and enriches calendar events"""
 
-    UID_PREFIX = "AT4S_"
+    UID_PREFIX = "AT4S"
     LECTURE_TYPE_LECTURE = "wyk"  # "wykład" (lecture in Polish)
     PRIMARY_CALENDAR_IDX = 0
     SECONDARY_CALENDAR_IDX = 1
@@ -244,45 +246,26 @@ class EventParser:
         self, text: str, candidates: Iterable[str]
     ) -> tuple[List[str], str]:
         """
-        Extract all consecutive tokens from the beginning of text.
+        Extract all consecutive tokens from text.
 
         Args:
             text: Input text to parse
             candidates: List of possible tokens to match
 
         Returns:
-            Tuple of (list_of_matched_tokens, remaining_text)
+            Tuple of (list of matched tokens, remaining text)
         """
-        matched = []
-        text = text.strip()
-
-        # Sort by length (longest first) to avoid partial matches
-        sorted_candidates = sorted(candidates, key=len, reverse=True)
-
-        while text:
-            found = False
-
-            for candidate in sorted_candidates:
-                # Check if text starts with candidate followed by space or end
-                if text == candidate:
-                    matched.append(candidate)
-                    text = ""
-                    found = True
-                    break
-                elif text.startswith(candidate + " "):
-                    matched.append(candidate)
-                    text = text[len(candidate) :].strip()
-                    found = True
-                    break
-
-            if not found:
+        found = []
+        while True:
+            token, text = self._extract_token(text, candidates, must_match=False)
+            if token:
+                found.append(token)
+            else:
                 break
-
-        return matched, text
+        return found, text
 
     def parse_ics_file(
-        self,
-        server_events: Dict[int, Dict[str, ParsedServerEvent]],
+        self, server_events: Dict[int, Dict[str, ParsedServerEvent]]
     ) -> Dict[int, Dict[str, ParsedIcsEvent]]:
         """
         Parse ICS file and extract events.
@@ -306,10 +289,7 @@ class EventParser:
             timetable_data = self._fetch_timetable_data()
 
             # Process each event in the calendar
-            for component in cal.walk():
-                if component.name != "VEVENT":
-                    continue
-
+            for component in cal.walk("VEVENT"):
                 try:
                     self._process_event(
                         component, timetable_data, server_events, events
@@ -364,18 +344,39 @@ class EventParser:
         # Determine target calendar
         calendar_idx = self._determine_calendar_index(parsed_event)
 
-        # Update component with parsed data
-        component["summary"] = parsed_event.summary
-        component.add("description", parsed_event.description)
-        component.add("location", self.config.default_location)
+        # Build the icalendar Event
+        event = Event()
+        event.add("summary", parsed_event.summary)
+        if parsed_event.description:
+            event.add("description", parsed_event.description)
+        event.add("location", self.config.default_location)
+
+        # Add date/time properties with timezone conversion
+        for prop in ["dtstart", "dtend"]:
+            if dt_obj := component.get(prop):
+                event.add(prop, self._convert_to_local_timezone(dt_obj.dt))
+
+        # Add base fields
+        event.add(
+            "dtstamp", component.get("dtstamp", datetime.now(tz=self.config.timezone))
+        )
+        event.add("sequence", 0)
+        event.add(
+            "transp",
+            (
+                "TRANSPARENT"
+                if parsed_event.type == self.LECTURE_TYPE_LECTURE
+                else "OPAQUE"
+            ),
+        )
 
         # Generate UID
-        uid = f"{self.UID_PREFIX}{self.config.course_id}_{component['uid']}"
-        component["uid"] = uid
+        uid = f"{self.UID_PREFIX}_{self.config.course_id}_{component.get('uid')}"
+        event.add("uid", uid)
 
         # Create event with proper versioning
         parsed_event_obj = self._create_parsed_event(
-            component, uid, calendar_idx, server_events
+            event, uid, calendar_idx, server_events
         )
 
         events[calendar_idx][uid] = parsed_event_obj
@@ -395,9 +396,20 @@ class EventParser:
             )
         return self.PRIMARY_CALENDAR_IDX
 
+    def _convert_to_local_timezone(self, dt_obj: datetime) -> datetime:
+        """Convert datetime to configured timezone."""
+        if not isinstance(dt_obj, datetime):
+            return dt_obj
+
+        if dt_obj.tzinfo is None:
+            dt_obj = dt_obj.replace(tzinfo=ZoneInfo("UTC"))
+
+        # Now convert to target timezone
+        return dt_obj.astimezone(self.config.timezone)
+
     def _create_parsed_event(
         self,
-        component,
+        event: Event,
         uid: str,
         calendar_idx: int,
         server_events: Dict[int, Dict[str, ParsedServerEvent]],
@@ -411,24 +423,20 @@ class EventParser:
         3. Hash generation for comparing event content
         """
         # Create a copy for hashing (without updated sequence/dtstamp)
-        component_hash = component.copy()
+        event_hash = event.copy()
+        event_hash.pop("dtstamp", None)
+        event_hash.pop("sequence", None)
 
         # Handle existing events on server
         if uid in server_events[calendar_idx]:
-            self._apply_server_metadata(
-                component, component_hash, uid, calendar_idx, server_events
-            )
-        else:
-            # New event - use start time as timestamp
-            component_hash["dtstamp"] = component["dtstart"]
+            self._apply_server_metadata(event, uid, calendar_idx, server_events)
 
         # Convert to iCalendar format
-        event_str = self._component_to_ical_string(component)
-        event_str_hash = self._component_to_ical_string(component_hash)
-
+        event_str = self._event_to_ical_string(event)
+        event_str_hash = self._event_to_ical_string(event_hash, hash=True)
         # Normalize for consistent comparison
         event_str = re.sub(r"\r\n?", "\n", event_str).strip()
-        event_str_hash = self._canonicalize_for_hashing(event_str_hash)
+        event_str_hash = self.canonicalize_for_hashing(event_str_hash)
 
         # Generate content hash
         content_hash = hashlib.md5(event_str_hash.encode()).hexdigest()
@@ -441,43 +449,36 @@ class EventParser:
 
     def _apply_server_metadata(
         self,
-        component,
-        component_hash,
+        event: Event,
         uid: str,
         calendar_idx: int,
         server_events: Dict[int, Dict[str, ParsedServerEvent]],
     ) -> None:
-        """Apply metadata from existing server event (sequence number, dtstamp)."""
-        server_event_data = server_events[calendar_idx][uid].event_str.strip("\n")
+        """Apply metadata from existing server event."""
+        server_event_data = server_events[calendar_idx][uid].event_str
         server_cal = Calendar.from_ical(server_event_data)
 
         for server_component in server_cal.walk():
             if server_component.name == "VEVENT":
-                # For hashing, use the old sequence/dtstamp
-                current_sequence = server_component.get("sequence", 0)
-                component_hash["dtstamp"] = server_component.get(
-                    "dtstamp", component["dtstart"]
-                )
-                component_hash["sequence"] = server_component.get("sequence", 1)
-
-                # For the actual event, increment the sequence
-                component["sequence"] = current_sequence + 1
+                event_sequence = server_component.get("sequence", 0)
+                event["sequence"] = event_sequence + 1
                 break
 
-    def _component_to_ical_string(self, component) -> str:
-        """Convert component to iCalendar string, wrapping in VCALENDAR if needed."""
-        event_str = component.to_ical().decode("utf-8")
+    def _event_to_ical_string(self, event: Event, hash: bool = False) -> str:
+        """Convert event to iCalendar string, wrapping in VCALENDAR if needed."""
+        event_str = event.to_ical().decode("utf-8")
 
         if not event_str.startswith("BEGIN:VCALENDAR"):
             vcal = Calendar()
-            vcal.add("prodid", "-//ATS4 Sync//PL")
+            if not hash:
+                vcal.add("prodid", "-//ATS4 Sync//PL")
             vcal.add("version", "2.0")
-            vcal.add_component(component)
+            vcal.add("calscale", "GREGORIAN")
+            vcal.add_component(event)
             event_str = vcal.to_ical().decode("utf-8")
-
         return event_str
 
-    def _canonicalize_for_hashing(self, ical_str: str) -> str:
+    def canonicalize_for_hashing(self, ical_str: str) -> str:
         """
         Canonicalize iCalendar string for consistent hashing.
 

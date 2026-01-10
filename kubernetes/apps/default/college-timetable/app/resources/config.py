@@ -5,6 +5,7 @@ Configuration management for CalDAV sync.
 import os
 from dataclasses import dataclass, field
 from typing import List, Set
+from zoneinfo import ZoneInfo
 
 
 @dataclass
@@ -28,9 +29,23 @@ class Config:
     # Default location for events
     default_location: str = "Zygmunta Krasińskiego 8, 40-019 Katowice, Polska"
 
+    # Timezone for events
+    timezone: ZoneInfo = field(default_factory=lambda: ZoneInfo("Europe/Warsaw"))
+
     # Events to skip
     skip_holidays: Set[str] = field(
         default_factory=lambda: {"ŚWIĘTA", "Wakacje zimowe", "DNI WOLNE"}
+    )
+
+    # CalDAV specific settings
+    calendar_fields_to_pop: Set[str] = field(
+        default_factory=lambda: {
+            "PRODID",
+            "DTSTAMP",
+            "SEQUENCE",
+            "LAST-MODIFIED",
+            "X-APPLE-STRUCTURED-LOCATION",
+        }
     )
 
     # Sync settings

@@ -47,13 +47,13 @@ class PlanFetcher:
                     if attempt < self.max_retries - 1:
                         # Exponential backoff: 1s, 2s, 4s, etc.
                         delay = self.base_delay * (2**attempt)
-                        print(
+                        logger.warning(
                             f"Timeout on attempt {attempt + 1}/{self.max_retries}. "
                             f"Retrying in {delay:.1f}s..."
                         )
                         time.sleep(delay)
                     else:
-                        print(f"All {self.max_retries} attempts failed.")
+                        logger.error(f"All {self.max_retries} attempts failed.")
                 except httpx.HTTPStatusError:
                     # Don't retry on HTTP errors (4xx, 5xx)
                     raise
