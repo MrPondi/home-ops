@@ -77,4 +77,4 @@ spec:
         path: /mnt/terra/Media
         globalMounts:
           - path: /media/downloads
-            subPath: downloads
+            subPath: media/Downloads

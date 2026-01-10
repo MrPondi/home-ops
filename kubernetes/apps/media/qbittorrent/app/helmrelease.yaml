@@ -113,6 +113,6 @@ spec:
         path: /mnt/terra/Media
         globalMounts:
           - path: /media/Downloads/qbittorrent
-            subPath: downloads/qbittorrent
+            subPath: media/Downloads/qbittorrent
       tmp:
         type: emptyDir
