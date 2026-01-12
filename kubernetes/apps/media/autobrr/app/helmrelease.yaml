@@ -92,7 +92,7 @@ spec:
         existingClaim: "{{ .Release.Name }}"
       tmp:
         type: emptyDir
-      external_scripts:
+      external-scripts:
         type: configMap
         name: "{{ .Release.Name }}-configmap"
         globalMounts:
