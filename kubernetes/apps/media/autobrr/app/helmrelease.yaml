@@ -92,3 +92,9 @@ spec:
         existingClaim: "{{ .Release.Name }}"
       tmp:
         type: emptyDir
+      external_scripts:
+        type: configMap
+        name: "{{ .Release.Name }}-configmap"
+        globalMounts:
+          - path: /app/freespace_rapid.sh
+            subPath: freespace_rapid.sh

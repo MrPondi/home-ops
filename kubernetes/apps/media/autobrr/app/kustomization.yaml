@@ -7,3 +7,10 @@ resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
   - ./prometheusrule.yaml
+configMapGenerator:
+  - name: autobrr-configmap
+    files:
+      - freespace_rapid.sh=./resources/freespace_rapid.sh
+generatorOptions:
+  disableNameSuffixHash: true
+
