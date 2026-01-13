@@ -7,7 +7,7 @@
       automerge: true,
       automergeType: "pr",
       matchUpdateTypes: ["digest"],
-      matchPackageNames: ["/home-operations/"],
+      matchPackageNames: ["/home-operations/", "python"],
       ignoreTests: false,
     },
     {
@@ -16,7 +16,7 @@
       automerge: true,
       automergeType: "pr",
       matchUpdateTypes: ["minor", "patch"],
-      matchPackageNames: ["/kube-prometheus-stack/"],
+      matchPackageNames: ["/kube-prometheus-stack/", "/grafana/"],
       ignoreTests: false,
     },
     {
@@ -31,10 +31,7 @@
     {
       description: "Auto-merge trusted GitHub Actions",
       matchManagers: ["github-actions"],
-      matchPackageNames: [
-        "/^actions\//",
-        "/^renovatebot\//",
-      ],
+      matchPackageNames: ["/^actions//", "/^renovatebot//"],
       automerge: true,
       automergeType: "branch",
       matchUpdateTypes: ["minor", "patch", "digest"],
@@ -47,12 +44,12 @@
       automerge: true,
       automergeType: "branch",
       matchUpdateTypes: ["minor", "patch"],
-      matchPackageNames: ["/external-dns/", "/gateway-api/", "/prometheus-operator/"],
+      matchPackageNames: ["/external-dns", "/prometheus-operator/"],
       ignoreTests: true,
     },
     {
-      description: "Auto-merge Mise Tools",
-      matchManagers: ["mise"],
+      description: "Auto-merge Tools",
+      matchManagers: ["mise", "terraform"],
       automerge: true,
       automergeType: "branch",
       matchUpdateTypes: ["minor", "patch"],
