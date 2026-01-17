@@ -68,6 +68,17 @@ spec:
             port: *port
     route:
       app:
+        annotations:
+          gatus.home-operations.com/endpoint: |
+            group: media
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: "Radarr"
+          gethomepage.dev/group: "Downloads"
+          gethomepage.dev/icon: "radarr.png"
+          gethomepage.dev/description: "Movies"
+          gethomepage.dev/widget.type: "radarr"
+          gethomepage.dev/widget.url: "http://radarr.media.svc.cluster.local"
+          gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_RADARR_TOKEN}}`}}"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:

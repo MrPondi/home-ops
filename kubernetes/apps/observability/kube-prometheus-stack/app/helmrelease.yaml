@@ -18,6 +18,11 @@ spec:
           annotations:
             gatus.home-operations.com/endpoint: |-
               name: alertmanager
+              group: observability
+            gethomepage.dev/enabled: "true"
+            gethomepage.dev/icon: alertmanager.png
+            gethomepage.dev/name: Alert-Manager
+            gethomepage.dev/group: Monitoring
           hostnames:
             - alertmanager.pondi.dev
           parentRefs:
@@ -47,6 +52,11 @@ spec:
           annotations:
             gatus.home-operations.com/endpoint: |-
               name: prometheus
+              group: observability
+            gethomepage.dev/enabled: "true"
+            gethomepage.dev/icon: prometheus.png
+            gethomepage.dev/name: Prometheus
+            gethomepage.dev/group: Observability
           hostnames:
             - prometheus.pondi.dev
           parentRefs:

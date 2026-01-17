@@ -63,6 +63,14 @@ spec:
             port: *port
     route:
       app:
+        annotations:
+          gatus.home-operations.com/endpoint: |
+            group: media
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: "Qui"
+          gethomepage.dev/group: "Downloads"
+          gethomepage.dev/icon: "qui.png"
+          gethomepage.dev/description: "QBittorrent Interface"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:

@@ -22,6 +22,11 @@ spec:
         annotations:
           gatus.home-operations.com/endpoint: |-
             name: victoria logs
+            group: observability
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/icon: victoria-logs.png
+          gethomepage.dev/name: Victoria Logs
+          gethomepage.dev/group: Observability
         hostnames:
           - victoria-logs.pondi.dev
         parentRefs:
