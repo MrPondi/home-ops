@@ -69,10 +69,10 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: "Seerr"
           gethomepage.dev/group: "Video"
-          gethomepage.dev/icon: "seerr.png"
+          gethomepage.dev/icon: "jellyseerr.png"
           gethomepage.dev/description: "Media Requests"
-          gethomepage.dev/widget.type: "seerr"
-          gethomepage.dev/widget.url: "http://seerr.media.svc.cluster.local"
+          gethomepage.dev/widget.type: "jellyseerr"
+          gethomepage.dev/widget.url: "http://seerr.media.svc.cluster.local:80"
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_SEERR_TOKEN}}`}}"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"

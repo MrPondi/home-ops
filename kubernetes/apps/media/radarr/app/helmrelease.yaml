@@ -77,7 +77,7 @@ spec:
           gethomepage.dev/icon: "radarr.png"
           gethomepage.dev/description: "Movies"
           gethomepage.dev/widget.type: "radarr"
-          gethomepage.dev/widget.url: "http://radarr.media.svc.cluster.local"
+          gethomepage.dev/widget.url: "http://radarr.media.svc.cluster.local:80"
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_RADARR_TOKEN}}`}}"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
