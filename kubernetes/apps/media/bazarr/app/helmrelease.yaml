@@ -22,6 +22,9 @@ spec:
             env:
               BAZARR__PORT: &port 80
               TZ: Europe/Warsaw
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
             probes:
               liveness: &probes
                 enabled: true
