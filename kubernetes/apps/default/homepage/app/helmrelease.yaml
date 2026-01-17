@@ -21,7 +21,7 @@ spec:
               tag: v1.8.0@sha256:7dc099d5c6ec7fc945d858218565925b01ff8a60bcbfda990fc680a8b5cd0b6e
             env:
               TZ: Europe/Warsaw
-              HOMEPAGE_ALLOWED_HOSTS: pondi.dev
+              HOMEPAGE_ALLOWED_HOSTS: "{{ .Release.Name }}.pondi.dev"
             # probes:
             #   liveness: &probes
             #     enabled: true
