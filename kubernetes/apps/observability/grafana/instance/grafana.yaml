@@ -62,6 +62,7 @@ spec:
     metadata:
       annotations:
         gatus.home-operations.com/endpoint: |
+          name: grafana
           group: observability
         gethomepage.dev/enabled: "true"
         gethomepage.dev/icon: grafana.png
@@ -69,7 +70,7 @@ spec:
         gethomepage.dev/group: Observability
         gethomepage.dev/app: grafana-operator
         gethomepage.dev/widget.type: grafana
-        gethomepage.dev/widget.url: http://grafana.observability.svc.cluster.local:3000
+        gethomepage.dev/widget.url: http://grafana-service.observability.svc.cluster.local:3000
         gethomepage.dev/widget.username: "{{HOMEPAGE_VAR_GRAFANA_USERNAME}}"
         gethomepage.dev/widget.password: "{{HOMEPAGE_VAR_GRAFANA_PASSWORD}}"
     spec:
