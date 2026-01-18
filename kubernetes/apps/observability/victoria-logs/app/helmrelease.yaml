@@ -24,7 +24,7 @@ spec:
             name: victoria logs
             group: observability
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/icon: victoria-logs.png
+          gethomepage.dev/icon: victorialogs.svg
           gethomepage.dev/name: Victoria Logs
           gethomepage.dev/group: Observability
           gethomepage.dev/app: victoria-logs-single

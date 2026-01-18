@@ -88,7 +88,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: "Autobrr"
           gethomepage.dev/group: "Downloads"
-          gethomepage.dev/icon: "autobrr.png"
+          gethomepage.dev/icon: "autobrr.svg"
           gethomepage.dev/description: "Autobrr BitTorrent Automation"
           gethomepage.dev/widget.type: "autobrr"
           gethomepage.dev/widget.url: "http://autobrr.media.svc.cluster.local"

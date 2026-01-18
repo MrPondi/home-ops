@@ -69,7 +69,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: "Qui"
           gethomepage.dev/group: "Downloads"
-          gethomepage.dev/icon: "qui.png"
+          gethomepage.dev/icon: "qui.svg"
           gethomepage.dev/description: "QBittorrent Interface"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"

@@ -65,7 +65,7 @@ spec:
           name: grafana
           group: observability
         gethomepage.dev/enabled: "true"
-        gethomepage.dev/icon: grafana.png
+        gethomepage.dev/icon: grafana.svg
         gethomepage.dev/name: Grafana
         gethomepage.dev/group: Observability
         gethomepage.dev/app: grafana-operator
