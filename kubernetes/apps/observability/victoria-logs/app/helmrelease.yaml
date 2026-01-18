@@ -27,6 +27,7 @@ spec:
           gethomepage.dev/icon: victoria-logs.png
           gethomepage.dev/name: Victoria Logs
           gethomepage.dev/group: Observability
+          gethomepage.dev/app: victoria-logs-single
         hostnames:
           - victoria-logs.pondi.dev
         parentRefs:
