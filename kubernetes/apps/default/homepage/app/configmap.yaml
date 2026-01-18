@@ -78,7 +78,7 @@ data:
         network: default
     - unifi_console:
         url: https://192.168.1.1
-        key: {{`{{HOMEPAGE_VAR_UNIFI_CONSOLE_KEY}}`}}
+        key: {{HOMEPAGE_VAR_UNIFI_CONSOLE_KEY}}
     - search:
         provider: duckduckgo
         target: _blank
