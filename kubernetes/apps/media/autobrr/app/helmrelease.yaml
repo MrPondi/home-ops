@@ -86,12 +86,12 @@ spec:
           gatus.home-operations.com/endpoint: |
             group: media
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: "Autobrr"
-          gethomepage.dev/group: "Downloads"
-          gethomepage.dev/icon: "autobrr.svg"
-          gethomepage.dev/description: "Autobrr BitTorrent Automation"
-          gethomepage.dev/widget.type: "autobrr"
-          gethomepage.dev/widget.url: "http://autobrr.media.svc.cluster.local"
+          gethomepage.dev/name: Autobrr
+          gethomepage.dev/group: Downloads
+          gethomepage.dev/icon: autobrr.svg
+          gethomepage.dev/description: Autobrr BitTorrent Automation
+          gethomepage.dev/widget.type: autobrr
+          gethomepage.dev/widget.url: http://autobrr.media.svc.cluster.local
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_AUTOBRR_TOKEN}}`}}"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"

@@ -67,7 +67,7 @@ spec:
         gethomepage.dev/enabled: "true"
         gethomepage.dev/icon: grafana.svg
         gethomepage.dev/name: Grafana
-        gethomepage.dev/group: Observability
+        gethomepage.dev/group: Kubernetes
         gethomepage.dev/app: grafana-operator
         gethomepage.dev/widget.type: grafana
         gethomepage.dev/widget.url: http://grafana-service.observability.svc.cluster.local:3000

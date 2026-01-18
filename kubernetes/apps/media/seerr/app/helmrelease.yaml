@@ -67,12 +67,12 @@ spec:
             conditions: ["[STATUS] == 200"]
             group: media
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: "Seerr"
-          gethomepage.dev/group: "Video"
-          gethomepage.dev/icon: "jellyseerr.svg"
-          gethomepage.dev/description: "Media Requests"
-          gethomepage.dev/widget.type: "jellyseerr"
-          gethomepage.dev/widget.url: "http://seerr.media.svc.cluster.local"
+          gethomepage.dev/name: Seerr
+          gethomepage.dev/group: Media
+          gethomepage.dev/icon: jellyseerr.svg
+          gethomepage.dev/description: Media Requests
+          gethomepage.dev/widget.type: jellyseerr
+          gethomepage.dev/widget.url: http://seerr.media.svc.cluster.local
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_SEERR_TOKEN}}`}}"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"

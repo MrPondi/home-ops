@@ -22,7 +22,7 @@ spec:
             gethomepage.dev/enabled: "true"
             gethomepage.dev/icon: alertmanager.svg
             gethomepage.dev/name: Alert-Manager
-            gethomepage.dev/group: Monitoring
+            gethomepage.dev/group: Kubernetes
             gethomepage.dev/pod-selector: statefulset.kubernetes.io/pod-name=alertmanager-kube-prometheus-stack-0
           hostnames:
             - alertmanager.pondi.dev
@@ -57,7 +57,7 @@ spec:
             gethomepage.dev/enabled: "true"
             gethomepage.dev/icon: prometheus.svg
             gethomepage.dev/name: Prometheus
-            gethomepage.dev/group: Observability
+            gethomepage.dev/group: Kubernetes
             gethomepage.dev/pod-selector: statefulset.kubernetes.io/pod-name=prometheus-kube-prometheus-stack-0
           hostnames:
             - prometheus.pondi.dev

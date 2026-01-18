@@ -26,7 +26,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/icon: victorialogs.svg
           gethomepage.dev/name: Victoria Logs
-          gethomepage.dev/group: Observability
+          gethomepage.dev/group: Kubernetes
           gethomepage.dev/app: victoria-logs-single
         hostnames:
           - victoria-logs.pondi.dev

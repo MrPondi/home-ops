@@ -52,6 +52,12 @@ spec:
             port: 3000
     route:
       app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/description: Control your Z-Wave devices through a web interface.
+          gethomepage.dev/group: Home Automation
+          gethomepage.dev/icon: zwavejs2mqtt.png
+          gethomepage.dev/name: Z-Wave JS
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:

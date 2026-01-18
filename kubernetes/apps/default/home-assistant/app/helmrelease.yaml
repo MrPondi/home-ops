@@ -53,6 +53,11 @@ spec:
         annotations:
           gatus.home-operations.com/endpoint: |-
             conditions: ["[STATUS] == 200"]
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/description: Smart home and automations
+          gethomepage.dev/group: Home Automation
+          gethomepage.dev/icon: home-assistant.svg
+          gethomepage.dev/name: Home Assistant
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
           - "hass.pondi.dev"
