@@ -77,7 +77,7 @@ spec:
           gethomepage.dev/icon: jellyfin.svg
           gethomepage.dev/description: Jellyfin Media Server
           gethomepage.dev/widget.type: jellyfin
-          gethomepage.dev/widget.url: http://jellyfin.media.svc.cluster.local:8096
+          gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:8096
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_JELLYFIN_TOKEN}}`}}"
           gethomepage.dev/widget.enableBlocks: "true"
           gethomepage.dev/widget.enableNowPlaying: "true"
