@@ -9,8 +9,9 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./college-timetable/ks.yaml
   - ./home-assistant/ks.yaml
   - ./homepage/ks.yaml
   - ./mosquitto/ks.yaml
+  - ./pelican/ks.yaml
   - ./zwave/ks.yaml
-  - ./college-timetable/ks.yaml

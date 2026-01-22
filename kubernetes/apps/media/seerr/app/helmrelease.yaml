@@ -72,7 +72,7 @@ spec:
           gethomepage.dev/icon: jellyseerr.svg
           gethomepage.dev/description: Media Requests
           gethomepage.dev/widget.type: jellyseerr
-          gethomepage.dev/widget.url: http://seerr.media.svc.cluster.local
+          gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_SEERR_TOKEN}}`}}"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"

@@ -1,0 +1,18 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: mariadb-cluster
+resources:
+  - ./externalsecret.yaml
+  - ./mariadb.yaml
+  - ./backup.yaml
+
+  # Pelican
+  - ./databases/pelican.yaml
+  - ./users/pelican.yaml
+  - ./grants/pelican.yaml
+
+  # Pelican User
+  - ./users/pelican-user.yaml
+  - ./grants/pelican-user.yaml

@@ -1,0 +1,33 @@
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: mariadb
+spec:
+  rootPasswordSecretKeyRef:
+    name: mariadb-root-secret
+    key: password
+
+  storage:
+    size: 5Gi
+    storageClassName: ceph-block
+
+  bootstrapFrom:
+    volume:
+      persistentVolumeClaim:
+        claimName: mariadb
+    restoreJob:
+      metadata:
+        labels:
+          sidecar.istio.io/inject: "false"
+      args:
+        - "--verbose"
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 1Gi
+
+  metrics:
+    enabled: true

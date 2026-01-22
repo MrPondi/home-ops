@@ -1,0 +1,14 @@
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  name: pelican
+spec:
+  mariaDbRef:
+    name: mariadb
+  privileges:
+    - "ALL PRIVILEGES"
+  database: panel
+  table: "*"
+  username: pelican
+  host: "%"

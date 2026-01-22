@@ -1,0 +1,27 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: pelican-secret
+spec:
+  secretStoreRef:
+    name: bitwarden-secretsmanager
+    kind: ClusterSecretStore
+  data:
+    - secretKey: password
+      remoteRef:
+        key: "152aebc9-1f23-4ecc-b1f0-b3da014fa6ad"
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: pelican
+spec:
+  mariaDbRef:
+    name: mariadb
+  passwordSecretKeyRef:
+    name: pelican-secret
+    key: password
+  host: "%"
+  maxUserConnections: 20

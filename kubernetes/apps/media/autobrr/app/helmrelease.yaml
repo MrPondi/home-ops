@@ -91,7 +91,7 @@ spec:
           gethomepage.dev/icon: autobrr.svg
           gethomepage.dev/description: Autobrr BitTorrent Automation
           gethomepage.dev/widget.type: autobrr
-          gethomepage.dev/widget.url: http://autobrr.media.svc.cluster.local
+          gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_AUTOBRR_TOKEN}}`}}"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
