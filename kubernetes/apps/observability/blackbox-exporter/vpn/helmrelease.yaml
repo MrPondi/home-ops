@@ -3,14 +3,14 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: blackbox-exporter-vpn
+  name: &app blackbox-exporter-vpn
 spec:
   chartRef:
     kind: OCIRepository
     name: blackbox-exporter-vpn
   interval: 1h
   values:
-    fullnameOverride: blackbox-exporter-vpn
+    fullnameOverride: *app
     strategy:
       type: Recreate
     podAnnotations:

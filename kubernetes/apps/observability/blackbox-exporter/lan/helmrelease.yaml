@@ -3,14 +3,14 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: blackbox-exporter-lan
+  name: &app blackbox-exporter-lan
 spec:
   chartRef:
     kind: OCIRepository
     name: blackbox-exporter-lan
   interval: 1h
   values:
-    fullnameOverride: blackbox-exporter-lan
+    fullnameOverride: *app
     config:
       modules:
         http_2xx:
