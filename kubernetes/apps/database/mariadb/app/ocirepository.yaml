@@ -11,4 +11,4 @@ spec:
     operation: copy
   ref:
     tag: 25.10.4
-  url: oci://ghcr.io/mariadb-operator/mariadb-operator
+  url: oci://ghcr.io/hydazz/charts-mirror/mariadb-operator

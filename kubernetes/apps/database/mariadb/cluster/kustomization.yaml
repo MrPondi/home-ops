@@ -6,9 +6,7 @@ metadata:
 resources:
   - ./externalsecret.yaml
   - ./mariadb.yaml
-
-  # Backups
-  - ./backup/volsync.yaml
+  - ./backup.yaml
 
   # Pelican
   - ./databases/pelican.yaml
