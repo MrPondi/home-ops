@@ -11,7 +11,7 @@ resources:
   - ./backup/volsync.yaml
 
   # Pelican
-  - ./database/pelican.yaml
+  - ./databases/pelican.yaml
   - ./users/pelican.yaml
   - ./grants/pelican.yaml
 
