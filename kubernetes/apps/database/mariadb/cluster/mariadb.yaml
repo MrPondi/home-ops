@@ -46,7 +46,7 @@ spec:
         name: mariadb-secret
         key: MINIO_SECRET_SECRET_KEY
       tls:
-        enabled: true
+        enabled: false
     backupContentType: Physical
     # stagingStorage:
     #   persistentVolumeClaim:
