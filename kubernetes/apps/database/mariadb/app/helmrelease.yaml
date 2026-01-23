@@ -1,14 +1,25 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd-community/flux2-schemas/main/helmrelease-helm-v2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: mariadb
+  name: mariadb-operator
 spec:
   chartRef:
     kind: OCIRepository
-    name: mariadb
+    name: mariadb-operator
   interval: 1h
   values:
     crds:
       enabled: true
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+    webhook:
+      certificate:
+        certManager: true
+      serviceMonitor:
+        enabled: true
+    certController:
+      enabled: false

@@ -3,7 +3,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: mariadb
+  name: mariadb-operator
 spec:
   interval: 15m
   layerSelector:
