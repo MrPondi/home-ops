@@ -142,6 +142,8 @@ spec:
       #         - path: /shared-bin
       #       app:
       #         - path: /opt/bin
+      tmp:
+        type: emptyDir
       logs:
         type: emptyDir
         globalMounts:
