@@ -21,5 +21,3 @@ spec:
         certManager: true
       serviceMonitor:
         enabled: true
-    certController:
-      enabled: false
