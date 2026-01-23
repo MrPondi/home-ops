@@ -14,7 +14,19 @@ spec:
       pelican:
         annotations:
           reloader.stakater.com/auto: "true"
-        # initContainers:
+        initContainers:
+          volume-permissions:
+            image:
+              repository: ghcr.io/home-operations/busybox
+              tag: 1.37.0@sha256:026ed7273270ec08f6902b4ae8334c23b473e5394bec3bbbdbfe580c710d50bc
+            command:
+              - /bin/sh
+              - -c
+              - |
+                chown -R 82:82 /pelican-data
+                chown -R 82:82 /var/www/html/storage/logs
+            securityContext:
+              runAsUser: 0
         #   install-plugin-deps:
         #     image:
         #       repository: ghcr.io/pelican-dev/panel
@@ -72,7 +84,7 @@ spec:
             #   readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+              readOnlyRootFilesystem: false
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
@@ -82,7 +94,7 @@ spec:
                 memory: 2Gi
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: true
+        runAsNonRoot: false
         runAsUser: 82
         runAsGroup: 82
         fsGroup: 82
