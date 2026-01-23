@@ -32,4 +32,4 @@ spec:
           storage: 4Gi
       accessModes:
         - ReadWriteMany
-      storageClassName: ceph-block
+      storageClassName: ceph-filesystem
