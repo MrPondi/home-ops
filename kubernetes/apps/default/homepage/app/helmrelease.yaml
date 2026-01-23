@@ -20,8 +20,8 @@ spec:
               repository: ghcr.io/gethomepage/homepage
               tag: v1.9.0@sha256:7fa7b07a26bd8d90a44bb975c6455b10d8dee467ce674b040750ffb4a0f486d6
             env:
-              TZ: Europe/Warsaw
               HOMEPAGE_ALLOWED_HOSTS: "{{ .Release.Name }}.pondi.dev"
+              TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"

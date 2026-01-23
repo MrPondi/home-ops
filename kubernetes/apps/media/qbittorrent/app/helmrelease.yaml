@@ -20,9 +20,9 @@ spec:
               repository: ghcr.io/home-operations/qbittorrent
               tag: 5.1.4@sha256:56ecd30a7f5e1357daf5eea2a6935134d329b7b268a3a9b9c67041b65fb87fc6
             env:
-              TZ: Europe/Warsaw
               QBT_WEBUI_PORT: &port 80
               QBT_TORRENTING_PORT: &torrentPort 50469
+              TZ: Europe/Warsaw
             probes:
               liveness: &probes
                 enabled: true
