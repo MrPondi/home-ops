@@ -14,13 +14,13 @@ spec:
     s3:
       accessKeyIdSecretKeyRef:
         name: mariadb-secret
-        key: MINIO_ACCESS_ACCESS_KEY
+        key: MINIO_ACCESS_KEY
       bucket: backups
       endpoint: minio.storage.svc.cluster.local:9000
       prefix: mariadb
       secretAccessKeySecretKeyRef:
         name: mariadb-secret
-        key: MINIO_SECRET_SECRET_KEY
+        key: MINIO_SECRET_KEY
       tls:
         enabled: false
   compression: bzip2

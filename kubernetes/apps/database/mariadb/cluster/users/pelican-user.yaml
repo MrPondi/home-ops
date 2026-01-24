@@ -1,16 +1,21 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/external-secrets.io/externalsecret_v1.json
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: pelican-user-secret
+  name: pelican-user
 spec:
   secretStoreRef:
-    name: bitwarden-secretsmanager
     kind: ClusterSecretStore
-  data:
-    - secretKey: password
-      remoteRef:
-        key: "66b985c2-5171-4944-870f-b3da0156feb6"
+    name: bitwarden-secretsmanager
+  target:
+    name: pelican-user-secret
+    template:
+      data:
+        password: "{{ .PELICANUSER_MARIADB_PASSWORD }}"
+  dataFrom:
+    - extract:
+        key: pelican
 
 ---
 apiVersion: k8s.mariadb.com/v1alpha1
