@@ -23,8 +23,9 @@ spec:
               - /bin/sh
               - -c
               - |
-                chown -R 82:82 /pelican-data
                 chown -R 82:82 /var/www/html/storage/logs
+                mkdir -p /pelican-data/plugins
+                chown -R 82:82 /pelican-data
             securityContext:
               runAsUser: 0
         containers:
