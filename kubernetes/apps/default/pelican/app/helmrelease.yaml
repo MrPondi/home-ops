@@ -23,9 +23,15 @@ spec:
               - /bin/sh
               - -c
               - |
-                chown -R 82:82 /var/www/html/storage/logs
+                # Create Laravel storage directories
+                mkdir -p /var/www/html/storage/framework/views
+                mkdir -p /var/www/html/storage/framework/sessions
+                mkdir -p /var/www/html/storage/framework/cache/data
                 mkdir -p /pelican-data/plugins
-                chown -R 82:82 /pelican-data
+
+                # Set permissions
+                chown -R 82:82 /var/www/html/storage /pelican-data
+                chmod -R 770 /var/www/html/storage/framework
             securityContext:
               runAsUser: 0
         containers:
@@ -55,7 +61,7 @@ spec:
               readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
+              readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
@@ -111,7 +117,31 @@ spec:
                 subPath: uploads.ini
       tmp:
         type: emptyDir
+      app-private:
+        type: emptyDir
+        globalMounts:
+          - path: /var/www/html/storage/app/private
       logs:
         type: emptyDir
         globalMounts:
           - path: /var/www/html/storage/logs
+      framework:
+        type: emptyDir
+        globalMounts:
+          - path: /var/www/html/storage/framework
+      bootstrap-cache:
+        type: emptyDir
+        globalMounts:
+          - path: /var/www/html/bootstrap/cache
+      supervisord:
+        type: emptyDir
+        globalMounts:
+          - path: /var/run/supervisord
+      homedir:
+        type: emptyDir
+        globalMounts:
+          - path: /home/www-data/
+      node-modules:
+        type: emptyDir
+        globalMounts:
+          - path: /var/www/html/node_modules
