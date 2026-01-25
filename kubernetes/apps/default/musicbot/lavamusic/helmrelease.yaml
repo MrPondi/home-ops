@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/botxlab/lavamusic
-              tag: main@sha256:30c08e38443374541da919bc2135634f94b23da3e9d02281adb11df90269d084
+              tag: v4.7.0@sha256:3541b981b5389d04d4e0b534080a9a4c7c390da70aa3057ec55c6cd2d96f2181
             env:
               TZ: Europe/Warsaw
             envFrom:
@@ -26,7 +26,7 @@ spec:
                   name: "{{ .Release.Name }}-secret"
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
+              readOnlyRootFilesystem: true
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
@@ -36,10 +36,10 @@ spec:
                 memory: 2Gi
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: false
-        runAsUser: 0
-        runAsGroup: 0
-        fsGroup: 233
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
 
     persistence:
@@ -47,3 +47,10 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /app/lavamusic-pgdata
+      entrypoint:
+        type: configMap
+        name: "{{ .Release.Name }}-configmap"
+        defaultMode: 0775
+        globalMounts:
+          - path: /app/entrypoint.sh
+            subPath: entrypoint.sh
