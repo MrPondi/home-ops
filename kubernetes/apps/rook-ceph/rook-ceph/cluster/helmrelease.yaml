@@ -25,7 +25,7 @@ spec:
           gethomepage.dev/group: Kubernetes
           gethomepage.dev/icon: rook.svg
           gethomepage.dev/description: Storage Cluster
-          gethomepage.dev/app: rook-ceph-operator
+          gethomepage.dev/pod-selector: app=rook-ceph-operator
         host:
           name: rook.pondi.dev
           path: /
