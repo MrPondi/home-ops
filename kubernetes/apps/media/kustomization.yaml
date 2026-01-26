@@ -11,7 +11,7 @@ resources:
   - ./namespace.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
-  - ./jellyfin/ks.yaml
+  # - ./jellyfin/ks.yaml
   - ./plex/ks.yaml
   - ./seerr/ks.yaml
   - ./prowlarr/ks.yaml
