@@ -12,6 +12,7 @@ resources:
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
   - ./jellyfin/ks.yaml
+  - ./plex/ks.yaml
   - ./seerr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
@@ -19,3 +20,4 @@ resources:
   - ./radarr/ks.yaml
   - ./recyclarr/ks.yaml
   - ./sonarr/ks.yaml
+  - ./tautulli/ks.yaml
