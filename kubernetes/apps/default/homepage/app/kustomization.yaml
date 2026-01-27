@@ -7,3 +7,9 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
+configMapGenerator:
+  - name: homepage-configmap
+    files:
+      - alertmanager.svg=./resources/alertmanager.svg
+generatorOptions:
+  disableNameSuffixHash: true

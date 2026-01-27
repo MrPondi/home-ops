@@ -105,6 +105,12 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /app/config/logs
+      resources:
+        type: configMap
+        name: "{{ .Release.Name }}-configmap"
+        globalMounts:
+          - path: /app/public/icons/alertmanager.svg
+            subPath: alertmanager.svg
       config:
         type: configMap
         name: "{{ .Release.Name }}-config"
