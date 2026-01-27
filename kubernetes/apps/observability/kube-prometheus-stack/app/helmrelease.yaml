@@ -22,7 +22,7 @@ spec:
             gethomepage.dev/enabled: "true"
             gethomepage.dev/name: Alertmanager
             gethomepage.dev/group: Monitoring & Operations
-            gethomepage.dev/icon: sh-alertmanager.svg
+            gethomepage.dev/icon: alertmanager.svg
             gethomepage.dev/description: Alert notification system
             gethomepage.dev/weight: "15"
             gethomepage.dev/app: alertmanager

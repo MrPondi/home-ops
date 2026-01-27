@@ -22,7 +22,12 @@ delete-ks ns ks:
 [doc('Open a shell on a node')]
 node-shell node:
     kubectl debug node/{{ node }} -n default -it --image="mirror.gcr.io/alpine:latest" --profile sysadmin
-    kubectl delete pod -n default -l app.kubernetes.io/managed-by=kubectl-debug
+    name=$(kubectl get pods -n default --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}'); \
+    if [[ $name == node-debugger-{{ node }}* ]]; then \
+        kubectl delete pod -n default $name; \
+    else \
+        echo "Pod name '$name' does not start with 'node-debugger-{{ node }}', skipping deletion"; \
+    fi
 
 [doc('Prune pods in Failed, Pending, or Succeeded state')]
 prune-pods:
