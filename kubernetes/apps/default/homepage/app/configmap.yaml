@@ -11,10 +11,10 @@ data:
     traefik: false
   settings.yaml: |
     title: Homelab
-    # background:
-    #   image: https://raw.githubusercontent.com/joryirving/home-ops/main/.docs/assets/101518784_p0.jpg
-    #   opacity: 20
-    favicon: https://github.com/walkxcode/dashboard-icons/blob/main/png/heimdall.png
+    background:
+      image: https://images.unsplash.com/photo-1672288072591-619afe830096?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80
+      opacity: 20
+    favicon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/heimdall.svg
     theme: dark
     color: slate
     headerStyle: boxed
