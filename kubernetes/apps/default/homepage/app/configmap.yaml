@@ -30,6 +30,7 @@ data:
         icon: /icons/popcorn.svg
         style: row
         columns: 4
+        useEqualHeights: true
       Home & Automation:
         icon: home-assistant
         style: column
