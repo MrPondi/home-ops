@@ -107,29 +107,11 @@ spec:
           - path: /app/config/logs
       resources:
         type: configMap
-        name: "{{ .Release.Name }}-configmap"
+        name: "{{ .Release.Name }}-resources"
         globalMounts:
-          - path: /app/public/icons/alertmanager.svg
-            subPath: alertmanager.svg
+          - path: /app/public/icons
       config:
         type: configMap
         name: "{{ .Release.Name }}-config"
         globalMounts:
-          - path: /app/config/custom.js
-            subPath: custom.js
-          - path: /app/config/custom.css
-            subPath: custom.css
-          - path: /app/config/bookmarks.yaml
-            subPath: bookmarks.yaml
-          - path: /app/config/docker.yaml
-            subPath: docker.yaml
-          - path: /app/config/kubernetes.yaml
-            subPath: kubernetes.yaml
-          - path: /app/config/proxmox.yaml
-            subPath: proxmox.yaml
-          - path: /app/config/services.yaml
-            subPath: services.yaml
-          - path: /app/config/settings.yaml
-            subPath: settings.yaml
-          - path: /app/config/widgets.yaml
-            subPath: widgets.yaml
+          - path: /app/config

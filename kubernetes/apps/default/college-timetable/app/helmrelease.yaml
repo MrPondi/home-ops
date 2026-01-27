@@ -152,15 +152,6 @@ spec:
         type: configMap
         name: "{{ .Release.Name }}-configmap"
         globalMounts:
-          - path: /app/config.py
-            subPath: config.py
-          - path: /app/fetcher.py
-            subPath: fetcher.py
-          - path: /app/parser.py
-            subPath: parser.py
-          - path: /app/sync.py
-            subPath: sync.py
-          - path: /app/populate_lecturers.py
-            subPath: populate_lecturers.py
+          - path: /app
       tmp:
         type: emptyDir

@@ -8,8 +8,9 @@ resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
 configMapGenerator:
-  - name: homepage-configmap
+  - name: homepage-resources
     files:
       - alertmanager.svg=./resources/alertmanager.svg
+      - popcorn.svg=./resources/popcorn.svg
 generatorOptions:
   disableNameSuffixHash: true

@@ -27,7 +27,7 @@ data:
       hideVisitURL: true
     layout:
       Media & Entertainment:
-        icon: jellyfin
+        icon: /icons/popcorn.svg
         style: row
         columns: 4
       Home & Automation:
@@ -42,10 +42,27 @@ data:
   custom.css: ""
   custom.js: ""
   bookmarks.yaml: ""
-  services.yaml: ""
+  services.yaml: |
+    - Infrastructure:
+      - Cloudflare Tunnel:
+          icon: cloudflare.svg
+          description: External access
+          weight: "20"
+          widget:
+            type: cloudflared
+            accountid: {{HOMEPAGE_VAR_CLOUDFLARE_ACCOUNT_ID}}
+            tunnelid: {{HOMEPAGE_VAR_CLOUDFLARE_TUNNEL_ID}}
+            key: {{HOMEPAGE_VAR_CLOUDFLARE_API_TOKEN}}
+    - Home & Automation:
+      - Pelican Wings:
+          icon: docker-moby.svg
+          description: Proxmox Ubuntu VM
+          weight: "15"
+          proxmoxNode: orion
+          proxmoxVMID: 102
   proxmox.yaml: |
     orion:
-      url: https:/10.0.10.10:8006
+      url: https://10.0.10.10:8006
       token: {{HOMEPAGE_VAR_PROXMOX_API_TOKEN}}
       secret: {{HOMEPAGE_VAR_PROXMOX_API_SECRET}}
   widgets.yaml: |
