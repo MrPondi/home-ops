@@ -24,9 +24,11 @@ spec:
             name: victoria logs
             group: observability
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/icon: victorialogs.svg
           gethomepage.dev/name: Victoria Logs
-          gethomepage.dev/group: Kubernetes
+          gethomepage.dev/group: Monitoring & Operations
+          gethomepage.dev/icon: victorialogs.svg
+          gethomepage.dev/description: Log aggregation system
+          gethomepage.dev/weight: "20"
           gethomepage.dev/app: victoria-logs-single
         hostnames:
           - victoria-logs.pondi.dev

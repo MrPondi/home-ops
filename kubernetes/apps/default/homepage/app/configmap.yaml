@@ -17,48 +17,37 @@ data:
     favicon: https://github.com/walkxcode/dashboard-icons/blob/main/png/heimdall.png
     theme: dark
     color: slate
-    headerStyle: clean
+    headerStyle: boxed
     statusStyle: dot
     useEqualHeights: false
     fiveColumns: true
     quicklaunch:
       searchDescriptions: true
       hideInternetSearch: true
-      showSearchSuggestions: true
       hideVisitURL: true
     layout:
-      Home Automation:
-        style: column
-        icon: home-assistant
-      LLM/Ai:
-        style: column
-        icon: open-webui
-      Apps:
-        style: column
-        icon: immich
-      Development:
-        style: column
-        icon: code-server
-      Security:
-        style: column
-        icon: pocket-id
-      Social:
-        style: column
-        icon: mastodon
-      Media:
-        style: column
+      Media & Entertainment:
         icon: jellyfin
-      Downloads:
+        style: row
+        columns: 4
+      Home & Automation:
+        icon: home-assistant
         style: column
-        icon: sonarr
-      Kubernetes:
+      Monitoring & Operations:
+        icon: prometheus
         style: column
-        icon: kubernetes
+      Infrastructure:
+        icon: flux-cd
+        style: column
   custom.css: ""
   custom.js: ""
   bookmarks.yaml: ""
   services.yaml: ""
-  proxmox.yaml: ""
+  proxmox.yaml: |
+    orion:
+      url: https:/10.0.10.10:8006
+      token: {{HOMEPAGE_VAR_PROXMOX_API_TOKEN}}
+      secret: {{HOMEPAGE_VAR_PROXMOX_API_SECRET}}
   widgets.yaml: |
     - kubernetes:
         cluster:

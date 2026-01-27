@@ -67,9 +67,10 @@ spec:
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Kopia
-          gethomepage.dev/group: Kubernetes
+          gethomepage.dev/group: Infrastructure
           gethomepage.dev/icon: kopia.svg
-          gethomepage.dev/description: Kopia Backup Manager
+          gethomepage.dev/description: Backup and restore service
+          gethomepage.dev/weight: "5"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:

@@ -20,10 +20,12 @@ spec:
               name: alertmanager
               group: observability
             gethomepage.dev/enabled: "true"
-            gethomepage.dev/icon: alertmanager.svg
-            gethomepage.dev/name: Alert-Manager
-            gethomepage.dev/group: Kubernetes
-            gethomepage.dev/pod-selector: statefulset.kubernetes.io/pod-name=alertmanager-kube-prometheus-stack-0
+            gethomepage.dev/name: Alertmanager
+            gethomepage.dev/group: Monitoring & Operations
+            gethomepage.dev/icon: sh-alertmanager.svg
+            gethomepage.dev/description: Alert notification system
+            gethomepage.dev/weight: "15"
+            gethomepage.dev/app: alertmanager
           hostnames:
             - alertmanager.pondi.dev
           parentRefs:
@@ -55,10 +57,12 @@ spec:
               name: prometheus
               group: observability
             gethomepage.dev/enabled: "true"
-            gethomepage.dev/icon: prometheus.svg
             gethomepage.dev/name: Prometheus
-            gethomepage.dev/group: Kubernetes
-            gethomepage.dev/pod-selector: statefulset.kubernetes.io/pod-name=prometheus-kube-prometheus-stack-0
+            gethomepage.dev/group: Monitoring & Operations
+            gethomepage.dev/icon: prometheus.svg
+            gethomepage.dev/description: Metrics collection engine
+            gethomepage.dev/weight: "10"
+            gethomepage.dev/app: prometheus
           hostnames:
             - prometheus.pondi.dev
           parentRefs:

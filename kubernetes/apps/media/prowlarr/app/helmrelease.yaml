@@ -83,9 +83,10 @@ spec:
             group: media
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Prowlarr
-          gethomepage.dev/group: Downloads
-          gethomepage.dev/icon: prowlarr.svg
-          gethomepage.dev/description: Indexer Manager
+          gethomepage.dev/group: Media & Entertainment
+          gethomepage.dev/icon: prowlarr.png
+          gethomepage.dev/description: Indexer management platform
+          gethomepage.dev/weight: "20"
           gethomepage.dev/widget.type: prowlarr
           gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_PROWLARR_TOKEN}}`}}"

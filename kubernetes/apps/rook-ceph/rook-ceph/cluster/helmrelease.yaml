@@ -22,9 +22,10 @@ spec:
             name: rook ceph
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Rook Ceph
-          gethomepage.dev/group: Kubernetes
+          gethomepage.dev/group: Infrastructure
           gethomepage.dev/icon: rook.svg
-          gethomepage.dev/description: Storage Cluster
+          gethomepage.dev/description: Storage cluster management interface
+          gethomepage.dev/weight: "10"
           gethomepage.dev/pod-selector: app=rook-ceph-operator
         host:
           name: rook.pondi.dev

@@ -7,9 +7,10 @@ metadata:
   annotations:
     gethomepage.dev/enabled: "true"
     gethomepage.dev/name: Flux Operator
-    gethomepage.dev/group: Kubernetes
+    gethomepage.dev/group: Infrastructure
     gethomepage.dev/icon: flux-cd.svg
-    gethomepage.dev/description: Flux Operator
+    gethomepage.dev/description: GitOps deployment automation
+    gethomepage.dev/weight: "15"
 spec:
   hostnames:
     - flux-operator.pondi.dev

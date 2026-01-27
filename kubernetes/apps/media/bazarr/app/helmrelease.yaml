@@ -76,9 +76,10 @@ spec:
             group: media
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Bazarr
-          gethomepage.dev/group: Downloads
+          gethomepage.dev/group: Media & Entertainment
           gethomepage.dev/icon: bazarr.svg
-          gethomepage.dev/description: Bazarr Subtitle Manager
+          gethomepage.dev/description: Subtitle download manager
+          gethomepage.dev/weight: "15"
           gethomepage.dev/widget.type: bazarr
           gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_BAZARR_TOKEN}}`}}"

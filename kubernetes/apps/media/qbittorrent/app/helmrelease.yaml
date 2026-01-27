@@ -88,6 +88,18 @@ spec:
             #       protocol: TCP
     route:
       app:
+        annotations:
+          gethomepage.dev/enabled: "false"
+          gethomepage.dev/name: Qbittorrent
+          gethomepage.dev/group: Media & Entertainment
+          gethomepage.dev/icon: qbittorrent.svg
+          gethomepage.dev/description: BitTorrent download client
+          gethomepage.dev/weight: "30"
+          gethomepage.dev/widget.type: qbittorrent
+          gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
+          gethomepage.dev/widget.username: ""
+          gethomepage.dev/widget.password: ""
+          gethomepage.dev/widget.enableLeechProgress: "true"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:
