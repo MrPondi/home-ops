@@ -37,7 +37,7 @@ class Config:
 
     # Events to skip
     skip_holidays: Set[str] = field(
-        default_factory=lambda: {"ŚWIĘTA", "Wakacje zimowe", "DNI WOLNE"}
+        default_factory=lambda: {"ŚWIĘTA", "DNI WOLNE", "Dni rektorskie", "Dni świąteczne", "Semestr Start", "Początek semestru", "Wakacje zimowe", "Wakacje wiosenne"}
     )
 
     # Sync settings
