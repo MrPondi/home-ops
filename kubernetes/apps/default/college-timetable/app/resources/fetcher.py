@@ -21,8 +21,9 @@ class PlanFetcher:
 
     BASE_URL = "https://plan.polsl.pl/plan.php"
 
-    def __init__(self, course_id: int):
-        self.course_id = course_id
+    def __init__(self, course_ics_id: int, course_ics_selector: int):
+        self.course_ics_id = course_ics_id
+        self.course_ics_selector = course_ics_selector
         self.ssl_context = ssl.create_default_context()
         self.ssl_context.set_ciphers("DEFAULT@SECLEVEL=1")
         self.max_retries: int = 3
@@ -74,7 +75,7 @@ class PlanFetcher:
         Fetch plan data from the server with automatic retries.
 
         Args:
-            id: Course or lecturer ID (defaults to course_id)
+            id: Course or lecturer ID (defaults to course_ics_id)
             type: Plan type (0=course, 10=lecturer)
             additional_params: Additional query parameters
 
@@ -86,7 +87,7 @@ class PlanFetcher:
             httpx.HTTPStatusError: If server returns error status
         """
         if id is None:
-            id = self.course_id
+            id = self.course_ics_id
 
         @self._retry_with_backoff
         def _fetch():
@@ -106,14 +107,16 @@ class PlanFetcher:
 
     def fetch_ics(self) -> str:
         """Fetch the ICS file for the course"""
-        content = self.fetch_plan(self.course_id, 0, {"cvsfile": "true", "wd": 1})
+        content = self.fetch_plan(
+            self.course_ics_id, 0, {"cvsfile": "true", "wd": self.course_ics_selector}
+        )
 
         return content.decode("utf-8")
 
     def fetch_timetable_html(self) -> str:
         """Fetch the HTML timetable for the course"""
         content = self.fetch_plan(
-            self.course_id, 0, {"winW": 2544, "winH": 1263, "loadBG": "000000"}
+            self.course_ics_id, 0, {"wd": self.course_ics_selector, "winW": 2544, "winH": 1263, "loadBG": "000000"}
         ).decode("iso-8859-2")
         return content
 

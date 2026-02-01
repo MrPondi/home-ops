@@ -73,7 +73,7 @@ class EventParser:
         """
         self.lecturers_map = self._load_lecturers(config.lecturers_json_path)
         self.config = config
-        self.fetcher = PlanFetcher(config.course_id)
+        self.fetcher = PlanFetcher(config.course_ics_id, config.course_ics_selector)
 
     def _load_lecturers(self, json_path: str) -> Dict[str, str]:
         """
@@ -371,7 +371,7 @@ class EventParser:
         )
 
         # Generate UID
-        uid = f"{self.UID_PREFIX}_{self.config.course_id}_{component.get('uid')}"
+        uid = f"{self.UID_PREFIX}_{self.config.course_ics_id}_{component.get('uid')}"
         event.add("uid", uid)
 
         # Create event with proper versioning

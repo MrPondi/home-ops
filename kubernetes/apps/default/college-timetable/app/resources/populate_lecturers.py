@@ -17,7 +17,7 @@ def populate_lecturers_template():
     """Create lecturers.json template with all found acronyms"""
 
     config = Config.from_env()
-    fetcher = PlanFetcher(config.course_id)
+    fetcher = PlanFetcher(config.course_ics_id, config.course_ics_selector)
 
     print("Fetching lecturer acronyms from schedule...")
     lecturers = fetcher.get_all_lecturers()

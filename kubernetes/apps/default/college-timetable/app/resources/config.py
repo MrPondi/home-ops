@@ -4,8 +4,10 @@ Configuration management for CalDAV sync.
 
 import os
 from dataclasses import dataclass, field
-from typing import List, Set
+from typing import List, Literal, Set, cast
 from zoneinfo import ZoneInfo
+
+ICS_SELECTOR = Literal[1, 2, 3, 4, 5, 6, 7, 8]
 
 
 @dataclass
@@ -21,7 +23,8 @@ class Config:
     calendar_names: List[str]
 
     # Course settings
-    course_id: int
+    course_ics_id: int
+    course_ics_selector: ICS_SELECTOR = 1
 
     # Lecturers data
     lecturers_json_path: str = "/data/lecturers.json"
@@ -37,7 +40,10 @@ class Config:
         default_factory=lambda: {"ŚWIĘTA", "Wakacje zimowe", "DNI WOLNE"}
     )
 
-    # CalDAV specific settings
+    # Sync settings
+    dry_run: bool = False
+
+    # Apple CalDAV specific settings
     calendar_fields_to_pop: Set[str] = field(
         default_factory=lambda: {
             "PRODID",
@@ -48,9 +54,6 @@ class Config:
         }
     )
 
-    # Sync settings
-    dry_run: bool = False
-
     @classmethod
     def from_env(cls) -> "Config":
         """Create config from environment variables"""
@@ -58,13 +61,16 @@ class Config:
             os.getenv("CALENDAR_NAME_1", "Studia Wykłady"),
             os.getenv("CALENDAR_NAME_2", "Studia Obowiązkowe"),
         ]
-
         return cls(
             caldav_url=os.getenv("CALDAV_URL", ""),
             username=os.getenv("USERNAME", ""),
             password=os.getenv("PASSWORD", ""),
             calendar_names=calendar_names,
-            course_id=int(os.getenv("COURSE_ID", "")),
+            course_ics_id=int(os.getenv("COURSE_ICS_ID", "")),
+            course_ics_selector=cast(
+                ICS_SELECTOR,
+                int(os.getenv("COURSE_ICS_SELECTOR", "1")),
+            ),
             dry_run=os.getenv("DRY_RUN", "false").lower() == "true",
         )
 
