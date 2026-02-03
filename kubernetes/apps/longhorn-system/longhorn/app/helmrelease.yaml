@@ -1,0 +1,59 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: longhorn
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: longhorn
+  interval: 1h
+  values:
+    persistence:
+      defaultClass: true
+      defaultClassReplicaCount: 1
+      dataEngine: v2
+
+    csi:
+      attacherReplicaCount: 1
+      provisionerReplicaCount: 1
+      resizerReplicaCount: 1
+      snapshotterReplicaCount: 1
+
+    defaultSettings:
+      defaultReplicaCount: '{"v1":"1","v2":"1"}'
+
+      v2DataEngine: true
+      v2DataEngineHugepageEnabled: true
+      dataEngineHugepageEnabled: true
+
+      allowVolumeCreationWithDegradedAvailability: true
+      autoSalvage: true
+
+      nodeDownPodDeletionPolicy: do-nothing
+      nodeDrainPolicy: block-if-contains-last-replica
+
+      concurrentReplicaRebuildPerNodeLimit: 5
+
+    longhornUI:
+      replicas: 1
+      affinity: {}
+
+    httproute:
+      enabled: true
+      parentRefs:
+        - name: envoy-internal
+          namespace: network
+      hostnames:
+        - longhorn.pondi.dev
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Longhorn
+        gethomepage.dev/group: Infrastructure
+        gethomepage.dev/icon: longhorn.svg
+        gethomepage.dev/description: Storage cluster management interface
+        gethomepage.dev/weight: "10"
+    metrics:
+      serviceMonitor:
+        enabled: true

@@ -1,0 +1,20 @@
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: k8s-01
+  namespace: longhorn-system
+spec:
+  allowScheduling: true
+  evictionRequested: false
+  disks:
+    sdb-disk:
+      path: /dev/sdb
+      allowScheduling: true
+      evictionRequested: false
+      storageReserved: 32212254720 # 30GB reserved
+      tags:
+        - storage
+        - ssd
+        - nvme
+      diskType: block
