@@ -50,12 +50,15 @@ spec:
       hostnames:
         - longhorn.pondi.dev
       annotations:
+        gatus.home-operations.com/endpoint: |-
+          name: longhorn
         gethomepage.dev/enabled: "true"
         gethomepage.dev/name: Longhorn
         gethomepage.dev/group: Infrastructure
         gethomepage.dev/icon: longhorn.svg
         gethomepage.dev/description: Storage cluster management interface
         gethomepage.dev/weight: "10"
+        gethomepage.dev/app: longhorn
     metrics:
       serviceMonitor:
         enabled: true
