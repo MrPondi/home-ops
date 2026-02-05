@@ -70,7 +70,7 @@ spec:
           gethomepage.dev/group: Infrastructure
           gethomepage.dev/icon: kopia.svg
           gethomepage.dev/description: Backup and restore service
-          gethomepage.dev/weight: "5"
+          gethomepage.dev/weight: "10"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:

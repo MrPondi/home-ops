@@ -94,7 +94,7 @@ spec:
           gethomepage.dev/group: Infrastructure
           gethomepage.dev/icon: minio.svg
           gethomepage.dev/description: S3-compatible object storage
-          gethomepage.dev/weight: "0"
+          gethomepage.dev/weight: "5"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
           - s3.pondi.dev

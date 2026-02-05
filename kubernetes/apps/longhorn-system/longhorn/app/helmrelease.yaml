@@ -57,7 +57,7 @@ spec:
         gethomepage.dev/group: Infrastructure
         gethomepage.dev/icon: longhorn.svg
         gethomepage.dev/description: Storage cluster management interface
-        gethomepage.dev/weight: "10"
+        gethomepage.dev/weight: "15"
         gethomepage.dev/app: longhorn
     metrics:
       serviceMonitor:

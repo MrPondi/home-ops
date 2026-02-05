@@ -48,12 +48,31 @@ data:
       - Cloudflare Tunnel:
           icon: cloudflare.svg
           description: External access
-          weight: "20"
+          weight: "25"
           widget:
             type: cloudflared
             accountid: {{HOMEPAGE_VAR_CLOUDFLARE_ACCOUNT_ID}}
             tunnelid: {{HOMEPAGE_VAR_CLOUDFLARE_TUNNEL_ID}}
             key: {{HOMEPAGE_VAR_CLOUDFLARE_API_TOKEN}}
+      - TrueNas:
+          icon: truenas.svg
+          description: NFS Storage
+          weight: "0"
+          widget:
+            type: truenas
+            url: https://qnap.internal
+            key: {{HOMEPAGE_VAR_TRUENAS_API_KEY}}
+            fields: ["uptime", "alerts"]
+            enablePools: true
+      - Proxmox:
+          icon: proxmox.svg
+          description: Virtualization Hypervisor
+          weight: "2"
+          widget:
+            type: proxmox
+            url: https://10.0.10.10:8006
+            username: {{HOMEPAGE_VAR_PROXMOX_API_TOKEN}}
+            password: {{HOMEPAGE_VAR_PROXMOX_API_SECRET}}
     - Home & Automation:
       - Pelican Wings:
           icon: docker-moby.svg
