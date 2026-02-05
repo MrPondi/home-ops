@@ -3,15 +3,15 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: lavalink
+  name: yt-cipher
 spec:
   chartRef:
     kind: OCIRepository
-    name: lavalink
+    name: yt-cipher
   interval: 1h
   values:
     controllers:
-      lavalink:
+      yt-cipher:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -21,6 +21,9 @@ spec:
               tag: master@sha256:df1f42ebdc811a1968d6e4a8bddf7bd19d3fcf54fe07433cd7a77fa842c3d699
             env:
               TZ: Europe/Warsaw
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
