@@ -23,28 +23,28 @@ spec:
     namespace: flux-system
   targetNamespace: default
   wait: false
-  # ---
-  # # yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/kustomize.toolkit.fluxcd.io/kustomization_v1.json
-  # apiVersion: kustomize.toolkit.fluxcd.io/v1
-  # kind: Kustomization
-  # metadata:
-  #   name: lavamusic
-  # spec:
-  #   components:
-  #     - ../../../../components/volsync
-  #   dependsOn:
-  #     - name: lavalink
-  #       namespace: default
-  #   interval: 1h
-  #   path: ./kubernetes/apps/default/musicbot/lavamusic
-  #   postBuild:
-  #     substitute:
-  #       APP: lavamusic
-  #       VOLSYNC_CAPACITY: 5Gi
-  #   prune: true
-  #   sourceRef:
-  #     kind: GitRepository
-  #     name: flux-system
-  #     namespace: flux-system
-  #   targetNamespace: default
-  #   wait: false
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.nerdz.cloud/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: lavamusic
+spec:
+  components:
+    - ../../../../components/volsync
+  dependsOn:
+    - name: lavalink
+      namespace: default
+  interval: 1h
+  path: ./kubernetes/apps/default/musicbot/lavamusic
+  postBuild:
+    substitute:
+      APP: lavamusic
+      VOLSYNC_CAPACITY: 5Gi
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: default
+  wait: false
