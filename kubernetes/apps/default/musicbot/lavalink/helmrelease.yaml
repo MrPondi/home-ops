@@ -45,6 +45,14 @@ spec:
         ports:
           http:
             port: *port
+      lavalink:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.0.30.132
+        externalTrafficPolicy: Local
+        ports:
+          lavalink:
+            port: *port
 
     persistence:
       config:
