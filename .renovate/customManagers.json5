@@ -29,5 +29,16 @@
       ],
       datasourceTemplate: "docker",
     },
+    {
+      customType: "regex",
+      description: "Process Lavalink plugin dependencies",
+      managerFilePatterns: [
+        "/lavalink/.*\\.yaml(?:\\.j2)?$/",
+      ],
+      matchStrings: [
+        "- dependency: \"(?<depName>[^:]+:[^:]+):(?<currentValue>[^\"]+)\"[^\\n]*\\n\\s+repository:\\s*\"(?<registryUrl>[^\"]+)\"",
+      ],
+      datasourceTemplate: "maven",
+    },
   ],
 }
