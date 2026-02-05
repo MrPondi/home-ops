@@ -46,3 +46,9 @@ spec:
         ports:
           http:
             port: 8001
+    persistence:
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /.cache
+
