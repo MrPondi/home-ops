@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: nextcloud
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: bitwarden-secretsmanager
+  target:
+    name: nextcloud-secret
+    template:
+      data:
+        password: "{{ .NEXTCLOUD_MARIADB_PASSWORD }}"
+  dataFrom:
+    - extract:
+        key: nextcloud
+
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: nextcloud
+spec:
+  mariaDbRef:
+    name: mariadb
+  passwordSecretKeyRef:
+    name: nextcloud-secret
+    key: password
+  host: "%"
+  maxUserConnections: 20
