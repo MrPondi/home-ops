@@ -84,18 +84,18 @@ spec:
         readOnlyRootFilesystem: true
         capabilities: {drop: ["ALL"]}
 
-      internalDatabase:
-        enabled: false
-      externalDatabase:
+    internalDatabase:
+      enabled: false
+    externalDatabase:
+      enabled: true
+      type: mysql
+      host: mariadb.database.svc.cluster.local:3306
+      database: nextcloud
+      existingSecret:
         enabled: true
-        type: mysql
-        host: mariadb.database.svc.cluster.local:3306
-        database: nextcloud
-        existingSecret:
-          enabled: true
-          secretName: nextcloud-secret
-          usernameKey: DB_USER
-          passwordKey: DB_PASSWORD
+        secretName: nextcloud-secret
+        usernameKey: DB_USER
+        passwordKey: DB_PASSWORD
     cronjob:
       enabled: true
     persistence:
