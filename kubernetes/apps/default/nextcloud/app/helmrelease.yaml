@@ -1,0 +1,121 @@
+---
+# yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/main/helmrelease-helm-v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: nextcloud
+  interval: 1h
+  values:
+    deploymentAnnotations:
+      reloader.stakater.com/auto: 'true'
+
+    httpRoute:
+      enabled: true
+      annotations:
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Nextcloud
+        gethomepage.dev/group: Home & Automation
+        gethomepage.dev/icon: nextcloud.svg
+        gethomepage.dev/description: Personal cloud storage
+        gethomepage.dev/weight: "20"
+      hostnames:
+        - nextcloud.pondi.dev
+      parentRefs:
+        - name: envoy-internal
+          namespace: network
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: "/"
+
+    nextcloud:
+      host: nextcloud.pondi.dev
+      username: admin
+      existingSecret:
+        enabled: true
+        secretName: "{{ .Release.Name }}-secret"
+        passwordKey: ADMIN_PASSWORD
+      mail:
+        enabled: true
+        fromAddress: no-reply
+        domain: pondi.dev
+        smtp:
+          host: smtp-replay.default.svc.cluster.local
+          port: 25
+          secure: NONE
+          authtype: NONE
+
+      configs:
+        proxy.config.php: |-
+          <?php
+          $CONFIG = array (
+            'trusted_proxies' => array(
+              0 => '127.0.0.1',
+              1 => '10.42.0.0/16',
+              2 => '10.43.0.0/16',
+            ),
+            'forwarded_for_headers' => array('HTTP_X_FORWARDED_FOR'),
+          ); ?>
+        misc.config.php: |-
+          <?php
+          $CONFIG = array (
+            'default_timezone' => 'Europe/Warsaw',
+            'default_phone_region' => 'PL',
+            'maintenance_window_start' => 2,
+            'simpleSignUpLink.shown' => false,
+            'overwrite.cli.url' => 'https://nextcloud.pondi.dev',
+            'overwriteprotocol' => 'https',
+          ); ?>
+      datadir: /mnt/data
+      extraVolumes:
+        - name: nfs-data
+          nfs:
+            server: qnap.internal
+            path: /mnt/terra/Media/nc-data
+      extraVolumeMounts:
+        - name: nfs-data
+          mountPath: /mnt/data
+
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 33
+        runAsGroup: 33
+        fsGroup: 33
+        fsGroupChangePolicy: OnRootMismatch
+        readOnlyRootFilesystem: true
+        capabilities: {drop: ["ALL"]}
+
+      internalDatabase:
+        enabled: false
+      externalDatabase:
+        enabled: true
+        type: mysql
+        host: mariadb.database.svc.cluster.local:3306
+        database: nextcloud
+        user: nextcloud
+        existingSecret:
+          enabled: true
+          secretName: "{{ .Release.Name }}-secret"
+          passwordKey: DB_PASSWORD
+    cronjob:
+      enabled: true
+    persistence:
+      enabled: true
+      existingClaim: "{{ .Release.Name }}"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 2Gi
+    startupProbe:
+      enabled: true
+    metrics:
+      enabled: false
+      serviceMonitor:
+        enabled: true

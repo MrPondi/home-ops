@@ -9,7 +9,7 @@ metadata:
       conditions: ["[STATUS] == 404"]
 spec:
   hostnames:
-    - "flux-webhook.pondi.dev"
+    - flux-webhook.pondi.dev
   parentRefs:
     - name: envoy-external
       namespace: network
