@@ -38,8 +38,8 @@ spec:
       username: admin
       existingSecret:
         enabled: true
-        secretName: "{{ .Release.Name }}-secret"
-        passwordKey: ADMIN_PASSWORD
+        secretName: "nextcloud-secret"
+        passwordKey: ADMINISTRATOR_PASSWORD
       mail:
         enabled: true
         fromAddress: no-reply
@@ -100,13 +100,13 @@ spec:
         user: nextcloud
         existingSecret:
           enabled: true
-          secretName: "{{ .Release.Name }}-secret"
+          secretName: "nextcloud-secret"
           passwordKey: DB_PASSWORD
     cronjob:
       enabled: true
     persistence:
       enabled: true
-      existingClaim: "{{ .Release.Name }}"
+      existingClaim: "nextcloud"
     resources:
       requests:
         cpu: 100m
