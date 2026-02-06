@@ -42,17 +42,17 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
     service:
       app:
-        ports:
-          http:
-            port: *port
-      lavalink:
         type: LoadBalancer
         annotations:
           lbipam.cilium.io/ips: 10.0.30.132
         externalTrafficPolicy: Local
         ports:
-          lavalink:
+          http:
             port: *port
+    serviceMonitor:
+      app:
+        endpoints:
+          - port: http
     persistence:
       config:
         type: secret
