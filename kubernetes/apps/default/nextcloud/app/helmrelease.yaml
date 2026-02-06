@@ -38,8 +38,8 @@ spec:
       username: admin
       existingSecret:
         enabled: true
-        secretName: "nextcloud-secret"
-        passwordKey: ADMINISTRATOR_PASSWORD
+        secretName: nextcloud-secret
+        passwordKey: ADMIN_PASSWORD
       mail:
         enabled: true
         fromAddress: no-reply
@@ -71,15 +71,6 @@ spec:
             'overwrite.cli.url' => 'https://nextcloud.pondi.dev',
             'overwriteprotocol' => 'https',
           ); ?>
-      datadir: /mnt/data
-      extraVolumes:
-        - name: nfs-data
-          nfs:
-            server: qnap.internal
-            path: /mnt/terra/Media/nc-data
-      extraVolumeMounts:
-        - name: nfs-data
-          mountPath: /mnt/data
 
       podSecurityContext:
         runAsNonRoot: true
@@ -100,13 +91,16 @@ spec:
         user: nextcloud
         existingSecret:
           enabled: true
-          secretName: "nextcloud-secret"
+          secretName: nextcloud-secret
           passwordKey: DB_PASSWORD
     cronjob:
       enabled: true
     persistence:
       enabled: true
-      existingClaim: "nextcloud"
+      existingClaim: nextcloud
+      nextcloudData:
+        enabled: true
+        existingClaim: nextcloud-data
     resources:
       requests:
         cpu: 100m
