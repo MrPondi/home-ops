@@ -1,0 +1,82 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nut-exporter
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: nut-exporter
+  interval: 1h
+  values:
+    controllers:
+      nut-exporter:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/druggeri/nut_exporter
+              tag: 3.2.3@sha256:a9e6c0100ebc0e8ec2c7a46de8af1366df8abd5d794f175b8ee6b2361819ee6e
+            env:
+              TZ: Europe/Warsaw
+            args:
+              - --nut.vars_enable="battery.charge,battery.charge,battery.runtime,battery.voltage,battery.voltage.nominal,input.voltage,input.voltage.nominal,output.voltage,output.voltage.nominal,ups.realpower,ups.load,ups.status,ups.status"
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+    service:
+      app:
+        ports:
+          metrics:
+            enabled: true
+            protocol: TCP
+            port: 9199
+    serviceMonitor:
+      app:
+        enabled: true
+        serviceName: nut-exporter
+        endpoints:
+          - interval: 30s
+            path: /ups_metrics
+            port: metrics
+            scheme: http
+            scrapeTimeout: 30s
+            params:
+              server:
+                - "pve.internal"
+              ups:
+                - "apc"
+            metricRelabelings:
+              - action: replace
+                replacement: apc
+                sourceLabels:
+                  - instance
+                targetLabel: instance
+              - action: replace
+                replacement: pve.internal
+                sourceLabels:
+                  - server
+                targetLabel: server
+              - action: labeldrop
+                regex: pod
