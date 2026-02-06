@@ -35,17 +35,20 @@ spec:
 
     nextcloud:
       host: nextcloud.pondi.dev
-      username: admin
       existingSecret:
         enabled: true
         secretName: nextcloud-secret
+        usernameKey: ADMIN_USERNAME
         passwordKey: ADMIN_PASSWORD
+        smtpUsernameKey: SMTP_USERNAME
+        smtpPasswordKey: SMTP_PASSWORD
+        smtpHostKey: SMTP_HOST
       mail:
         enabled: true
         fromAddress: no-reply
         domain: pondi.dev
         smtp:
-          host: smtp-replay.default.svc.cluster.local
+          host:
           port: 25
           secure: NONE
           authtype: NONE
@@ -88,10 +91,10 @@ spec:
         type: mysql
         host: mariadb.database.svc.cluster.local:3306
         database: nextcloud
-        user: nextcloud
         existingSecret:
           enabled: true
           secretName: nextcloud-secret
+          usernameKey: DB_USER
           passwordKey: DB_PASSWORD
     cronjob:
       enabled: true
