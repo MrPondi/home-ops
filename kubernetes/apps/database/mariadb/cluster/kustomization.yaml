@@ -15,3 +15,8 @@ resources:
   # Pelican User
   - ./users/pelican-user.yaml
   - ./grants/pelican-user.yaml
+
+  # Nextcloud
+  - ./databases/nextcloud.yaml
+  - ./users/nextcloud.yaml
+  - ./grants/nextcloud.yaml
