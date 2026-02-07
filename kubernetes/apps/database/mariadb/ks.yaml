@@ -5,9 +5,6 @@ kind: Kustomization
 metadata:
   name: mariadb
 spec:
-  dependsOn:
-    - name: external-secrets-store
-      namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/database/mariadb/app
   prune: true
@@ -27,6 +24,8 @@ spec:
   dependsOn:
     - name: mariadb
       namespace: database
+    - name: external-secrets-store
+      namespace: external-secrets
     - name: openebs
       namespace: openebs-system
   interval: 1h

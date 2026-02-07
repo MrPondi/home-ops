@@ -4,6 +4,7 @@ kind: Kustomization
 metadata:
   name: mariadb-cluster
 resources:
+  - ./externalsecret.yaml
   - ./mariadb.yaml
   - ./physicalbackup.yaml
 
