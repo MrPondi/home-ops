@@ -22,9 +22,9 @@ spec:
         gethomepage.dev/icon: nextcloud.svg
         gethomepage.dev/description: Personal cloud storage
         gethomepage.dev/weight: "20"
-        # gethomepage.dev/widget.type: nextcloud
-        # gethomepage.dev/widget.url: https://nextcloud.pondi.dev
-        # gethomepage.dev/widget.token: "{{`{{HOMEPAGE_VAR_NEXTCLOUD_TOKEN}}`}}"
+        gethomepage.dev/widget.type: nextcloud
+        gethomepage.dev/widget.url: https://nextcloud.pondi.dev
+        gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_NEXTCLOUD_TOKEN}}`}}"
       hostnames:
         - nextcloud.pondi.dev
       parentRefs:
@@ -77,6 +77,12 @@ spec:
             'overwrite.cli.url' => 'https://nextcloud.pondi.dev',
             'overwriteprotocol' => 'https',
           ); ?>
+      extraVolumes:
+        - name: tmp
+          ExmptyDir: {}
+      extraVolumeMounts:
+        - name: tmp
+          mountPath: "/tmp"
 
       podSecurityContext:
         runAsNonRoot: true
@@ -101,8 +107,7 @@ spec:
         passwordKey: DB_PASSWORD
     cronjob:
       enabled: true
-      type: cronjob
-      cronjob:
+      sidecar:
         securityContext:
           runAsNonRoot: true
           runAsUser: 33
