@@ -24,17 +24,13 @@ kind: Kustomization
 metadata:
   name: mariadb-cluster
 spec:
-  components:
-    - ../../../../components/volsync
   dependsOn:
     - name: mariadb
       namespace: database
+    - name: openebs
+      namespace: openebs-system
   interval: 1h
   path: ./kubernetes/apps/database/mariadb/cluster
-  postBuild:
-    substitute:
-      APP: mariadb
-      VOLSYNC_CAPACITY: 5Gi
   prune: true
   sourceRef:
     kind: GitRepository
