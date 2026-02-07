@@ -13,9 +13,6 @@ spec:
     global:
       podAnnotations:
         reloader.stakater.com/auto: 'true'
-      envFrom:
-        - secretRef:
-            name: "{{ .Release.Name }}-secret"
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -30,7 +27,7 @@ spec:
             claimName: "{{ .Release.Name }}"
     authentik:
       existingSecret:
-        secretName: "{{ .Release.Name }}-secret"
+        secretName: "authentik-secret"
       email:
         host: "smtp-relay.default.svc.cluster.local"
         from: "Authentik security <no-reply@pondi.dev>"
@@ -77,7 +74,7 @@ spec:
     geoip:
       enabled: true
       existingSecret:
-        secretName: "{{ .Release.Name }}-secret"
+        secretName: "authentik-secret"
         accountId: "GEOIP_ACCOUNT_ID"
         licenseKey: "GEOIP_LICENSE_KEY"
 
