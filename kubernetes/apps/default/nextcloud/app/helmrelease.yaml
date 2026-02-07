@@ -22,9 +22,9 @@ spec:
         gethomepage.dev/icon: nextcloud.svg
         gethomepage.dev/description: Personal cloud storage
         gethomepage.dev/weight: "20"
-        gethomepage.dev/widget.type: nextcloud
-        gethomepage.dev/widget.url: https://nextcloud.pondi.dev
-        gethomepage.dev/widget.token: "{{`{{HOMEPAGE_VAR_NEXTCLOUD_TOKEN}}`}}"
+        # gethomepage.dev/widget.type: nextcloud
+        # gethomepage.dev/widget.url: https://nextcloud.pondi.dev
+        # gethomepage.dev/widget.token: "{{`{{HOMEPAGE_VAR_NEXTCLOUD_TOKEN}}`}}"
       hostnames:
         - nextcloud.pondi.dev
       parentRefs:
@@ -101,6 +101,15 @@ spec:
         passwordKey: DB_PASSWORD
     cronjob:
       enabled: true
+      type: cronjob
+      cronjob:
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 33
+          runAsGroup: 33
+          fsGroup: 33
+          fsGroupChangePolicy: OnRootMismatch
+          readOnlyRootFilesystem: true
     persistence:
       enabled: true
       existingClaim: nextcloud
