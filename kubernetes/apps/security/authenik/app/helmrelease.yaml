@@ -1,0 +1,86 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: authentik
+  interval: 1h
+  values:
+    global:
+      podAnnotations:
+        reloader.stakater.com/auto: 'true'
+      envFrom:
+        - secretRef:
+            name: "{{ .Release.Name }}-secret"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        readOnlyRootFilesystem: true
+        capabilities: {drop: ["ALL"]}
+      volumes:
+        - name: media
+          persistentVolumeClaim:
+            claimName: "{{ .Release.Name }}"
+    authentik:
+      existingSecret:
+        secretName: "{{ .Release.Name }}-secret"
+      email:
+        host: "smtp-relay.default.svc.cluster.local"
+        from: "Authentik security <no-reply@pondi.dev>"
+    server:
+      volumeMounts:
+        - name: media
+          mountPath: /media
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+      route:
+        main:
+          enabled: true
+          annotations:
+            gethomepage.dev/enabled: "true"
+            gethomepage.dev/name: Authentik
+            gethomepage.dev/group: Infrastructure
+            gethomepage.dev/icon: authentik.svg
+            gethomepage.dev/description: Identity and access management platform
+            gethomepage.dev/weight: "0"
+            gethomepage.dev/widget.type: authentik
+            gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:9000
+            gethomepage.dev/widget.version: 2
+            gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_AUTHENTIK_TOKEN}}`}}"
+          hostnames:
+            - "{{ .Release.Name }}.pondi.dev"
+          parentRefs:
+            - name: envoy-internal
+              namespace: network
+    worker:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1.5Gi
+    geoip:
+      enabled: true
+      existingSecret:
+        secretName: "{{ .Release.Name }}-secret"
+        accountId: "GEOIP_ACCOUNT_ID"
+        licenseKey: "GEOIP_LICENSE_KEY"
+
+    prometheus:
+      rules:
+        enabled: true
