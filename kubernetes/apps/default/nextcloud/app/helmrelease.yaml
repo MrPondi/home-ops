@@ -77,13 +77,9 @@ spec:
             'overwrite.cli.url' => 'https://nextcloud.pondi.dev',
             'overwriteprotocol' => 'https',
           ); ?>
-      extraVolumes:
-        - name: tmp
-          ExmptyDir: {}
       extraVolumeMounts:
         - name: tmp
           mountPath: "/tmp"
-
       podSecurityContext:
         runAsNonRoot: true
         runAsUser: 33

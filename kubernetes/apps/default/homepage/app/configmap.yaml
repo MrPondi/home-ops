@@ -61,6 +61,7 @@ data:
           widget:
             type: truenas
             url: https://qnap.internal
+            version: 2
             key: {{HOMEPAGE_VAR_TRUENAS_API_KEY}}
             fields: ["uptime", "alerts"]
             enablePools: true
