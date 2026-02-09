@@ -24,7 +24,7 @@ spec:
       volumes:
         - name: media
           persistentVolumeClaim:
-            claimName: "{{ .Release.Name }}"
+            claimName: "authentik"
     authentik:
       existingSecret:
         secretName: "authentik-secret"
@@ -57,7 +57,7 @@ spec:
             gethomepage.dev/weight: "0"
             gethomepage.dev/widget.type: authentik
             gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:9000
-            gethomepage.dev/widget.version: 2
+            gethomepage.dev/widget.version: "2"
             gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_AUTHENTIK_TOKEN}}`}}"
           hostnames:
             - "{{ .Release.Name }}.pondi.dev"
