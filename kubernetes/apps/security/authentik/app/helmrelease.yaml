@@ -24,14 +24,21 @@ spec:
       volumes:
         - name: media
           persistentVolumeClaim:
-            claimName: "authentik"
+            claimName: authentik
     authentik:
       existingSecret:
-        secretName: "authentik-secret"
+        secretName: authentik-secret
       email:
         host: "smtp-relay.default.svc.cluster.local"
         from: "Authentik security <no-reply@pondi.dev>"
     server:
+      initContainers:
+        - name: init-db
+          image: ghcr.io/home-operations/postgres-init:18.1
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: authentik-secret
       volumeMounts:
         - name: media
           mountPath: /media
@@ -74,9 +81,9 @@ spec:
     geoip:
       enabled: true
       existingSecret:
-        secretName: "authentik-secret"
-        accountId: "GEOIP_ACCOUNT_ID"
-        licenseKey: "GEOIP_LICENSE_KEY"
+        secretName: authentik-secret
+        accountId: GEOIP_ACCOUNT_ID
+        licenseKey: GEOIP_LICENSE_KEY
 
     prometheus:
       rules:
