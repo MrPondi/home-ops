@@ -56,6 +56,7 @@ data:
             key: {{HOMEPAGE_VAR_CLOUDFLARE_API_TOKEN}}
       - TrueNas:
           icon: truenas.svg
+          href: https://qnap.internal
           description: NFS Storage
           weight: "0"
           widget:
@@ -67,6 +68,7 @@ data:
             enablePools: true
       - Proxmox:
           icon: proxmox.svg
+          href: https://pve.internal:8006
           description: Virtualization Hypervisor
           weight: "2"
           widget:
