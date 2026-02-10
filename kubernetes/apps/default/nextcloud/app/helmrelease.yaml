@@ -23,7 +23,7 @@ spec:
         gethomepage.dev/description: Personal cloud storage
         gethomepage.dev/weight: "20"
         gethomepage.dev/widget.type: nextcloud
-        gethomepage.dev/widget.url: http://nextcloud.default.svc.cluster.local
+        gethomepage.dev/widget.url: https://nextcloud.pondi.dev
         gethomepage.dev/widget.key: "{{HOMEPAGE_VAR_NEXTCLOUD_TOKEN}}"
       hostnames:
         - "{{ .Release.Name }}.pondi.dev"
