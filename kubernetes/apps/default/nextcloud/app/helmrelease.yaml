@@ -90,7 +90,7 @@ spec:
             'oidc_login_logout_url' => 'https://authentik.pondi.dev/application/o/nextcloud/end-session/',
             'oidc_login_end_session_redirect' => true,
             'oidc_login_default_quota' => '5368709120', // 5 GB
-            'oidc_login_button_text' => 'Log in with OpenID',
+            'oidc_login_button_text' => 'Log in with Authentik',
             'oidc_login_hide_password_form' => true,
 
             // Use ID Token instead of UserInfo
@@ -119,6 +119,17 @@ spec:
             'oidc_login_update_avatar' => true,
             'oidc_login_code_challenge_method' => 'S256',
           ); ?>
+      extraEnv:
+        - name: NEXTCLOUD_OIDC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: nextcloud-secret
+              key: NEXTCLOUD_OIDC_CLIENT_ID
+        - name: NEXTCLOUD_OIDC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: nextcloud-secret
+              key: NEXTCLOUD_OIDC_CLIENT_SECRET
       extraVolumes:
         - name: tmp
           EmptyDir: {}
