@@ -119,7 +119,25 @@ spec:
             'oidc_login_update_avatar' => true,
             'oidc_login_code_challenge_method' => 'S256',
           ); ?>
+      hooks:
+        post-installation: |-
+          printf "Configure NC-Token\n"
+          php occ config:app:set serverinfo token --value $NEXTCLOUD_TOKEN
+          printf "Add missing DB indices\n"
+          php occ db:add-missing-indices
+        post-upgrade: |-
+          # based on https://github.com/nextcloud/all-in-one/blob/25c580bca370eaead5f1fad9d3842a9c49562dff/Containers/nextcloud/entrypoint.sh#L451-L457
+          php occ maintenance:repair --include-expensive
+          php occ db:add-missing-indices
+          php occ db:add-missing-columns
+          php occ db:add-missing-primary-keys
+          yes | php occ db:convert-filecache-bigint
       extraEnv:
+        - name: NEXTCLOUD_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: nextcloud-secret
+              key: NEXTCLOUD_TOKEN
         - name: NEXTCLOUD_OIDC_CLIENT_ID
           valueFrom:
             secretKeyRef:

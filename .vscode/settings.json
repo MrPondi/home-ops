@@ -36,12 +36,13 @@
     "external-secrets": "secure",
     "flux-system": "pipe",
     "kube-system": "kubernetes",
+    "longhorn-system": "dump",
     "network": "connection",
     "observability": "event",
     "openebs-system": "base",
     "rook-ceph": "dump",
     "system-upgrade": "update",
-    "storage": "aws",
+    "storage": "aws"
   },
   "sops.defaults.ageKeyFile": "age.key",
   "vs-kubernetes": {
