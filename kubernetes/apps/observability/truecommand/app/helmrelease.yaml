@@ -19,19 +19,6 @@ spec:
               tag: 3.2.0@sha256:19c218455cd2a0517930b99b5de486ce2e0a2173f36c7a11d542a828f75e5a67
             env:
               TZ: Europe/Warsaw
-            probes:
-              liveness: &probes
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /health
-                    port: &port 80
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -51,7 +38,7 @@ spec:
       app:
         ports:
           http:
-            port: *port
+            port: 80
     route:
       app:
         annotations:
