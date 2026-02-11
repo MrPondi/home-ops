@@ -18,5 +18,6 @@ resources:
   - ./nut-exporter/ks.yaml
   - ./silence-operator/ks.yaml
   - ./smartctl-exporter/ks.yaml
+  - ./truecommand/ks.yaml
   - ./unpoller/ks.yaml
   - ./victoria-logs/ks.yaml

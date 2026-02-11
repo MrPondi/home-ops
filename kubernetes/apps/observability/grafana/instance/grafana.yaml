@@ -14,9 +14,19 @@ spec:
       feedback_links_enabled: "false"
       reporting_enabled: "false"
     auth:
-      disable_login_form: "false"
-    auth.anonymous:
+      disable_login_form: "true"
+      signout_redirect_url: "https://authentik.pondi.dev/application/o/grafana/end-session/"
+    # auth.anonymous:
+    #   enabled: "true"
+    auth.generic_oauth:
       enabled: "true"
+      name: authentik
+      scopes: "openid profile email"
+      auth_url: "https://authentik.pondi.dev/application/o/authorize/"
+      token_url: "http://authentik.security.svc.cluster.local/application/o/token/"
+      api_url: "http://authentik.security.svc.cluster.local/application/o/userinfo/"
+      role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
+      auto_login: "true"
     log:
       mode: console
     metrics:
@@ -38,12 +48,9 @@ spec:
         spec:
           containers:
             - name: grafana
-              env:
-                - name: GF_SECURITY_ADMIN_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: grafana-admin-password-secret
-                      key: GF_SECURITY_ADMIN_PASSWORD
+              envFrom:
+                - secretRef:
+                    name: grafana-secret
               securityContext:
                 allowPrivilegeEscalation: false
                 readOnlyRootFilesystem: true

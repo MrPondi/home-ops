@@ -20,8 +20,6 @@ spec:
               repository: ghcr.io/home-operations/home-assistant
               tag: 2026.2.1@sha256:79f5a2e8d0aa2b8a7dcfbc4fe7e0930321248724bce219d97acf9f5ce7ff854b
             env:
-              HASS_HTTP_TRUSTED_PROXY_1: 10.0.30.0/24
-              HASS_HTTP_TRUSTED_PROXY_2: 10.42.0.0/16
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
@@ -57,7 +55,7 @@ spec:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Home Assistant
           gethomepage.dev/group: Home & Automation
-          gethomepage.dev/icon: home-assistant.svg
+          gethomepage.dev/icon: home-assistant-alt.svg
           gethomepage.dev/description: Smart home automation platform
           gethomepage.dev/weight: "0"
           gethomepage.dev/widget.type: homeassistant
@@ -74,6 +72,12 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /config
+      config-file:
+        type: secret
+        name: "{{ .Release.Name }}-config"
+        globalMounts:
+          - path: /config/configuration.yaml
+            subPath: configuration.yaml
       config-cache:
         existingClaim: "{{ .Release.Name }}-cache"
         globalMounts:

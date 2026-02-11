@@ -2,6 +2,7 @@
 *.pub
 *.key
 *.decrypted~*.yaml
+*.decrypted~*.json
 /age.key
 /cloudflare-tunnel.json
 /github-deploy.key
@@ -32,4 +33,5 @@ credentials.auto.tfvars
 *.auto.tfvars.json
 credentials.sh
 .env
+.bw-provider-state
 id_rsa
