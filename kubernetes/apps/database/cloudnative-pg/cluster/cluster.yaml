@@ -21,7 +21,7 @@ spec:
       name: barman-cloud.cloudnative-pg.io
       parameters: &barmanParameters
         barmanObjectName: minio
-        serverName: postgres-v1
+        serverName: postgres-1
   postgresql:
     parameters:
       max_connections: "300"
