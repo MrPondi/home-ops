@@ -62,6 +62,7 @@ spec:
             gethomepage.dev/icon: authentik.svg
             gethomepage.dev/description: Identity and access management platform
             gethomepage.dev/weight: "0"
+            gethomepage.dev/app: authentik
             gethomepage.dev/widget.type: authentik
             gethomepage.dev/widget.url: "http://authentik-server.security.svc.cluster.local"
             gethomepage.dev/widget.version: "2"
