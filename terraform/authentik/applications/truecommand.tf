@@ -38,6 +38,8 @@ resource "authentik_provider_saml" "truecommand" {
     authentik_property_mapping_provider_saml.saml-truecommand-email.id,
     authentik_property_mapping_provider_saml.saml-truecommand-display-name.id,
   ]
+
+  signing_kp = data.authentik_certificate_key_pair.self-signed.id
 }
 
 resource "authentik_application" "truecommand" {
