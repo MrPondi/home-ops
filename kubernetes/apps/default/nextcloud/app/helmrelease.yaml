@@ -86,7 +86,7 @@ spec:
             'oidc_login_provider_url' => 'https://authentik.pondi.dev/application/o/nextcloud',
             'oidc_login_client_id' => getenv('NEXTCLOUD_OIDC_CLIENT_ID'),
             'oidc_login_client_secret' => getenv('NEXTCLOUD_OIDC_CLIENT_SECRET'),
-            'oidc_login_auto_redirect' => false, // Set to true after testing
+            'oidc_login_auto_redirect' => true,
             'oidc_login_logout_url' => 'https://authentik.pondi.dev/application/o/nextcloud/end-session/',
             'oidc_login_end_session_redirect' => true,
             'oidc_login_default_quota' => '5368709120', // 5 GB
@@ -101,7 +101,7 @@ spec:
                 'name' => 'name',
                 'mail' => 'email',
                 'quota' => 'quota',
-                'groups' => 'groups',
+                'groups' => 'nc-groups',
                 'photoURL' => 'avatar',
                 'is_admin' => 'is_admin',
                 'birthdate' => 'birthdate',

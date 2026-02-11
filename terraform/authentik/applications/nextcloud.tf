@@ -7,7 +7,7 @@ groups = [group.name.removeprefix("nextcloud-") for group in request.user.ak_gro
 
 return {
     "name": request.user.name,
-    "groups": groups,
+    "nc-groups": groups,
     "quota": request.user.group_attributes().get("nextcloud_quota", None),
     "avatar": request.user.avatar,
     "is_admin": request.user.is_superuser or request.user.group_attributes().get("nextcloud_admin", False),
@@ -32,7 +32,7 @@ resource "authentik_provider_oauth2" "nextcloud" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
-      url           = "https://nextcloud.pondi.dev/apps/user_oidc/code",
+      url           = "https://nextcloud.pondi.dev/apps/oidc_login/oidc",
     }
   ]
 

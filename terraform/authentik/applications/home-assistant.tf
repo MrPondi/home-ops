@@ -13,7 +13,7 @@ resource "authentik_provider_oauth2" "home-assistant" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
-      url           = "https://home-assistant.pondi.dev/auth/openid/callback",
+      url           = "https://hass.pondi.dev/auth/openid/callback",
     }
   ]
 
@@ -29,6 +29,6 @@ resource "authentik_application" "home-assistant" {
   slug              = "home-assistant"
   protocol_provider = authentik_provider_oauth2.home-assistant.id
   meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/home-assistant-alt.svg"
-  meta_launch_url   = "https://home-assistant.pondi.dev"
+  meta_launch_url   = "https://hass.pondi.dev"
   open_in_new_tab   = true
 }

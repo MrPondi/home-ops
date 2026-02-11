@@ -62,7 +62,7 @@ spec:
           gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:8123
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_HOMEASSISTANT_TOKEN}}`}}"
         hostnames:
-          - "{{ .Release.Name }}.pondi.dev"
+          # - "{{ .Release.Name }}.pondi.dev"
           - "hass.pondi.dev"
         parentRefs:
           - name: envoy-external
