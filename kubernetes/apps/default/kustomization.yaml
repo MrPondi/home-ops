@@ -16,5 +16,6 @@ resources:
   - ./musicbot/ks.yaml
   - ./nextcloud/ks.yaml
   - ./pelican/ks.yaml
+  - ./ringback/ks.yaml
   - ./smtp-relay/ks.yaml
   - ./zwave/ks.yaml
