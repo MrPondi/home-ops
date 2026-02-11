@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # Constants
 DB_PATH = "/data/notified_calls.db"
-CONFIG_PATH = "config.json"
+CONFIG_PATH = "/config/config.json"
 TIMEOUT_DAYS = 7  # Check calls from the last 7 days
 RETRY_WINDOW_DAYS = 14  # Check unnotified calls up to 14 days
 PHONE_NUMBER_LENGTH = 9  # Polish phone numbers (without country code)

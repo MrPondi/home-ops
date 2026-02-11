@@ -86,7 +86,7 @@ spec:
         type: secret
         name: "{{ .Release.Name }}-secret"
         globalMounts:
-          - path: /app/config.json
+          - path: /config/config.json
             subPath: config.json
       packages:
         type: emptyDir
