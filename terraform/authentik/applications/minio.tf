@@ -6,7 +6,12 @@ resource "authentik_property_mapping_provider_scope" "minio-policy" {
   name       = "MinIO Policy"
   scope_name = "policy"
   expression = <<EOF
-return "consoleAdmin" if request.user.is_superuser or request.user.group_attributes().get("minio_admin", False) else "readonly"
+return {
+  "policy": "consoleAdmin"
+    if request.user.is_superuser
+    or request.user.group_attributes().get("minio_admin", False)
+    else "readonly"
+}
 EOF
 }
 
