@@ -59,3 +59,9 @@ data "authentik_property_mapping_provider_saml" "saml-username" {
 data "authentik_property_mapping_provider_saml" "saml-windows-accountname" {
   name = "authentik default SAML Mapping: WindowsAccountname (Username)"
 }
+
+# Certificates
+
+data "authentik_certificate_key_pair" "self-signed" {
+  name = "authentik Self-signed Certificate"
+}

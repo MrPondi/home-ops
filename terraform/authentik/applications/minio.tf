@@ -2,6 +2,14 @@ data "bitwarden-secrets_secret" "minio" {
   id = "bf6713b4-8ae0-4100-9208-b3dc00d6a8ae"
 }
 
+resource "authentik_property_mapping_provider_scope" "minio-policy" {
+  name       = "MinIO Policy"
+  scope_name = "policy"
+  expression = <<EOF
+return "consoleAdmin" if request.user.is_superuser or request.user.group_attributes().get("minio_admin", False) else "readonly"
+EOF
+}
+
 resource "authentik_provider_oauth2" "minio" {
   name          = "MinIO OAuth2 Provider"
   client_id     = jsondecode(data.bitwarden-secrets_secret.minio.value)["MINIO_OIDC_CLIENT_ID"]
@@ -18,10 +26,13 @@ resource "authentik_provider_oauth2" "minio" {
   ]
 
   property_mappings = [
+    authentik_property_mapping_provider_scope.minio-policy.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
   ]
+
+  signing_key = data.authentik_certificate_key_pair.self-signed.id
 }
 
 resource "authentik_application" "minio" {

@@ -25,6 +25,8 @@ resource "authentik_provider_oauth2" "grafana" {
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
   ]
+
+  signing_key = data.authentik_certificate_key_pair.self-signed.id
 }
 
 resource "authentik_application" "grafana" {

@@ -23,7 +23,8 @@ resource "authentik_provider_oauth2" "proxmox" {
     data.authentik_property_mapping_provider_scope.scope-profile.id,
   ]
 
-  sub_mode = "user_email"
+  signing_key = data.authentik_certificate_key_pair.self-signed.id
+  sub_mode    = "user_email"
 }
 
 resource "authentik_application" "proxmox" {
