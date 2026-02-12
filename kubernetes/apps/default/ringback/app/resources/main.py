@@ -265,6 +265,10 @@ def process_calls(
             logger.warning(f"Call missing callingNumber field: {call}")
             continue
 
+        if call.get("status", "") not in ["CONNECTED", "REDIRECTED"]:
+            logger.debug(f"Skipping call with status {call.get('status')}: {calling_number}")
+            continue
+
         logger.debug(f"Processing call from {calling_number}")
 
         # Check if this number has an associated order

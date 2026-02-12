@@ -5,10 +5,10 @@ kind: SecurityPolicy
 metadata:
   name: ${APP}
 spec:
-  targetRef:
-    group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: ${APP_HTTPROUTE:=${APP}}
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: ${APP_HTTPROUTE:=${APP}}
   extAuth:
     headersToExtAuth:
       - cookie
@@ -16,7 +16,7 @@ spec:
       backendRefs:
         - name: authentik-server
           namespace: security
-          port: 9000
+          port: 80
       path: /outpost.goauthentik.io/auth/envoy
       headersToBackend:
         - cookie
