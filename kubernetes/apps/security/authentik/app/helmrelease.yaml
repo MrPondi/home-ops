@@ -28,9 +28,6 @@ spec:
     authentik:
       existingSecret:
         secretName: authentik-secret
-      email:
-        host: "smtp-relay.default.svc.cluster.local"
-        from: "Authentik security <no-reply@pondi.dev>"
     server:
       initContainers:
         - name: init-db
