@@ -4,7 +4,7 @@ machine:
     kubernetesTalosAPIAccess:
       allowedKubernetesNamespaces:
         - actions-runner-system
-        # - system-upgrade
+        - system-upgrade
       allowedRoles:
         - os:admin
       enabled: true
