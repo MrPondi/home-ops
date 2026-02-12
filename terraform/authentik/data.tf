@@ -65,3 +65,9 @@ data "authentik_property_mapping_provider_saml" "saml-windows-accountname" {
 data "authentik_certificate_key_pair" "self-signed" {
   name = "authentik Self-signed Certificate"
 }
+
+# Service Connection
+
+data "authentik_service_connection_kubernetes" "local" {
+  name = "Local Kubernetes Cluster"
+}

@@ -18,8 +18,8 @@ provider "authentik" {
   token = jsondecode(data.bitwarden-secrets_secret.authentik.value)["AUTHENTIK_TERRAFORM_TOKEN"]
 }
 
-module "applications" {
-  source = "./applications"
+module "configuration" {
+  source = "./config"
 
   providers = {
     authentik       = authentik
