@@ -2,20 +2,20 @@
   "editor.bracketPairColorization.enabled": true,
   "editor.fontFamily": "FiraCode Nerd Font",
   "editor.fontLigatures": true,
+  "editor.fontSize": 14,
   "editor.guides.bracketPairs": true,
   "editor.guides.bracketPairsHorizontal": true,
   "editor.guides.highlightActiveBracketPair": true,
   "editor.hover.delay": 1500,
   "editor.rulers": [100],
   "editor.stickyScroll.enabled": false,
-  "explorer.autoReveal": false,
+  "explorer.autoReveal": true,
   "files.associations": {
-    "**/*.json5": "json5",
+    "**/*.json5": "json5"
   },
   "files.trimTrailingWhitespace": true,
   "material-icon-theme.files.associations": {
     "*.gotmpl": "smarty",
-    "*.sops.yaml": "lock",
     "helmfile.yaml": "helm",
     "kubeconfig": "kubernetes",
     "talosconfig": "kubernetes"
@@ -44,18 +44,17 @@
     "system-upgrade": "update",
     "storage": "aws"
   },
-  "sops.defaults.ageKeyFile": "age.key",
+  "terminal.integrated.fontSize": 14,
   "vs-kubernetes": {
     "vs-kubernetes.kubeconfig": "./kubeconfig",
-    "vs-kubernetes.knownKubeconfigs": [
-      "./kubeconfig"
-    ]
+    "vs-kubernetes.knownKubeconfigs": ["./kubeconfig"]
   },
+  "window.zoomLevel": 0,
   "yaml.schemaStore.enable": true,
   "yaml.schemas": {
     "kubernetes": "./kubernetes/**/*.yaml"
   },
   "[yaml]": {
     "editor.defaultFormatter": "bluebrown.yamlfmt"
-  },
+  }
 }
