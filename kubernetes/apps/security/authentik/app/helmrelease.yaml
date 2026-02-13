@@ -65,7 +65,7 @@ spec:
             gethomepage.dev/widget.version: "2"
             gethomepage.dev/widget.key: "{{HOMEPAGE_VAR_AUTHENTIK_TOKEN}}"
           hostnames:
-            - "{{ .Release.Name }}.pondi.dev"
+            - "auth.pondi.dev"
           parentRefs:
             - name: envoy-internal
               namespace: network

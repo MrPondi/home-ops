@@ -83,11 +83,11 @@ spec:
           $CONFIG = array (
             'allow_user_to_change_display_name' => false,
             'lost_password_link' => 'disabled',
-            'oidc_login_provider_url' => 'https://authentik.pondi.dev/application/o/nextcloud',
+            'oidc_login_provider_url' => 'https://auth.pondi.dev/application/o/nextcloud',
             'oidc_login_client_id' => getenv('NEXTCLOUD_OIDC_CLIENT_ID'),
             'oidc_login_client_secret' => getenv('NEXTCLOUD_OIDC_CLIENT_SECRET'),
             'oidc_login_auto_redirect' => true,
-            'oidc_login_logout_url' => 'https://authentik.pondi.dev/application/o/nextcloud/end-session/',
+            'oidc_login_logout_url' => 'https://auth.pondi.dev/application/o/nextcloud/end-session/',
             'oidc_login_end_session_redirect' => true,
             'oidc_login_default_quota' => '5368709120', // 5 GB
             'oidc_login_button_text' => 'Log in with Authentik',

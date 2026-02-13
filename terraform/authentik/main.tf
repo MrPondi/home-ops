@@ -14,7 +14,7 @@ data "bitwarden-secrets_secret" "authentik" {
 }
 
 provider "authentik" {
-  url   = "https://authentik.pondi.dev"
+  url   = "https://auth.pondi.dev"
   token = jsondecode(data.bitwarden-secrets_secret.authentik.value)["AUTHENTIK_TERRAFORM_TOKEN"]
 }
 
