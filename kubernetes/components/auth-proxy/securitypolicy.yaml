@@ -19,6 +19,5 @@ spec:
           port: 80
       path: /outpost.goauthentik.io/auth/envoy
       headersToBackend:
-        - cookie
         - set-cookie
         - x-authentik-*

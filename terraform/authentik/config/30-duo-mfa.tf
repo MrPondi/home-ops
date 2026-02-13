@@ -67,6 +67,6 @@ resource "authentik_provider_ldap" "duo" {
 resource "authentik_rbac_permission_role" "duo-provider-search" {
   role       = authentik_rbac_role.ldap-search.id
   model      = "authentik_providers_ldap.ldapprovider"
-  permission = "search_full_directory"
+  permission = "authentik_providers_ldap.search_full_directory"
   object_id  = authentik_provider_ldap.duo.id
 }
