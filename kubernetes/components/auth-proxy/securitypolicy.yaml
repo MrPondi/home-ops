@@ -10,6 +10,7 @@ spec:
       kind: HTTPRoute
       name: ${APP_HTTPROUTE:=${APP}}
   extAuth:
+    failOpen: false
     headersToExtAuth:
       - cookie
     http:
@@ -21,3 +22,4 @@ spec:
       headersToBackend:
         - set-cookie
         - x-authentik-*
+        - authorization
