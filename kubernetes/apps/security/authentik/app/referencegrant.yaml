@@ -10,6 +10,9 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: "media"
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: "default"
   to:
     - group: ""
       kind: Service
