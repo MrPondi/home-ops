@@ -87,6 +87,13 @@ sync-oci:
 view-secret namespace secret="":
     kubectl view-secret -n {{ namespace }} {{ secret }}
 
+[doc('View helm template')]
+template-release ns ks path:
+    helm template \
+    "$(yq -r '.metadata.name' apps/{{ ns }}/{{ ks }}/{{ path }}/helmrelease.yaml)" \
+    "$(yq -r '.spec.url' apps/{{ ns }}/{{ ks }}/{{ path }}/ocirepository.yaml)" \
+    -f <(yq '.spec.values' apps/{{ ns }}/{{ ks }}/{{ path }}/helmrelease.yaml)
+
 [private]
 render-local-ks ns ks:
     flux-local build ks --namespace "{{ ns }}" --path "{{ kubernetes_dir }}/flux/cluster" "{{ ks }}"

@@ -154,9 +154,6 @@ spec:
       extraVolumeMounts:
         - name: tmp
           mountPath: "/tmp"
-        - name: nextcloud-data
-          mountPath: "/var/www/html/data"
-          subPath: nextcloud
       podSecurityContext:
         runAsNonRoot: true
         runAsUser: 33
@@ -195,6 +192,7 @@ spec:
       nextcloudData:
         enabled: true
         existingClaim: nextcloud-data
+        subPath: nextcloud
     resources:
       requests:
         cpu: 100m
