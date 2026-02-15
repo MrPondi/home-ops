@@ -12,7 +12,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     server: "qnap.internal"
-    path: "/mnt/terra/Media/nextcloud"
+    path: "/mnt/terra/Media"
   mountOptions:
     - nfsvers=4.2
     - hard
