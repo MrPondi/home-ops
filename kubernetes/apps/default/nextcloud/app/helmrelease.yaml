@@ -192,7 +192,6 @@ spec:
       nextcloudData:
         enabled: true
         existingClaim: nextcloud-data
-        subPath: nextcloud
     resources:
       requests:
         cpu: 100m
