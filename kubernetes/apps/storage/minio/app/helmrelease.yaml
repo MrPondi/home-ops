@@ -70,6 +70,10 @@ spec:
     service:
       app:
         controller: minio
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.0.30.130
+        externalTrafficPolicy: Cluster
         ports:
           http:
             port: 9001

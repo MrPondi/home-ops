@@ -53,6 +53,8 @@ spec:
         main:
           enabled: true
           annotations:
+            gatus.home-operations.com/endpoint: |-
+              name: authentik
             gethomepage.dev/enabled: "true"
             gethomepage.dev/name: Authentik
             gethomepage.dev/group: Infrastructure
