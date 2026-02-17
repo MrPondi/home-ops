@@ -11,6 +11,7 @@ resources:
   - ./namespace.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
+  - ./decluttarr/ks.yaml
   - ./jellyfin/ks.yaml
   # - ./plex/ks.yaml
   - ./seerr/ks.yaml
@@ -19,5 +20,6 @@ resources:
   - ./qui/ks.yaml
   - ./radarr/ks.yaml
   - ./recyclarr/ks.yaml
+  - ./seasonpackerr/ks.yaml
   - ./sonarr/ks.yaml
   # - ./tautulli/ks.yaml

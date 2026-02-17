@@ -64,6 +64,7 @@ spec:
             "ips": ["10.0.40.10/24"],
             "mac": "32:0b:d8:1f:b6:e4"
           }]
+      terminationGracePeriodSeconds: 300
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
