@@ -35,3 +35,9 @@ resource "authentik_application" "proxmox" {
   meta_launch_url   = "https://pve.internal:8006"
   open_in_new_tab   = true
 }
+
+resource "authentik_policy_binding" "proxmox-access" {
+  target = authentik_application.proxmox.uuid
+  group  = data.authentik_group.admins.id
+  order  = 10
+}

@@ -18,3 +18,9 @@ resource "authentik_application" "radarr" {
   meta_launch_url   = "https://radarr.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_policy_binding" "radarr-access" {
+  target = authentik_application.radarr.uuid
+  group  = authentik_group.torrent-mgmt.id
+  order  = 10
+}

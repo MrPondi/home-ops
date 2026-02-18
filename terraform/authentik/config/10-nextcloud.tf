@@ -10,7 +10,7 @@ return {
     "nc-groups": groups,
     "quota": request.user.group_attributes().get("nextcloud_quota", None),
     "avatar": request.user.avatar,
-    "is_admin": request.user.is_superuser or request.user.group_attributes().get("nextcloud_admin", False),
+    "is_admin": request.user.is_superuser or ak_is_group_member(request.user, name="Nextcloud Admins"),
     # Since attribute 'birthdate' is supported from NC version 30 onwards, this attribute can be mapped too. Accepted format: YYYY-MM-DD
     "birthdate": user.attributes.get("nextcloud_birthdate", None),
 }
@@ -54,4 +54,19 @@ resource "authentik_application" "nextcloud" {
   meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/nextcloud.svg"
   meta_launch_url   = "https://nextcloud.pondi.dev"
   open_in_new_tab   = true
+}
+
+resource "authentik_group" "nextcloud-users" {
+  name         = "Nextcloud Users"
+}
+
+resource "authentik_group" "nextcloud-admins" {
+  name         = "Nextcloud Admins"
+  parents      = [authentik_group.nextcloud-users.id]
+}
+
+resource "authentik_policy_binding" "nextcloud-access" {
+  target = authentik_application.nextcloud.uuid
+  group  = authentik_group.nextcloud-users.id
+  order  = 10
 }

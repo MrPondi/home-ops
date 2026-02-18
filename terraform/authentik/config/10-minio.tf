@@ -9,7 +9,7 @@ resource "authentik_property_mapping_provider_scope" "minio-policy" {
 return {
   "policy": "consoleAdmin"
     if request.user.is_superuser
-    or request.user.group_attributes().get("minio_admin", False)
+    or ak_is_group_member(request.user, name="MinIO Admins")
     else "readonly"
 }
 EOF
@@ -47,4 +47,19 @@ resource "authentik_application" "minio" {
   meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/minio.svg"
   meta_launch_url   = "https://minio.pondi.dev"
   open_in_new_tab   = true
+}
+
+resource "authentik_group" "minio-users" {
+  name         = "MinIO Users"
+}
+
+resource "authentik_group" "minio-admins" {
+  name         = "MinIO Admins"
+  parents      = [authentik_group.minio-users.id]
+}
+
+resource "authentik_policy_binding" "minio-access" {
+  target = authentik_application.minio.uuid
+  group  = authentik_group.minio-users.id
+  order  = 10
 }

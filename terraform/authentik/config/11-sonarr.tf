@@ -18,3 +18,9 @@ resource "authentik_application" "sonarr" {
   meta_launch_url   = "https://sonarr.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_policy_binding" "sonarr-access" {
+  target = authentik_application.sonarr.uuid
+  group  = authentik_group.torrent-mgmt.id
+  order  = 10
+}

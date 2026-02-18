@@ -34,3 +34,9 @@ resource "authentik_application" "autobrr" {
   meta_launch_url   = "https://autobrr.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_policy_binding" "autobrr-access" {
+  target = authentik_application.autobrr.uuid
+  group  = authentik_group.torrent-mgmt.id
+  order  = 10
+}

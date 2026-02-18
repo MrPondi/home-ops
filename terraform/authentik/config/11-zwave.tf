@@ -18,3 +18,9 @@ resource "authentik_application" "zwavejs2mqtt" {
   meta_launch_url   = "https://zwave.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_policy_binding" "zwave-access" {
+  target = authentik_application.zwavejs2mqtt.uuid
+  group  = authentik_group.hass-admins.id
+  order  = 10
+}

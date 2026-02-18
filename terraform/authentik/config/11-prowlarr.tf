@@ -18,3 +18,9 @@ resource "authentik_application" "prowlarr" {
   meta_launch_url   = "https://prowlarr.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_policy_binding" "prowlarr-access" {
+  target = authentik_application.prowlarr.uuid
+  group  = authentik_group.torrent-mgmt.id
+  order  = 10
+}

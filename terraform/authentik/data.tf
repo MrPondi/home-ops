@@ -71,3 +71,9 @@ data "authentik_certificate_key_pair" "self-signed" {
 data "authentik_service_connection_kubernetes" "local" {
   name = "Local Kubernetes Cluster"
 }
+
+# Users
+
+data "authentik_group" "admins" {
+  name = "authentik Admins"
+}

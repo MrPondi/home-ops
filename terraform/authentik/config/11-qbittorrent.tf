@@ -18,3 +18,13 @@ resource "authentik_application" "qbittorrent" {
   meta_launch_url   = "https://qbittorrent.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_group" "torrent-mgmt" {
+  name         = "Torrent Management"
+}
+
+resource "authentik_policy_binding" "qbittorrent-access" {
+  target = authentik_application.qbittorrent.uuid
+  group  = authentik_group.torrent-mgmt.id
+  order  = 10
+}

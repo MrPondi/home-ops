@@ -34,3 +34,13 @@ resource "authentik_application" "pelican" {
   meta_launch_url   = "https://gamepanel.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_group" "pelican-access" {
+  name         = "Gamepanel access"
+}
+
+resource "authentik_policy_binding" "pelican-access" {
+  target = authentik_application.pelican.uuid
+  group  = authentik_group.pelican-access.id
+  order  = 10
+}

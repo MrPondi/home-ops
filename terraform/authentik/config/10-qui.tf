@@ -34,3 +34,9 @@ resource "authentik_application" "qui" {
   meta_launch_url   = "https://qui.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_policy_binding" "qui-access" {
+  target = authentik_application.qui.uuid
+  group  = authentik_group.torrent-mgmt.id
+  order  = 10
+}

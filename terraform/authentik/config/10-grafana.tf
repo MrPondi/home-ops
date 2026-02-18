@@ -2,6 +2,20 @@ data "bitwarden-secrets_secret" "grafana" {
   id = "fd76020c-90ae-4d8e-b515-b3dc00d3e903"
 }
 
+resource "authentik_group" "grafana_viewers" {
+  name    = "Grafana Viewers"
+}
+
+resource "authentik_group" "grafana_editors" {
+  name    = "Grafana Editors"
+  parents = [authentik_group.grafana_viewers.id]
+}
+
+resource "authentik_group" "grafana_admins" {
+  name    = "Grafana Admins"
+  parents = [authentik_group.grafana_editors.id]
+}
+
 resource "authentik_provider_oauth2" "grafana" {
   name          = "Grafana OAuth2 Provider"
   client_id     = jsondecode(data.bitwarden-secrets_secret.grafana.value)["GRAFANA_OIDC_CLIENT_ID"]
@@ -38,14 +52,8 @@ resource "authentik_application" "grafana" {
   open_in_new_tab   = true
 }
 
-resource "authentik_group" "grafana_admins" {
-  name    = "Grafana Admins"
-}
-
-resource "authentik_group" "grafana_editors" {
-  name    = "Grafana Editors"
-}
-
-resource "authentik_group" "grafana_viewers" {
-  name    = "Grafana Viewers"
+resource "authentik_policy_binding" "grafana-access" {
+  target = authentik_application.grafana.uuid
+  group  = authentik_group.grafana_viewers.id
+  order  = 10
 }

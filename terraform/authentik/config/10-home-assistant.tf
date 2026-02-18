@@ -34,3 +34,18 @@ resource "authentik_application" "home-assistant" {
   meta_launch_url   = "https://hass.pondi.dev"
   open_in_new_tab   = true
 }
+
+resource "authentik_group" "hass-users" {
+  name         = "Home Assistant Users"
+}
+
+resource "authentik_group" "hass-admins" {
+  name         = "Home Assistant Admins"
+  parents      = [authentik_group.hass-users.id]
+}
+
+resource "authentik_policy_binding" "hass-access" {
+  target = authentik_application.home-assistant.uuid
+  group  = authentik_group.hass-users.id
+  order  = 10
+}
