@@ -2,7 +2,7 @@
 resource "authentik_flow" "passwordless-flow" {
   name           = "Homelab Passwordless Flow"
   title          = "Homelab Passwordless Flow"
-  slug           = "homelab-passwordless-flow"
+  slug           = "passwordless-flow"
   designation    = "authentication"
 }
 

@@ -30,6 +30,10 @@ data "authentik_stage" "default-authentication-login" {
   name = "default-authentication-login"
 }
 
+data "authentik_stage" "default-password-change-write" {
+  name = "default-password-change-write"
+}
+
 # OAuth2/OIDC scopes
 
 data "authentik_property_mapping_provider_scope" "scope-email" {
