@@ -1,3 +1,56 @@
+resource "authentik_flow" "duo-ldap-authentication-flow" {
+  name        = "Duo LDAP Authentication Flow"
+  title       = "Duo LDAP Authentication Flow"
+  slug        = "duo-ldap-authentication-flow"
+  designation = "authentication"
+}
+
+resource "authentik_stage_password" "ldap-authentication-password" {
+  name     = "ldap-authentication-password"
+  backends = ["authentik.core.auth.InbuiltBackend"]
+}
+
+resource "authentik_stage_identification" "ldap-identification-stage" {
+  name           = "ldap-identification-stage"
+  user_fields    = ["username", "email"]
+  password_stage = authentik_stage_password.ldap-authentication-password.id
+}
+
+resource "authentik_stage_authenticator_validate" "ldap-duo-mfa" {
+  name                  = "ldap-duo-mfa-validation"
+  device_classes        = ["duo"]
+  not_configured_action = "skip"
+}
+
+resource "authentik_stage_user_login" "ldap-authentication-login" {
+  name = "ldap-authentication-login"
+}
+
+resource "authentik_flow_stage_binding" "duo-ldap-identification-stage" {
+  target = authentik_flow.duo-ldap-authentication-flow.uuid
+  stage  = authentik_stage_identification.ldap-identification-stage.id
+  order  = 10
+}
+
+resource "authentik_flow_stage_binding" "duo-ldap-mfa" {
+  target = authentik_flow.duo-ldap-authentication-flow.uuid
+  stage  = authentik_stage_authenticator_validate.ldap-duo-mfa.id
+  order  = 20
+}
+
+resource "authentik_flow_stage_binding" "duo-ldap-authentication-login" {
+  target = authentik_flow.duo-ldap-authentication-flow.uuid
+  stage  = authentik_stage_user_login.ldap-authentication-login.id
+  order  = 30
+}
+
+resource "authentik_provider_ldap" "duo" {
+  name        = "Duo LDAP Provider"
+  base_dn     = "dc=ldap-duo,dc=pondi,dc=dev"
+  bind_flow   = authentik_flow.duo-ldap-authentication-flow.uuid
+  unbind_flow = data.authentik_flow.default-invalidation-flow.id
+}
+
 resource "authentik_user" "ldap-bind" {
   username = "ldapservice"
   name     = "LDAP Outpost Bind User Service-Account"
@@ -15,19 +68,11 @@ resource "authentik_group" "ldap-search" {
   roles    = [authentik_rbac_role.ldap-search.id]
 }
 
-resource "authentik_stage_password" "ldap-authentication-password" {
-  name     = "ldap-authentication-password"
-  backends = ["authentik.core.auth.InbuiltBackend"]
-}
-
-resource "authentik_stage_identification" "ldap-identification-stage" {
-  name           = "ldap-identification-stage"
-  user_fields    = ["username", "email"]
-  password_stage = authentik_stage_password.ldap-authentication-password.id
-}
-
-resource "authentik_stage_user_login" "ldap-authentication-login" {
-  name = "ldap-authentication-login"
+resource "authentik_rbac_permission_role" "duo-provider-search" {
+  role       = authentik_rbac_role.ldap-search.id
+  model      = "authentik_providers_ldap.ldapprovider"
+  permission = "authentik_providers_ldap.search_full_directory"
+  object_id  = authentik_provider_ldap.duo.id
 }
 
 resource "authentik_outpost" "ldap" {

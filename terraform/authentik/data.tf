@@ -16,6 +16,20 @@ data "authentik_flow" "default-provider-invalidation-flow" {
   slug = "default-provider-invalidation-flow"
 }
 
+# Stages
+
+data "authentik_stage" "default-authenticator-totp-setup" {
+  name = "default-authenticator-totp-setup"
+}
+
+data "authentik_stage" "default-authenticator-webauthn-setup" {
+  name = "default-authenticator-webauthn-setup"
+}
+
+data "authentik_stage" "default-authentication-login" {
+  name = "default-authentication-login"
+}
+
 # OAuth2/OIDC scopes
 
 data "authentik_property_mapping_provider_scope" "scope-email" {
