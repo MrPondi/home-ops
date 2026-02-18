@@ -10,3 +10,18 @@ resource "authentik_outpost" "embedded" {
     authentik_provider_proxy.zwavejs2mqtt.id,
   ]
 }
+
+resource "authentik_group" "admins" {
+  name = "authentik Admins"
+  is_superuser = true
+
+  parents = [
+    authentik_group.pelican-access.id,
+    authentik_group.grafana-admins.id,
+    authentik_group.hass-admins.id,
+    authentik_group.jellyfin-admins.id,
+    authentik_group.minio-admins.id,
+    authentik_group.nextcloud-admins.id,
+    authentik_group.torrent-mgmt.id,
+  ]
+}

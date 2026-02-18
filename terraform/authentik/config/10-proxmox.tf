@@ -38,6 +38,6 @@ resource "authentik_application" "proxmox" {
 
 resource "authentik_policy_binding" "proxmox-access" {
   target = authentik_application.proxmox.uuid
-  group  = data.authentik_group.admins.id
+  group  = authentik_group.admins.id
   order  = 10
 }
