@@ -57,7 +57,7 @@ spec:
           - path: /opt/Lavalink/application.yml
             subPath: application.yml
       plugins:
-        existingClaim: "{{ .Release.Name }}"
+        existingClaim: "{{ .Release.Name }}-plugins"
         globalMounts:
           - path: /opt/Lavalink/plugins/
       tmp:

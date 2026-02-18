@@ -21,8 +21,6 @@ kind: Kustomization
 metadata:
   name: lavalink
 spec:
-  components:
-    - ../../../../components/volsync
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -30,10 +28,6 @@ spec:
       namespace: default
   interval: 1h
   path: ./kubernetes/apps/default/musicbot/lavalink
-  postBuild:
-    substitute:
-      APP: lavalink
-      VOLSYNC_CAPACITY: 5Gi
   prune: true
   sourceRef:
     kind: GitRepository
