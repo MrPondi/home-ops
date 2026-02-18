@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/kikkia/yt-cipher
-              tag: master@sha256:bac355845513aba593b2f5626bfad43f3e82d0a4faf2a615e3880a53a3eda25a
+              tag: master@sha256:c6f800e84939ffa9ae796dcf368ea7c70a583621589f02da2761c6ab4b9f16a9
             env:
               TZ: Europe/Warsaw
             envFrom:
