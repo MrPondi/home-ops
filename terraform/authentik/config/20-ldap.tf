@@ -35,6 +35,25 @@ resource "authentik_flow_stage_binding" "duo-ldap-identification-stage" {
 resource "authentik_flow_stage_binding" "duo-ldap-mfa" {
   target = authentik_flow.duo-ldap-authentication-flow.uuid
   stage  = authentik_stage_authenticator_validate.ldap-duo-mfa.id
+  policy_engine_mode = "all"
+  evaluate_on_plan = false
+  re_evaluate_policies = true
+  order  = 20
+}
+
+resource "authentik_policy_binding" "ldapservice-bypass" {
+  target = authentik_flow_stage_binding.duo-ldap-mfa.id
+  user  = authentik_user.ldap-bind.id
+  failure_result = true
+  negate = true
+  order  = 10
+}
+
+resource "authentik_policy_binding" "ip-bypass" {
+  target = authentik_flow_stage_binding.duo-ldap-mfa.id
+  policy  = authentik_policy_expression.local-ip-check.id
+  failure_result = true
+  negate = true
   order  = 20
 }
 

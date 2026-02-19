@@ -62,3 +62,8 @@ resource "authentik_stage_captcha" "turnstile" {
   js_url = "https://challenges.cloudflare.com/turnstile/v0/api.js"
   interactive = true
 }
+
+resource "authentik_policy_expression" "local-ip-check" {
+  name       = "local-ip-check"
+  expression = "return ak_client_ip.is_private"
+}
