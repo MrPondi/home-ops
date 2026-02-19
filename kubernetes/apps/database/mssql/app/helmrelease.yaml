@@ -1,0 +1,63 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mssql
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: mssql
+  interval: 1h
+  values:
+    controllers:
+      mssql:
+        strategy: RollingUpdate
+        containers:
+          app:
+            image:
+              repository: mcr.microsoft.com/mssql/server
+              tag: 2025-latest@sha256:5ffdffd2ba852051c2fc2f5b310391bf896dbaf8d16cc026a3c859d6214b30d1
+            env:
+              ACCEPT_EULA: Y
+              TZ: Europe/Warsaw
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 512Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: mssql.pondi.dev
+          gatus.home-operations.com/endpoint: |-
+            group: services
+          lbipam.cilium.io/ips: 10.0.30.131
+        externalTrafficPolicy: Local
+        ports:
+          mssql:
+            port: 1433
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /var/opt/mssql
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /var/opt/mssql/log

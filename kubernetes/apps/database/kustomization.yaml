@@ -11,3 +11,4 @@ resources:
   - ./namespace.yaml
   - ./mariadb/ks.yaml
   - ./cloudnative-pg/ks.yaml
+  - ./mssql/ks.yaml
