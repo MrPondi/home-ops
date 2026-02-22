@@ -14,7 +14,7 @@ resources:
   - ./homepage/ks.yaml
   - ./mosquitto/ks.yaml
   - ./musicbot/ks.yaml
-  # - ./nextcloud/ks.yaml
+  - ./nextcloud/ks.yaml
   - ./pelican/ks.yaml
   # - ./ringback/ks.yaml
   - ./smtp-relay/ks.yaml
