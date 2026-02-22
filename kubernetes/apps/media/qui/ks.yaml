@@ -15,7 +15,7 @@ spec:
   path: ./kubernetes/apps/media/qui/app
   postBuild:
     substitute:
-      APP: qu
+      APP: qui
   prune: true
   sourceRef:
     kind: GitRepository
