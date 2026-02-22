@@ -125,7 +125,7 @@ spec:
           php occ app:install oidc_login
           printf "Add missing DB indices\n"
           php occ db:add-missing-indices
-          printf "Perform maintenance repair\n"
+          printf "Running maintenance repair\n"
           php occ maintenance:repair --include-expensive
           printf "Configure NC-Token\n"
           php occ config:app:set serverinfo token --value $NEXTCLOUD_TOKEN
