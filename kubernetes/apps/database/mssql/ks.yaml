@@ -15,7 +15,7 @@ spec:
   postBuild:
     substitute:
       APP: mssql
-      VOLSYNC_CAPACITY: 10Gi
+      VOLSYNC_CAPACITY: 8Gi
   prune: true
   sourceRef:
     kind: GitRepository

@@ -52,7 +52,6 @@ spec:
   postBuild:
     substitute:
       APP: lavamusic
-      VOLSYNC_CAPACITY: 5Gi
   prune: true
   sourceRef:
     kind: GitRepository

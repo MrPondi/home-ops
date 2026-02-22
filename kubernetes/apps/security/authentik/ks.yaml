@@ -17,7 +17,6 @@ spec:
   postBuild:
     substitute:
       APP: authentik
-      VOLSYNC_CAPACITY: 10Gi
   prune: true
   sourceRef:
     kind: GitRepository

@@ -15,8 +15,7 @@ spec:
   path: ./kubernetes/apps/media/qui/app
   postBuild:
     substitute:
-      APP: qui
-      VOLSYNC_CAPACITY: 2Gi
+      APP: qu
   prune: true
   sourceRef:
     kind: GitRepository

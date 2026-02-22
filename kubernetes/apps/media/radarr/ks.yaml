@@ -17,7 +17,6 @@ spec:
   postBuild:
     substitute:
       APP: radarr
-      VOLSYNC_CAPACITY: 5Gi
   prune: true
   sourceRef:
     kind: GitRepository
