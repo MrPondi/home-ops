@@ -12,6 +12,9 @@ spec:
   values:
     controllers:
       nut-exporter:
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
         containers:
           app:
             image:

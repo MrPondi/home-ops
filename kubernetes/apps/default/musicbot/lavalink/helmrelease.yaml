@@ -43,12 +43,12 @@ spec:
     service:
       app:
         ports:
-          http:
+          lavalink:
             port: *port
     serviceMonitor:
       app:
         endpoints:
-          - port: http
+          - port: lavalink
     persistence:
       config:
         type: secret

@@ -74,7 +74,6 @@ spec:
       app:
         annotations:
           gatus.home-operations.com/endpoint: |-
-            conditions: ["[STATUS] == 200"]
             group: media
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Seerr
@@ -89,7 +88,7 @@ spec:
           - "{{ .Release.Name }}.pondi.dev"
           - requests.pondi.dev
         parentRefs:
-          - name: envoy-external
+          - name: envoy-internal
             namespace: network
     persistence:
       config:
