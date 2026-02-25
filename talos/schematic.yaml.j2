@@ -7,6 +7,7 @@ customization:
     - amd_iommu=on                        # PCI Passthrough
     - iommu=pt                            # PCI Passthrough
     - pcie_aspm=off                       # Disable PCIe ASPM
+    - pcie_port_pm=off                    # Disable PCIe Port PM
     - mitigations=off                     # Less security, faster puter
     - talos.auditd.disabled=1             # Less security, faster puter
     {% if iso == 'true' %}
