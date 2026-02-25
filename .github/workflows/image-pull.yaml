@@ -17,7 +17,7 @@ permissions:
 jobs:
   filter:
     name: Image Pull - Filter
-    runs-on: ubuntu-latest
+    runs-on: home-ops-runner
     outputs:
       any_changed: ${{ steps.changed-files.outputs.any_changed }}
     steps:
@@ -35,48 +35,66 @@ jobs:
     needs: filter
     name: Image Pull - Extract Images
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch:
-          - default
-          - pull
-      fail-fast: false
     outputs:
       default: ${{ steps.extract.outputs.default }}
       pull: ${{ steps.extract.outputs.pull }}
     steps:
-      - name: Checkout
+      - name: Checkout Default Branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ matrix.branch == 'default' && github.event.repository.default_branch || '' }}
+          ref: ${{ github.event.repository.default_branch }}
+          path: default
 
-      - name: Gather Images
+      - name: Gather Images (default)
         uses: docker://ghcr.io/allenporter/flux-local:v8.0.1
         with:
           args: >-
             get cluster
             --all-namespaces
-            --path /github/workspace/kubernetes/flux/cluster
+            --path /github/workspace/default/kubernetes/flux/cluster
             --enable-images
             --only-images
             --output json
-            --output-file images.json
+            --output-file /github/workspace/images-default.json
+
+      - name: Checkout Pull Request Branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: pull
+
+      - name: Gather Images (pull)
+        uses: docker://ghcr.io/allenporter/flux-local:v8.0.1
+        with:
+          args: >-
+            get cluster
+            --all-namespaces
+            --path /github/workspace/pull/kubernetes/flux/cluster
+            --enable-images
+            --only-images
+            --output json
+            --output-file /github/workspace/images-pull.json
 
       - name: Extract Images
         id: extract
         run: |-
-          echo "${{ matrix.branch }}=$(jq --compact-output '.' images.json)" >> $GITHUB_OUTPUT
+          echo "default=$(jq --compact-output '.' images-default.json)" >> $GITHUB_OUTPUT
+          echo "pull=$(jq --compact-output '.' images-pull.json)" >> $GITHUB_OUTPUT
 
-          echo '## Branch ${{ matrix.branch }} images' >> $GITHUB_STEP_SUMMARY
+          echo '## Default branch images' >> $GITHUB_STEP_SUMMARY
           echo '```json' >> $GITHUB_STEP_SUMMARY
-          jq '.' images.json >> $GITHUB_STEP_SUMMARY
+          jq '.' images-default.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+          echo '## Pull request images' >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          jq '.' images-pull.json >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   diff:
     if: ${{ needs.extract.outputs.default != needs.extract.outputs.pull }}
     needs: extract
     name: Image Pull - Diff Images
-    runs-on: ubuntu-latest
+    runs-on: home-ops-runner
     outputs:
       images: ${{ steps.diff.outputs.images }}
     steps:
@@ -118,7 +136,7 @@ jobs:
     if: ${{ !cancelled() }}
     needs: pull
     name: Image Pull - Success
-    runs-on: ubuntu-latest
+    runs-on: home-ops-runner
     steps:
       - name: Any jobs failed?
         if: ${{ contains(needs.*.result, 'failure') }}

@@ -17,7 +17,7 @@ permissions:
 jobs:
   filter:
     name: Flux Local - Filter
-    runs-on: ubuntu-latest
+    runs-on: home-ops-runner
     outputs:
       any_changed: ${{ steps.changed-files.outputs.any_changed }}
     steps:
@@ -113,7 +113,7 @@ jobs:
       - test
       - diff
     name: Flux Local - Success
-    runs-on: ubuntu-latest
+    runs-on: home-ops-runner
     steps:
       - name: Any jobs failed?
         if: ${{ contains(needs.*.result, 'failure') }}
