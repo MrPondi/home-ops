@@ -8,7 +8,7 @@ groups = [group.name.removeprefix("nextcloud-") for group in request.user.ak_gro
 return {
     "name": request.user.name,
     "nc-groups": groups,
-    "quota": request.user.group_attributes().get("nextcloud_quota", None),
+    "quota": request.user.group_attributes().get("nextcloud_quota", None) * 1024 * 1024 * 1024, # Convert GB to Bytes
     "avatar": request.user.avatar,
     "is_admin": request.user.is_superuser or ak_is_group_member(request.user, name="Nextcloud Admins"),
     # Since attribute 'birthdate' is supported from NC version 30 onwards, this attribute can be mapped too. Accepted format: YYYY-MM-DD
