@@ -23,5 +23,6 @@ resource "authentik_group" "admins" {
     authentik_group.minio-admins.id,
     authentik_group.nextcloud-admins.id,
     authentik_group.torrent-mgmt.id,
+    authentik_group.flux-operator-admins.id,
   ]
 }

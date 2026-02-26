@@ -14,11 +14,31 @@ spec:
       create: true
     web:
       config:
+        baseURL: "https://flux-operator.pondi.dev"
         authentication:
-          type: Anonymous
-          anonymous:
-            username: flux
-            groups:
-              - flux-admin
+          type: OAuth2
+          oauth2:
+            provider: OIDC
+            issuerURL: "https://auth.pondi.dev/application/o/flux-operator/"
+            scopes:
+              - email
+              - openid
+              - profile
+              - admin
+            variables:
+              - name: groups
+                expression: "has(claims.admin) ? ['flux-admin'] : ['flux-user']"
+            impersonation:
+              username: "claims.preferred_username"
+              groups: "variables.groups"
       networkPolicy:
         create: false
+  valuesFrom:
+    - kind: Secret
+      name: flux-operator-secret
+      valuesKey: OIDC_CLIENT_ID
+      targetPath: web.config.authentication.oauth2.clientID
+    - kind: Secret
+      name: flux-operator-secret
+      valuesKey: OIDC_CLIENT_SECRET
+      targetPath: web.config.authentication.oauth2.clientSecret
