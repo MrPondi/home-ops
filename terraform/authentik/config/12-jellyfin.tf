@@ -1,12 +1,3 @@
-resource "authentik_group" "jellyfin-users" {
-  name         = "Jellyfin Users"
-}
-
-resource "authentik_group" "jellyfin-admins" {
-  name         = "Jellyfin Admins"
-  parents      = [authentik_group.jellyfin-users.id]
-}
-
 resource "authentik_application" "jellyfin" {
   name              = "Jellyfin"
   slug              = "jellyfin"
@@ -14,6 +5,15 @@ resource "authentik_application" "jellyfin" {
   meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/jellyfin.svg"
   meta_launch_url   = "https://jellyfin.pondi.dev"
   open_in_new_tab   = true
+}
+
+resource "authentik_group" "jellyfin-users" {
+  name         = "Jellyfin Users"
+}
+
+resource "authentik_group" "jellyfin-admins" {
+  name         = "Jellyfin Admins"
+  parents      = [authentik_group.jellyfin-users.id]
 }
 
 resource "authentik_policy_binding" "jellyfin-access" {

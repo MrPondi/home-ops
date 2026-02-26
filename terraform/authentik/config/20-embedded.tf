@@ -19,7 +19,6 @@ resource "authentik_group" "admins" {
   is_superuser = true
 
   parents = [
-    authentik_group.pelican-access.id,
     authentik_group.grafana-admins.id,
     authentik_group.hass-admins.id,
     authentik_group.jellyfin-admins.id,
@@ -27,6 +26,7 @@ resource "authentik_group" "admins" {
     authentik_group.nextcloud-admins.id,
     authentik_group.torrent-mgmt.id,
     authentik_group.flux-operator-admins.id,
-    authentik_group.metrics-access.id
+    authentik_group.metrics-access.id,
+    authentik_group.pelican-wings-ssh.id,
   ]
 }
