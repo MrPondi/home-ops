@@ -8,6 +8,9 @@ resource "authentik_outpost" "embedded" {
     authentik_provider_proxy.bazarr.id,
     authentik_provider_proxy.qbittorrent.id,
     authentik_provider_proxy.zwavejs2mqtt.id,
+    authentik_provider_proxy.prometheus.id,
+    authentik_provider_proxy.alertmanager.id,
+    authentik_provider_proxy.victoria-logs.id,
   ]
 }
 
@@ -24,5 +27,6 @@ resource "authentik_group" "admins" {
     authentik_group.nextcloud-admins.id,
     authentik_group.torrent-mgmt.id,
     authentik_group.flux-operator-admins.id,
+    authentik_group.metrics-access.id
   ]
 }
