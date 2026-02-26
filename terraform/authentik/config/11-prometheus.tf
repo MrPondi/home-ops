@@ -10,6 +10,11 @@ resource "authentik_provider_proxy" "prometheus" {
   access_token_validity = "hours=6"
 }
 
+resource "authentik_outpost_provider_attachment" "prometheus" {
+  outpost           = data.authentik_outpost.embedded.id
+  protocol_provider = authentik_provider_proxy.prometheus.id
+}
+
 resource "authentik_application" "prometheus" {
   name              = "Prometheus"
   slug              = "prometheus"

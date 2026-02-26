@@ -10,6 +10,11 @@ resource "authentik_provider_proxy" "zwavejs2mqtt" {
   access_token_validity = "hours=6"
 }
 
+resource "authentik_outpost_provider_attachment" "zwavejs2mqtt" {
+  outpost           = data.authentik_outpost.embedded.id
+  protocol_provider = authentik_provider_proxy.zwavejs2mqtt.id
+}
+
 resource "authentik_application" "zwavejs2mqtt" {
   name              = "Z-Wave JS"
   slug              = "zwavejs2mqtt"

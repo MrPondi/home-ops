@@ -10,6 +10,11 @@ resource "authentik_provider_proxy" "prowlarr" {
   access_token_validity = "hours=6"
 }
 
+resource "authentik_outpost_provider_attachment" "prowlarr" {
+  outpost           = data.authentik_outpost.embedded.id
+  protocol_provider = authentik_provider_proxy.prowlarr.id
+}
+
 resource "authentik_application" "prowlarr" {
   name              = "Prowlarr"
   slug              = "prowlarr"
