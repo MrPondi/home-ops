@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/lavalink-devs/lavalink
-              tag: 4.2.0@sha256:0ec84c5327efcc82e6a020bf7663e3facf0d5c008a2f6915032784f3083f81d8
+              tag: 4.2.1@sha256:c2b0de2f0734d005861025f918fd8275508cc8b3d2d532dc42ee17128e295639
             env:
               _JAVA_OPTIONS: -Xmx2G
               SERVER_PORT: &port 2333
