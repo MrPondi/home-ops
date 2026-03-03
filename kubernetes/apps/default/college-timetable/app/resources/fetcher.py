@@ -98,7 +98,7 @@ class PlanFetcher:
             if additional_params:
                 params.update(additional_params)
 
-            with httpx.Client(verify=self.ssl_context, timeout=30.0) as client:
+            with httpx.Client(verify=self.ssl_context, timeout=60.0) as client:
                 response = client.get(self.BASE_URL, params=params)
                 response.raise_for_status()
                 return response.content
