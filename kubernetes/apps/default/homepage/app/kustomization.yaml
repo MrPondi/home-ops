@@ -10,7 +10,6 @@ resources:
 configMapGenerator:
   - name: homepage-resources
     files:
-      - alertmanager.svg=./resources/alertmanager.svg
       - popcorn.svg=./resources/popcorn.svg
 generatorOptions:
   disableNameSuffixHash: true

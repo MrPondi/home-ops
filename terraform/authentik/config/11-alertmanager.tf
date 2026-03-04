@@ -19,7 +19,7 @@ resource "authentik_application" "alertmanager" {
   name              = "Alertmanager"
   slug              = "alertmanager"
   protocol_provider = authentik_provider_proxy.alertmanager.id
-  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/prometheus.svg"
+  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/alertmanager-dark.svg"
   meta_launch_url   = "https://alertmanager.pondi.dev"
   open_in_new_tab   = true
 }
