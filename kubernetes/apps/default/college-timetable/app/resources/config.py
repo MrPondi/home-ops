@@ -35,11 +35,6 @@ class Config:
     # Timezone for events
     timezone: ZoneInfo = field(default_factory=lambda: ZoneInfo("Europe/Warsaw"))
 
-    # Events to skip
-    skip_holidays: Set[str] = field(
-        default_factory=lambda: {"ŚWIĘTA", "DNI WOLNE", "Dni rektorskie", "Dni świąteczne", "Semestr Start", "Początek semestru", "Wakacje zimowe", "Wakacje wiosenne"}
-    )
-
     # Sync settings
     dry_run: bool = False
 

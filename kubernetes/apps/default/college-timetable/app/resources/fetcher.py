@@ -120,9 +120,7 @@ class PlanFetcher:
         ).decode("iso-8859-2")
         return content
 
-    def get_all_short_names(
-        self, content: Optional[str] = None, skip_holidays: Set[str] = set()
-    ) -> Dict[str, str]:
+    def get_all_short_names(self, content: Optional[str] = None) -> Dict[str, str]:
         """
         Fetch and parse the legend to get all subject short names.
 
@@ -139,11 +137,9 @@ class PlanFetcher:
             logger.warning("Legend not found")
             return {}
 
-        return self._parse_legend_subjects(legend, skip_holidays)
+        return self._parse_legend_subjects(legend)
 
-    def _parse_legend_subjects(
-        self, legend: Tag, skip_holidays: Set[str]
-    ) -> Dict[str, str]:
+    def _parse_legend_subjects(self, legend: Tag) -> Dict[str, str]:
         """
         Parse legend content to extract subject mappings.
 
@@ -177,7 +173,7 @@ class PlanFetcher:
                 if full_name:
                     subjects[current_short_name] = full_name
                     current_short_name = None
-                elif current_short_name not in skip_holidays:
+                else:
                     logger.warning(
                         f"Could not parse full name for subject: {current_short_name}"
                     )

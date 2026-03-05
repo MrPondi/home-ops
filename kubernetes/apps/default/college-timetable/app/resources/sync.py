@@ -52,7 +52,7 @@ class ICSCalDAVSync:
         for calendar_name in self.config.calendar_names:
             found = False
             for cal in all_calendars:
-                if cal.name == calendar_name:
+                if cal.get_display_name() == calendar_name:
                     logger.info(f"Found existing calendar: {calendar_name}")
                     found_calendars.append(cal)
                     found = True

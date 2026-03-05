@@ -7,9 +7,9 @@ import json
 import logging
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set
+from typing import Dict, Iterable, List, Optional
 from zoneinfo import ZoneInfo
 
 from caldav import Event as CaldavEvent
@@ -114,7 +114,6 @@ class EventParser:
         self,
         component: Component,
         timetable_data: TimetableData,
-        skip_holidays: Set[str],
     ) -> Optional[ParsedEvent]:
         """
         Parse event summary and extract structured data.
@@ -122,7 +121,6 @@ class EventParser:
         Args:
             component: iCalendar VEVENT component
             timetable_data: Contains shortnames, lecturers, lecture_types, lecture_halls
-            skip_holidays: Set of holiday/break names to skip
 
         Returns:
             ParsedEvent with parsed data or None if event should be skipped
@@ -133,10 +131,6 @@ class EventParser:
 
         # Normalize whitespace
         line = " ".join(summary.split())
-
-        # Skip holidays and breaks
-        if line.strip() in skip_holidays:
-            return None
 
         result = {
             "short": "",
@@ -189,6 +183,21 @@ class EventParser:
         # Log any unparsed remainder
         if line.strip():
             logger.debug(f"Unparsed text in '{original_line}': '{line.strip()}'")
+
+        if (
+            not result["type"]
+            and not result["lecturer"]
+            and not result["location"]
+            and component.get("dtstart").dt.hour in [5, 6]
+            and (
+                component.get("dtend").dt
+                == component.get("dtstart").dt + timedelta(hours=1)
+            )
+        ):
+            logger.debug(
+                f"Skipping event likely to be an info banner: '{original_line}'"
+            )
+            return None
 
         # Build description
         description_parts = []
@@ -315,9 +324,7 @@ class EventParser:
 
         logger.debug("Parsing timetable data")
         return TimetableData(
-            shortnames=self.fetcher.get_all_short_names(
-                timetable_html, self.config.skip_holidays
-            ),
+            shortnames=self.fetcher.get_all_short_names(timetable_html),
             lecture_types=self.fetcher.get_all_lecture_types(timetable_html),
             lecturers=self.fetcher.get_all_lecturers(timetable_html),
             lecture_halls=self.fetcher.get_all_lecture_halls(timetable_html),
@@ -335,7 +342,6 @@ class EventParser:
         parsed_event = self.parse_event(
             component,
             timetable_data,
-            skip_holidays=self.config.skip_holidays,
         )
 
         if not parsed_event:
