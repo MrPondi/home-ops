@@ -1,0 +1,69 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pstream-backend
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: pstream-backend
+  interval: 1h
+  values:
+    controllers:
+      pstream-backend:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          postgres-init:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18.3@sha256:6fa1f331cddd2eb0b6afa7b8d3685c864127a81ab01c3d9400bc3ff5263a51cf
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/dumbutdumber/backend
+              tag: latest@sha256:ca7225a7d143ef681a5336f7d36a54d3600df3520a07762528780b811ce84f43
+            env:
+              META_NAME: pondi-backend
+              META_DESCRIPTION: "Backend for P-Stream, (Pondi Stream)."
+              TZ: Europe/Warsaw
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        ports:
+          http:
+            port: 80
+    serviceMonitor:
+      app:
+        endpoints:
+          - port: http
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.pondi.dev"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
