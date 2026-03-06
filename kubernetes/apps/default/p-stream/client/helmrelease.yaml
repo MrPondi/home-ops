@@ -14,15 +14,6 @@ spec:
       pstream:
         annotations:
           reloader.stakater.com/auto: "true"
-
-        initContainers:
-          postgres-init:
-            image:
-              repository: ghcr.io/home-operations/postgres-init
-              tag: 18.3@sha256:6fa1f331cddd2eb0b6afa7b8d3685c864127a81ab01c3d9400bc3ff5263a51cf
-            envFrom:
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
         containers:
           app:
             image:
@@ -61,3 +52,17 @@ spec:
       app:
         endpoints:
           - port: http
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: PStream
+          gethomepage.dev/group: Home & Automation
+          gethomepage.dev/icon: libremdb.png
+          gethomepage.dev/description: Movie provider agregator
+          gethomepage.dev/weight: "25"
+        hostnames:
+          - "{{ .Release.Name }}.pondi.dev"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
