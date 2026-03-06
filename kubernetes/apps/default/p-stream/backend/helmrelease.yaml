@@ -22,6 +22,17 @@ spec:
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
+          init-metrics:
+            image:
+              repository: busybox
+              tag: latest
+            command:
+              - sh
+              - -c
+              - |
+                for f in .metrics.json .metrics_daily.json .metrics_weekly.json .metrics_monthly.json; do
+                  [ ! -f /data/$f ] && echo '{}' > /data/$f
+                done
         containers:
           app:
             image:
@@ -35,8 +46,8 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             securityContext:
-              allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
+              allowPrivilegeEscalation: false
               capabilities: {drop: ["ALL"]}
             resources:
               requests:
@@ -55,7 +66,7 @@ spec:
       app:
         ports:
           http:
-            port: 80
+            port: 3000
     serviceMonitor:
       app:
         endpoints:
@@ -65,5 +76,21 @@ spec:
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:
-          - name: envoy-internal
+          - name: envoy-external
             namespace: network
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        advancedMounts:
+          pstream-backend:
+            init-metrics:
+              - path: /data
+            app:
+              - path: /app/.metrics.json
+                subPath: .metrics.json
+              - path: /app/.metrics_daily.json
+                subPath: .metrics_daily.json
+              - path: /app/.metrics_weekly.json
+                subPath: .metrics_weekly.json
+              - path: /app/.metrics_monthly.json
+                subPath: .metrics_monthly.json
