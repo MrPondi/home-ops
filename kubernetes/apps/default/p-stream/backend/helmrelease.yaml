@@ -33,6 +33,7 @@ spec:
                 for f in .metrics.json .metrics_daily.json .metrics_weekly.json .metrics_monthly.json; do
                   [ ! -f /data/$f ] && echo '{}' > /data/$f
                 done
+                printf "Initialized metrics files\n"
         containers:
           app:
             image:
@@ -73,6 +74,10 @@ spec:
           - port: http
     route:
       app:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            group: services
+            conditions: ["[STATUS] == 200"]
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:
