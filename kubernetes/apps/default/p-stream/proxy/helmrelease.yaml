@@ -68,10 +68,13 @@ spec:
             port: 3000
     route:
       app:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            group: services
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:
-          - name: envoy-internal
+          - name: envoy-external
             namespace: network
     persistence:
       workspace:
