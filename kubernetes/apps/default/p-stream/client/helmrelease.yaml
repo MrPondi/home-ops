@@ -22,7 +22,9 @@ spec:
             command:
               - "git"
               - "clone"
-              - "https://github.com/p-stream/p-stream.git#production"
+              - "-b"
+              - "production"
+              - "https://github.com/p-stream/p-stream.git"
               - "/workspace"
           2-build:
             image:
