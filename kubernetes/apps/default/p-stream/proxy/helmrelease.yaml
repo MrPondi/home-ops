@@ -1,0 +1,82 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pstream-proxy
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: pstream-proxy
+  interval: 1h
+  values:
+    controllers:
+      pstream-proxy:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          clone:
+            image:
+              repository: alpine/git
+              tag: 2.52.0@sha256:d453f54c83320412aa89c391b076930bd8569bc1012285e8c68ce2d4435826a3
+            command:
+              - "git"
+              - "clone"
+              - "https://github.com/p-stream/simple-proxy.git"
+              - "/workspace"
+        containers:
+          app:
+            image:
+              repository: node
+              tag: 25-alpine@sha256:636c5bc8fa6a7a542bc99f25367777b0b3dd0db7d1ca3959d14137a1ac80bde2
+            env:
+              TZ: Europe/Warsaw
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            command:
+              - sh
+              - -c
+              - |
+                cd /workspace
+                npm install -g pnpm
+                pnpm install
+                pnpm build
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        ports:
+          http:
+            port: 3000
+    route:
+      app:
+        hostnames:
+          - "{{ .Release.Name }}.pondi.dev"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    persistence:
+      workspace:
+        type: emptyDir
+        globalMounts:
+          - path: /workspace
+      node:
+        type: emptyDir
+        globalMounts:
+          - path: /home/node/.npm

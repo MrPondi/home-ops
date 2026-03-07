@@ -14,18 +14,38 @@ spec:
       pstream:
         annotations:
           reloader.stakater.com/auto: "true"
-        containers:
-          app:
+        initContainers:
+          clone:
             image:
-              repository: ghcr.io/dumbutdumber/backend
-              tag: latest@sha256:ca7225a7d143ef681a5336f7d36a54d3600df3520a07762528780b811ce84f43
-            env:
-              META_NAME: pondi
-              META_DESCRIPTION: "Backend for P-Stream, (Pondi Stream)."
-              TZ: Europe/Warsaw
+              repository: alpine/git
+              tag: 2.52.0@sha256:d453f54c83320412aa89c391b076930bd8569bc1012285e8c68ce2d4435826a3
+            command:
+              - "git"
+              - "clone"
+              - "https://github.com/p-stream/p-stream.git#production"
+              - "/workspace"
+          build:
+            image:
+              repository: node
+              tag: 25-alpine@sha256:636c5bc8fa6a7a542bc99f25367777b0b3dd0db7d1ca3959d14137a1ac80bde2
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
+            command:
+              - sh
+              - -c
+              - |
+                cd /workspace
+                npm install -g pnpm
+                pnpm install
+                pnpm build
+        containers:
+          app:
+            image:
+              repository: nginx
+              tag: 1.29-alpine@sha256:9c551c46bb1ef7f4ca7a8355f3be61c80df89bc16a2b9e1ca1c3449c33100377
+            env:
+              TZ: Europe/Warsaw
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -48,10 +68,6 @@ spec:
         ports:
           http:
             port: 80
-    serviceMonitor:
-      app:
-        endpoints:
-          - port: http
     route:
       app:
         annotations:
@@ -66,3 +82,19 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+    persistence:
+      workspace:
+        type: emptyDir
+        advancedMounts:
+          pstream:
+            clone:
+              - path: /workspace
+            build:
+              - path: /workspace
+            app:
+              - path: /usr/share/nginx/html
+                subPath: dist
+      node:
+        type: emptyDir
+        globalMounts:
+          - path: /home/node/.npm
