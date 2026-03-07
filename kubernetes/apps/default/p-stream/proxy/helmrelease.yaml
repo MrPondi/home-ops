@@ -31,6 +31,7 @@ spec:
               tag: 25-alpine@sha256:636c5bc8fa6a7a542bc99f25367777b0b3dd0db7d1ca3959d14137a1ac80bde2
             env:
               TZ: Europe/Warsaw
+              NPM_CONFIG_PREFIX: /tmp/node
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -39,9 +40,10 @@ spec:
               - -c
               - |
                 cd /workspace
-                npm install -g pnpm
-                pnpm install
-                pnpm build
+                npx --yes pnpm install
+                npx pnpm install
+                npx pnpm build
+                npx pnpm start
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -76,7 +78,13 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /workspace
-      node:
+      node-npm:
         type: emptyDir
         globalMounts:
           - path: /home/node/.npm
+      node-local:
+        type: emptyDir
+        globalMounts:
+          - path: /home/node/.local
+      tmp:
+        type: emptyDir

@@ -15,7 +15,7 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          clone:
+          1-clone:
             image:
               repository: alpine/git
               tag: 2.52.0@sha256:d453f54c83320412aa89c391b076930bd8569bc1012285e8c68ce2d4435826a3
@@ -24,7 +24,7 @@ spec:
               - "clone"
               - "https://github.com/p-stream/p-stream.git#production"
               - "/workspace"
-          build:
+          2-build:
             image:
               repository: node
               tag: 25-alpine@sha256:636c5bc8fa6a7a542bc99f25367777b0b3dd0db7d1ca3959d14137a1ac80bde2
@@ -36,9 +36,9 @@ spec:
               - -c
               - |
                 cd /workspace
-                npm install -g pnpm
-                pnpm install
-                pnpm build
+                npx --yes pnpm install
+                npx pnpm install
+                npx pnpm build
         containers:
           app:
             image:
@@ -87,14 +87,20 @@ spec:
         type: emptyDir
         advancedMounts:
           pstream:
-            clone:
+            1-clone:
               - path: /workspace
-            build:
+            2-build:
               - path: /workspace
             app:
               - path: /usr/share/nginx/html
                 subPath: dist
-      node:
+      node-npm:
         type: emptyDir
         globalMounts:
           - path: /home/node/.npm
+      node-local:
+        type: emptyDir
+        globalMounts:
+          - path: /home/node/.local
+      tmp:
+        type: emptyDir
