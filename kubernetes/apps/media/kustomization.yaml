@@ -13,6 +13,7 @@ resources:
   - ./bazarr/ks.yaml
   - ./deduparr/ks.yaml
   - ./jellyfin/ks.yaml
+  - ./brrpolice/ks.yaml
   # - ./plex/ks.yaml
   - ./seerr/ks.yaml
   - ./prowlarr/ks.yaml
