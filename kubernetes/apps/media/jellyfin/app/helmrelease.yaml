@@ -22,22 +22,18 @@ spec:
             env:
               TZ: Europe/Warsaw
             probes:
-              liveness:
-                enabled: true
-                spec:
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              readiness:
+              liveness: &probes
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /health
                     port: &port 8096
+                  initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 5
-                  failureThreshold: 5
+                  failureThreshold: 3
+              readiness: *probes
               startup:
                 enabled: true
                 spec:
@@ -75,6 +71,7 @@ spec:
         annotations:
           gatus.home-operations.com/endpoint: |
             group: media
+            url: https://{{ .Release.Name }}.pondi.dev/health
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Jellyfin
           gethomepage.dev/group: Media & Entertainment
@@ -96,8 +93,6 @@ spec:
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /config
       config-metadata:
         existingClaim: "{{ .Release.Name }}-metadata"
         globalMounts:
@@ -109,11 +104,14 @@ spec:
         globalMounts:
           - path: /media
             subPath: media
-      tmp:
+      tmpfs:
         type: emptyDir
-      cache:
-        type: emptyDir
-      logs:
-        type: emptyDir
-        globalMounts:
-          - path: /config/log
+        advancedMounts:
+          jellyfin:
+            app:
+              - path: /cache
+                subPath: cache
+              - path: /config/log
+                subPath: log
+              - path: /tmp
+                subPath: tmp

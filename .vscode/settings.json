@@ -18,14 +18,26 @@
     {
       "name": "external-secrets",
       "base": "lock",
-      "color": "#1986ff",
+      "color": "#298cef",
       "fileNames": ["externalsecret.yaml"]
     },
     {
       "name": "ocirepository",
       "base": "installation",
-      "color": "#a5e075",
+      "color": "#7fe93a",
       "fileNames": ["ocirepository.yaml"]
+    },
+    {
+      "name": "kustomization",
+      "base": "serverless",
+      "color": "#e9b13a",
+      "fileNames": ["kustomization.yaml"]
+    },
+    {
+      "name": "ks",
+      "base": "serverless",
+      "color": "#3a72e9",
+      "fileNames": ["ks.yaml"]
     }
   ],
   "material-icon-theme.files.associations": {
@@ -35,6 +47,9 @@
     "*.backup": "changelog",
     "helmrelease.yaml": "helm",
     "grafanadashboard.yaml": "grafana-alloy",
+    "pvc.yaml": "sequelize",
+    "resourceclaimtemplate.yaml": "parcel",
+    "prometheusrule.yaml": "sentry",
     "entrypoint.sh": "docker",
     "kubeconfig": "kubernetes",
     "talosconfig": "kubernetes"
