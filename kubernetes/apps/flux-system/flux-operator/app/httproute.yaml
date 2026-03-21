@@ -8,7 +8,7 @@ metadata:
     gethomepage.dev/enabled: "true"
     gethomepage.dev/name: Flux Operator
     gethomepage.dev/group: Infrastructure
-    gethomepage.dev/icon: flux-cd.svg
+    gethomepage.dev/icon: flux-operator.svg
     gethomepage.dev/description: GitOps deployment automation
     gethomepage.dev/weight: "20"
 spec:
