@@ -22,7 +22,7 @@ spec:
             command:
               - "git"
               - "clone"
-              - "https://github.com/p-stream/simple-proxy.git"
+              - "https://github.com/MrPondi/simple-proxy.git"
               - "/workspace"
         containers:
           app:
