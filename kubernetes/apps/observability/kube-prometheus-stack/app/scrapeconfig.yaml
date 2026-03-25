@@ -10,6 +10,7 @@ spec:
         - wings0.pondi.dev:9100
         - qnap.internal:9100
         - contabo.external:9100
+        - hetzner.external:9100
   metricsPath: /metrics
   relabelings:
     - action: replace
