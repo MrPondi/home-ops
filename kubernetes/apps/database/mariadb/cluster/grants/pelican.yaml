@@ -12,3 +12,18 @@ spec:
   table: "*"
   username: pelican
   host: "%"
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Grant
+metadata:
+  name: pelican-user
+spec:
+  mariaDbRef:
+    name: mariadb
+  privileges:
+    - "ALL PRIVILEGES"
+  database: "*"
+  table: "*"
+  username: pelicanuser
+  host: "%"
+  grantOption: true

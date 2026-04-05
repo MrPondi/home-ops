@@ -11,14 +11,16 @@ resources:
 
   # Pelican
   - ./databases/pelican.yaml
-  - ./users/pelican.yaml
   - ./grants/pelican.yaml
-
-  # Pelican User
+  - ./users/pelican.yaml
   - ./users/pelican-user.yaml
-  - ./grants/pelican-user.yaml
 
   # Nextcloud
   - ./databases/nextcloud.yaml
-  - ./users/nextcloud.yaml
   - ./grants/nextcloud.yaml
+  - ./users/nextcloud.yaml
+
+  # Wordpress
+  - ./databases/wordpress.yaml
+  - ./grants/wordpress.yaml
+  - ./users/robotybezprzewodowe.yaml
