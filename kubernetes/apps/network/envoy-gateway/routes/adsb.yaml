@@ -34,7 +34,7 @@ spec:
     - name: envoy-internal
       namespace: network
   hostnames:
-    - adsb.pondi.dev
+    - air.pondi.dev
   rules:
     - backendRefs:
         - name: adsb-backend

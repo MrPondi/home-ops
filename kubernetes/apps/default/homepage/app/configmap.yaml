@@ -85,7 +85,7 @@ data:
           proxmoxVMID: 102
       - ADS-B Receiver:
           icon: ads-b-exchange.png
-          href: https://adsb.pondi.dev
+          href: https://air.pondi.dev
           description: Tar1090 Web Interface
           weight: "25"
   proxmox.yaml: |
