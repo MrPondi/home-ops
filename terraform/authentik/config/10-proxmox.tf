@@ -13,7 +13,7 @@ resource "authentik_provider_oauth2" "proxmox" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
-      url           = "https://pve.internal:8006",
+      url           = "https://pve.pondi.dev",
     }
   ]
 
@@ -32,7 +32,7 @@ resource "authentik_application" "proxmox" {
   slug              = "proxmox"
   protocol_provider = authentik_provider_oauth2.proxmox.id
   meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/proxmox.svg"
-  meta_launch_url   = "https://pve.internal:8006"
+  meta_launch_url   = "https://pve.pondi.dev"
   open_in_new_tab   = true
 }
 
