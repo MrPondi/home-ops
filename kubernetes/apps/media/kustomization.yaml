@@ -14,7 +14,6 @@ resources:
   - ./deduparr/ks.yaml
   - ./jellyfin/ks.yaml
   - ./brrpolice/ks.yaml
-  # - ./plex/ks.yaml
   - ./seerr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
@@ -23,4 +22,3 @@ resources:
   - ./recyclarr/ks.yaml
   # - ./seasonpackerr/ks.yaml
   - ./sonarr/ks.yaml
-  # - ./tautulli/ks.yaml
