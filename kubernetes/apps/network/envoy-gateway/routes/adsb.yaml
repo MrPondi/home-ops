@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adsb-backend
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: http
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: adsb-backend-slice
+  labels:
+    kubernetes.io/service-name: adsb-backend
+addressType: IPv4
+ports:
+  - name: http
+    port: 8080
+endpoints:
+  - addresses:
+      - 192.168.1.174
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: adsb-route
+spec:
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+  hostnames:
+    - adsb.pondi.dev
+  rules:
+    - backendRefs:
+        - name: adsb-backend
+          port: 8080

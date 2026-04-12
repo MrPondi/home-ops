@@ -10,6 +10,7 @@ resources:
   - ./ocirepository.yaml
   - ./scrapeconfig.yaml
   - ./securitypolicy.yaml
+  - ./servicemonitor.yaml
 configMapGenerator:
   - name: flux-metrics-configmap
     files:

@@ -12,7 +12,7 @@ data:
   settings.yaml: |
     title: Homelab
     background:
-      image: https://images.unsplash.com/photo-1672288072591-619afe830096?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80
+      image: https://images.unsplash.com/photo-1672288072591-619afe830096
       opacity: 20
     favicon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/heimdall.svg
     theme: dark
@@ -58,7 +58,7 @@ data:
           icon: truenas.svg
           href: https://qnap.internal
           description: NFS Storage
-          weight: "0"
+          weight: "4"
           widget:
             type: truenas
             url: https://qnap.internal
@@ -68,12 +68,12 @@ data:
             enablePools: true
       - Proxmox:
           icon: proxmox.svg
-          href: https://pve.internal:8006
+          href: https://pve.pondi.dev
           description: Virtualization Hypervisor
           weight: "2"
           widget:
             type: proxmox
-            url: https://pve.internal:8006
+            url: https://pve.pondi.dev
             username: {{HOMEPAGE_VAR_PROXMOX_API_TOKEN}}
             password: {{HOMEPAGE_VAR_PROXMOX_API_SECRET}}
     - Home & Automation:
@@ -83,9 +83,14 @@ data:
           weight: "15"
           proxmoxNode: orion
           proxmoxVMID: 102
+      - ADS-B Receiver:
+          icon: ads-b-exchange.png
+          href: https://adsb.pondi.dev
+          description: Tar1090 Web Interface
+          weight: "25"
   proxmox.yaml: |
     orion:
-      url: https://pve.internal:8006
+      url: https://pve.pondi.dev
       token: {{HOMEPAGE_VAR_PROXMOX_API_TOKEN}}
       secret: {{HOMEPAGE_VAR_PROXMOX_API_SECRET}}
   widgets.yaml: |

@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: proxmox-ca-cert
+data:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIE/DCCAuSgAwIBAgIBATANBgkqhkiG9w0BAQsFADB2MSQwIgYDVQQDDBtQcm94
+    bW94IFZpcnR1YWwgRW52aXJvbm1lbnQxLTArBgNVBAsMJGIzNTg5MDc0LTE0ZjMt
+    NDE3OC1hODRlLWVlNDA4N2IyNmI2MjEfMB0GA1UECgwWUFZFIENsdXN0ZXIgTWFu
+    YWdlciBDQTAeFw0yNTA4MTQwNzQyNTNaFw0yNzA4MTQwNzQyNTNaMFsxGTAXBgNV
+    BAsTEFBWRSBDbHVzdGVyIE5vZGUxJDAiBgNVBAoTG1Byb3htb3ggVmlydHVhbCBF
+    bnZpcm9ubWVudDEYMBYGA1UEAxMPb3Jpb24ucG9uZGkuZGV2MIIBIjANBgkqhkiG
+    9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4PkRmpA37WENRlbNivg1r7dYVXK3/VZP/60F
+    HjURCRnCYXXaX7ZFwRPo1WRwh1iwIhE+8EB4RMxz5Sw0qDsinnawmq2pZPQbMstv
+    FkW6sm1Hqy+i6gzoyt6en6XY/dfElG9Yd/FsxX6GErUInYCNPKpAsXfPz44eWyNb
+    A4fj3OaGIYVvQsiEM9DTCEAoM1+mCcZ8yId7E7HsyDhOI7mvvRHXEofvnyESkffz
+    usXV2HBu9/4kel//bOwHA6s30IxqM6TwQfgLypVnUkivoQ6u8fG332NSniRh/FHR
+    S32D4z1oYwJaUhUoWY/QH6EvhDSILJtsa3kFJ7xAoRzcLt+WEwIDAQABo4GvMIGs
+    MAkGA1UdEwQCMAAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwSgYDVR0RBEMwQYcEfwAA
+    AYcQAAAAAAAAAAAAAAAAAAAAAYIJbG9jYWxob3N0hwQKAAoKggVvcmlvboIPb3Jp
+    b24ucG9uZGkuZGV2MB0GA1UdDgQWBBTFCIUYyt0ah5Bs/dsjRGyUqj23IjAfBgNV
+    HSMEGDAWgBTd5hX6O1vn1QnJd9B6DkZt2J/i/jANBgkqhkiG9w0BAQsFAAOCAgEA
+    D6cbcMXC6viwuxi0AVSp4thMR1LHR+o90VeAWl4zea54BoUhQIijVfw6//T7DkFX
+    O+9PprUaOKVeOHG006OGNN4+D0sZKMUb6ivV0ONtrMjMd4B+HSCsI0hpQ+hZNkCe
+    9Fj2mxO1BVDT69u7ZPpfAcNucYGzOaHiLPIbn3Y7dqfGuKtTqKobfzYkXfKODBJS
+    T1ic2Ko3LEeLWCh+lLScVQX1df1LHBD58b5IH5iCM4eZ2XLVEGMgAYLJs/2Tg7lX
+    EXTTCEHY9dxkW3VrhCQ4OdqJ+cl8Ha6hciy/JPGcoVFfe6dr9cEDFkfmzVqNpqUl
+    RMz9b65cNNtZjwOR14HUyYKtLBcY6ERBP0QL+ggJntpLLbaLQ7V9kKuZznihA24i
+    uWBb7XM4aPt7MqjhnRDuG+AmgElLEVj995sKKnOs1aaAEtDRuL0ds5Jyc4VeDg0J
+    SBPytc32V+52otivDRJsrlbxANAHWyGTOndipM4X/sK5lrpEn6wc1aur18jjofCs
+    wusSjbSkyQKUJHdWACDD6fXRIfpRzMToFaTev3OstEuB8SaPa0jDZB6rtbUeLE02
+    btX/gfUtWWDBE23sikX2clMIQ1rhMSEShfz33te51mHxP7p91wFWZBQDxVmcJMVz
+    JO+GKq7Oy7i0WzCEI0UQpTMaD8QLWffUE1/FjcCb5zY=
+    -----END CERTIFICATE-----
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxmox-backend
+spec:
+  ports:
+    - name: https
+      protocol: TCP
+      port: 8006
+      targetPort: https
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: proxmox-backend-slice
+  namespace: default # Must match Service
+  labels:
+    kubernetes.io/service-name: proxmox-backend
+addressType: IPv4
+ports:
+  - name: https
+    port: 8006
+endpoints:
+  - addresses:
+      - 10.0.10.10
+---
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: BackendTLSPolicy
+metadata:
+  name: proxmox-tls-policy
+spec:
+  targetRefs:
+    - kind: Service
+      name: proxmox-backend
+      group: ""
+  validation:
+    hostname: "orion.pondi.dev"
+    caCertificateRefs:
+      - kind: ConfigMap
+        name: proxmox-ca-cert
+        group: ""
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: proxmox-route
+spec:
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+  hostnames:
+    - pve.pondi.dev
+  rules:
+    - backendRefs:
+        - name: proxmox-backend
+          port: 8006
