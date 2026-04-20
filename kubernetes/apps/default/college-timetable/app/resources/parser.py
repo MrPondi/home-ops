@@ -208,7 +208,7 @@ class EventParser:
 
         # Build summary
         summary_parts = []
-        if result["type"]:
+        if result["type"] and result["type"] != self.LECTURE_TYPE_LECTURE:
             summary_parts.append(result["type"].upper())
         if result["short"]:
             summary_parts.append(result["short"])
