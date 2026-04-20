@@ -116,7 +116,14 @@ class PlanFetcher:
     def fetch_timetable_html(self) -> str:
         """Fetch the HTML timetable for the course"""
         content = self.fetch_plan(
-            self.course_ics_id, 0, {"wd": self.course_ics_selector, "winW": 2544, "winH": 1263, "loadBG": "000000"}
+            self.course_ics_id,
+            0,
+            {
+                "wd": self.course_ics_selector,
+                "winW": 2544,
+                "winH": 1263,
+                "loadBG": "000000",
+            },
         ).decode("iso-8859-2")
         return content
 

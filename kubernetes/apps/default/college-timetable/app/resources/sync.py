@@ -4,22 +4,22 @@ Sync ICS file events to a CalDAV server efficiently and safely.
 Handles event creation, updates, and deletions with proper error handling.
 """
 
+import asyncio
 import difflib
 import hashlib
 import logging
-import sys
 from typing import Dict
 
-import caldav
-from caldav.lib.error import AuthorizationError
-from icalendar import Calendar
+from caldav.async_davclient import AsyncDAVClient, get_davclient
+from caldav.collection import Calendar
+from icalendar import Calendar as Cal
 from rich.progress import track
 
 from config import Config
 from parser import EventParser, ParsedServerEvent
 
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -33,62 +33,50 @@ class ICSCalDAVSync:
             config: Configuration object with CalDAV and calendar settings
         """
         self.config = config
-        self.client = caldav.DAVClient(
-            url=config.caldav_url, username=config.username, password=config.password
-        )
-        try:
-            self.principal = self.client.principal()
-        except AuthorizationError as e:
-            logger.error(f"Failed access caldav server: {str(e).split(', reason ')[1]}")
-            sys.exit(1)
-        self.calendars = None
         self.parser = EventParser(config)
 
-    def get_or_create_calendars(self) -> list[caldav.Calendar]:
+    async def get_or_create_calendars(self, client: AsyncDAVClient) -> list[Calendar]:
         """Get existing calendars or create new ones."""
-        all_calendars = self.principal.calendars()
+        principal = await client.get_principal()
+        all_calendars = await client.get_calendars(principal)
         found_calendars = []
 
         for calendar_name in self.config.calendar_names:
-            found = False
             for cal in all_calendars:
-                if cal.get_display_name() == calendar_name:
+                calname = await cal.get_display_name()  # type: ignore
+                if calname == calendar_name:
                     logger.info(f"Found existing calendar: {calendar_name}")
                     found_calendars.append(cal)
-                    found = True
                     break
 
-            if not found:
+            else:
                 logger.warning(f"Calendar '{calendar_name}' not found. Creating one.")
-                if self.config.dry_run:
-                    logger.info(f"[DRY RUN] Would create calendar: {calendar_name}")
-                else:
-                    new_cal = self.principal.make_calendar(name=calendar_name)
-                    logger.info(f"Created new calendar: {calendar_name}")
-                    found_calendars.append(new_cal)
+                new_cal = principal.make_calendar(name=calendar_name)
+                logger.info(f"Created new calendar: {calendar_name}")
+                found_calendars.append(new_cal)
 
         return found_calendars
 
-    def get_server_events(self) -> Dict[int, Dict[str, ParsedServerEvent]]:
+    async def get_server_events(
+        self, calendars: list[Calendar]
+    ) -> Dict[int, Dict[str, ParsedServerEvent]]:
         """
         Get all events from CalDAV server.
 
         Returns:
             Dict mapping calendar_index -> {UID: ParsedServerEvent}
         """
-        if not self.calendars:
-            raise ValueError("Calendars not initialized")
 
-        server_events = {i: {} for i in range(len(self.calendars))}
+        server_events = {i: {} for i in range(len(calendars))}
 
-        for idx, calendar in enumerate(self.calendars):
-            events = calendar.events()
+        for idx, calendar in enumerate(calendars):
+            events = await calendar.get_events()  # type: ignore
 
             for event in events:
                 try:
-                    cal = Calendar.from_ical(event.data)
+                    cal = Cal.from_ical(event.data)
 
-                    clean_cal = Calendar()
+                    clean_cal = Cal()
                     for key in cal.keys():
                         if key.upper() not in self.config.calendar_fields_to_pop:
                             clean_cal.add(key, cal[key])
@@ -125,7 +113,7 @@ class ICSCalDAVSync:
         logger.info(f"Found {total_events} events on server")
         return server_events
 
-    def sync(self) -> Dict[str, int]:
+    async def sync(self) -> Dict[str, int]:
         """
         Sync ICS file to CalDAV server.
 
@@ -137,135 +125,144 @@ class ICSCalDAVSync:
         """
         stats = {"created": 0, "updated": 0, "deleted": 0, "unchanged": 0, "errors": 0}
 
-        # Get or create calendars
-        self.calendars = self.get_or_create_calendars()
+        async with await get_davclient(
+            url=self.config.caldav_url,
+            username=self.config.username,
+            password=self.config.password,
+        ) as client:
+            # Get or create calendars
+            calendars = await self.get_or_create_calendars(client)
 
-        if len(self.calendars) != len(self.config.calendar_names):
-            logger.error("Not all calendars were found. Aborting sync.")
-            return stats
+            if len(calendars) != len(self.config.calendar_names):
+                logger.error("Not all calendars were found. Aborting sync.")
+                return stats
 
-        # Get server events
-        server_events = self.get_server_events()
+            # Get server events
+            server_events = await self.get_server_events(calendars)
 
-        # Parse local ICS file
-        local_events = self.parser.parse_ics_file(server_events)
+            # Parse local ICS file
+            local_events = self.parser.parse_ics_file(server_events)
 
-        # Sync each calendar
-        for i in range(len(self.calendars)):
-            logger.info(f"{'=' * 60}")
-            logger.info(f"Syncing calendar: {self.config.calendar_names[i]}")
+            # Sync each calendar
+            for i in range(len(calendars)):
+                logger.info(f"{'=' * 60}")
+                logger.info(f"Syncing calendar: {self.config.calendar_names[i]}")
 
-            local_cal_events = local_events[i]
-            server_cal_events = server_events[i]
+                local_cal_events = local_events[i]
+                server_cal_events = server_events[i]
 
-            local_uids = set(local_cal_events.keys())
-            server_uids = set(server_cal_events.keys())
+                local_uids = set(local_cal_events.keys())
+                server_uids = set(server_cal_events.keys())
 
-            # Events to create (in local but not on server)
-            to_create = local_uids - server_uids
+                # Events to create (in local but not on server)
+                to_create = local_uids - server_uids
 
-            # Events to update (in both & different hash)
-            to_update = local_uids & server_uids
-            for uid in list(to_update):
-                local_event = local_cal_events[uid]
-                server_event = server_cal_events[uid]
-                if local_event.content_hash == server_event.content_hash:
-                    to_update.remove(uid)
-                    stats["unchanged"] += 1
-
-            # Events to delete (on server but not in local)
-            to_delete = server_uids - local_uids
-
-            logger.info("Sync Plan:")
-            logger.info(f"  To create: {len(to_create)}")
-            logger.info(f"  To update: {len(to_update)}")
-            logger.info(f"  To delete: {len(to_delete)}")
-            logger.info(f"{'=' * 60}")
-
-            if self.config.dry_run:
-                logger.info("DRY RUN MODE - No changes will be made")
-
-            # Create new events
-            for uid in track(
-                list(to_create),
-                description=f"Creating events in {self.config.calendar_names[i]}",
-            ):
-                try:
-                    event = local_cal_events[uid]
-                    summary = next(
-                        (
-                            line.split("SUMMARY:")[1]
-                            for line in event.event_str_hash.splitlines()
-                            if line.startswith("SUMMARY:")
-                        ),
-                        "",
-                    )
-                    if self.config.dry_run:
-                        logger.debug(f"[DRY RUN] Would create event: {summary} ({uid})")
-                    else:
-                        self.calendars[i].save_event(event.event_str)
-                        logger.debug(f"✓ Created event: {summary} ({uid})")
-                    stats["created"] += 1
-                except Exception as e:
-                    logger.error(f"✗ Error creating event {uid}: {e}")
-                    event_data = local_cal_events[uid].event_str
-                    logger.debug(f"Event data:\n{repr(event_data)}")
-                    stats["errors"] += 1
-
-            # Check and update existing events
-            for uid in track(
-                list(to_update),
-                description=f"Updating events in {self.config.calendar_names[i]}",
-            ):
-                try:
+                # Events to update (in both & different hash)
+                to_update = local_uids & server_uids
+                for uid in list(to_update):
                     local_event = local_cal_events[uid]
                     server_event = server_cal_events[uid]
+                    if local_event.content_hash == server_event.content_hash:
+                        to_update.remove(uid)
+                        stats["unchanged"] += 1
 
-                    diff = "\n".join(
-                        difflib.unified_diff(
-                            server_event.event_str_hash.splitlines(),
-                            local_event.event_str_hash.splitlines(),
-                            lineterm="",
+                # Events to delete (on server but not in local)
+                to_delete = server_uids - local_uids
+
+                logger.info("Sync Plan:")
+                logger.info(f"  To create: {len(to_create)}")
+                logger.info(f"  To update: {len(to_update)}")
+                logger.info(f"  To delete: {len(to_delete)}")
+                logger.info(f"{'=' * 60}")
+
+                if self.config.dry_run:
+                    logger.info("DRY RUN MODE - No changes will be made")
+
+                # Create new events
+                for uid in track(
+                    list(to_create),
+                    description=f"Creating events in {self.config.calendar_names[i]}",
+                ):
+                    try:
+                        event = local_cal_events[uid]
+                        summary = next(
+                            (
+                                line.split("SUMMARY:")[1]
+                                for line in event.event_str_hash.splitlines()
+                                if line.startswith("SUMMARY:")
+                            ),
+                            "",
                         )
-                    )
-                    logger.debug(f"Event update diff: {diff}")
-                    if self.config.dry_run:
-                        logger.info(f"[DRY RUN] Would update event: {uid}")
-                    else:
-                        server_event.event.data = local_event.event_str
-                        server_event.event.save()
-                        logger.debug(f"✓ Updated event: {uid}")
-                    stats["updated"] += 1
-                except Exception as e:
-                    logger.error(f"✗ Error updating event {uid}: {e}")
-                    stats["errors"] += 1
+                        if self.config.dry_run:
+                            logger.debug(
+                                f"[DRY RUN] Would create event: {summary} ({uid})"
+                            )
+                        else:
+                            calendars[i].add_event(event.event_str)
+                            logger.debug(f"✓ Created event: {summary} ({uid})")
+                        stats["created"] += 1
+                    except Exception as e:
+                        logger.error(f"✗ Error creating event {uid}: {e}")
+                        event_data = local_cal_events[uid].event_str
+                        logger.debug(f"Event data:\n{repr(event_data)}")
+                        stats["errors"] += 1
 
-            # Delete events not in local file
-            for uid in track(
-                list(to_delete),
-                description=f"Deleting events from {self.config.calendar_names[i]}",
-            ):
-                try:
-                    server_event = server_cal_events[uid]
-                    summary = next(
-                        (
-                            line.split("SUMMARY:")[1]
-                            for line in server_event.event_str_hash.splitlines()
-                            if line.startswith("SUMMARY:")
-                        ),
-                        "",
-                    )
-                    if self.config.dry_run:
-                        logger.info(f"[DRY RUN] Would delete event: {summary} ({uid})")
-                    else:
-                        server_event.event.delete()
-                        logger.debug(f"✓ Deleted event: {summary} ({uid})")
-                    stats["deleted"] += 1
-                except Exception as e:
-                    logger.error(f"✗ Error deleting event {uid}: {e}")
-                    event_data = server_cal_events[uid].event_str
-                    logger.debug(f"Event data:\n{repr(event_data)}")
-                    stats["errors"] += 1
+                # Check and update existing events
+                for uid in track(
+                    list(to_update),
+                    description=f"Updating events in {self.config.calendar_names[i]}",
+                ):
+                    try:
+                        local_event = local_cal_events[uid]
+                        server_event = server_cal_events[uid]
+
+                        diff = "\n".join(
+                            difflib.unified_diff(
+                                server_event.event_str_hash.splitlines(),
+                                local_event.event_str_hash.splitlines(),
+                                lineterm="",
+                            )
+                        )
+                        logger.debug(f"Event update diff: {diff}")
+                        if self.config.dry_run:
+                            logger.info(f"[DRY RUN] Would update event: {uid}")
+                        else:
+                            server_event.event.data = local_event.event_str
+                            server_event.event.save()
+                            logger.debug(f"✓ Updated event: {uid}")
+                        stats["updated"] += 1
+                    except Exception as e:
+                        logger.error(f"✗ Error updating event {uid}: {e}")
+                        stats["errors"] += 1
+
+                # Delete events not in local file
+                for uid in track(
+                    list(to_delete),
+                    description=f"Deleting events from {self.config.calendar_names[i]}",
+                ):
+                    try:
+                        server_event = server_cal_events[uid]
+                        summary = next(
+                            (
+                                line.split("SUMMARY:")[1]
+                                for line in server_event.event_str_hash.splitlines()
+                                if line.startswith("SUMMARY:")
+                            ),
+                            "",
+                        )
+                        if self.config.dry_run:
+                            logger.info(
+                                f"[DRY RUN] Would delete event: {summary} ({uid})"
+                            )
+                        else:
+                            server_event.event.delete()
+                            logger.debug(f"✓ Deleted event: {summary} ({uid})")
+                        stats["deleted"] += 1
+                    except Exception as e:
+                        logger.error(f"✗ Error deleting event {uid}: {e}")
+                        event_data = server_cal_events[uid].event_str
+                        logger.debug(f"Event data:\n{repr(event_data)}")
+                        stats["errors"] += 1
 
         # Print summary
         logger.info(f"{'=' * 60}")
@@ -280,7 +277,7 @@ class ICSCalDAVSync:
         return stats
 
 
-def main():
+async def main():
     """Main entry point"""
     config = Config.from_env()
     syncer = ICSCalDAVSync(config)
@@ -292,8 +289,8 @@ def main():
     else:
         logger.info("Performing actual sync...")
 
-    syncer.sync()
+    await syncer.sync()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

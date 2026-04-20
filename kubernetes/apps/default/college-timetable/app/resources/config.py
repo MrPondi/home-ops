@@ -24,7 +24,7 @@ class Config:
 
     # Course settings
     course_ics_id: int
-    course_ics_selector: ICS_SELECTOR = 1
+    course_ics_selector: ICS_SELECTOR
 
     # Lecturers data
     lecturers_json_path: str = "/data/lecturers.json"

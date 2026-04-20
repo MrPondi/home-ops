@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional
 from zoneinfo import ZoneInfo
 
-from caldav import Event as CaldavEvent
+from caldav.calendarobjectresource import Event as CaldavEvent
 from icalendar import Calendar, Component, Event
 
 from config import Config
