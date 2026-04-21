@@ -16,12 +16,8 @@ This repository contains my homelab infrastructure and Kubernetes cluster, manag
 
 The homelab runs on a **Proxmox hypervisor**, which provides the virtualization foundation for all services:
 
-- **Talos VMs** - Host the Kubernetes control plane and worker nodes
-- **Pelican Gamepanel** - Runs in an LXC container
-- **Docker VMs** - Support legacy workloads including:
-  - Watchtower for automated image updates
-  - Discord Music Bot
-  - Pelican Game Servers
+- **Talos VM** - Hosts the Kubernetes control plane
+- **Docker VM** - Pelican Game Servers
 
 This hybrid approach maintains a clean, immutable Kubernetes environment while preserving flexibility for legacy applications and services that don't require Kubernetes orchestration.
 
