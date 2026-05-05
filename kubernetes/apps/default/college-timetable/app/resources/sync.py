@@ -198,7 +198,7 @@ class ICSCalDAVSync:
                                 f"[DRY RUN] Would create event: {summary} ({uid})"
                             )
                         else:
-                            calendars[i].add_event(event.event_str)
+                            await calendars[i].add_event(event.event_str)
                             logger.debug(f"✓ Created event: {summary} ({uid})")
                         stats["created"] += 1
                     except Exception as e:
@@ -228,7 +228,7 @@ class ICSCalDAVSync:
                             logger.info(f"[DRY RUN] Would update event: {uid}")
                         else:
                             server_event.event.data = local_event.event_str
-                            server_event.event.save()
+                            await server_event.event.save()
                             logger.debug(f"✓ Updated event: {uid}")
                         stats["updated"] += 1
                     except Exception as e:
@@ -255,7 +255,7 @@ class ICSCalDAVSync:
                                 f"[DRY RUN] Would delete event: {summary} ({uid})"
                             )
                         else:
-                            server_event.event.delete()
+                            await server_event.event.delete()
                             logger.debug(f"✓ Deleted event: {summary} ({uid})")
                         stats["deleted"] += 1
                     except Exception as e:
