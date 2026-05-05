@@ -206,6 +206,7 @@ class ICSCalDAVSync:
                         event_data = local_cal_events[uid].event_str
                         logger.debug(f"Event data:\n{repr(event_data)}")
                         stats["errors"] += 1
+                        raise e
 
                 # Check and update existing events
                 for uid in track(
