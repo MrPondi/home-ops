@@ -1,0 +1,104 @@
+import asyncio
+import json
+import os
+
+from httpx import AsyncClient
+
+# Import the class blueprints directly, NOT from dependencies.py
+from auth import Auth
+from config import Config
+from httpauth import HttpAuth
+from notifications import NotificationsClient
+
+
+async def main():
+    # 1. Initialize synchronous configs
+    config = Config()
+
+    # 2. Create the AsyncClient inside an 'async with' context manager.
+    # This automatically safely closes the client when the block ends!
+    async with AsyncClient(
+        headers={
+            "api-version": "1",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+        }
+    ) as httpclient:
+        # 3. Instantiate all services (Dependency Injection)
+        auth_service = Auth(config, httpclient)
+
+        web_notifications_client = NotificationsClient(
+            config.web_notifications_url, auth_service, httpclient
+        )
+
+        # 4. Load initial credentials
+        creds = {
+            "userId": "0",
+            "isProvider": True,
+        }
+        creds["userId"] = os.getenv("USERID", 0)
+
+        try:
+            with open("/data/token.json", "r") as f:
+                token_data = json.load(f)
+                creds.update(token_data)
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                "token.json not found. Please create the file with the necessary credentials before running the bot."
+            )
+
+        # 5. Set up the state
+        auth_service.storeCredentials(creds)
+
+        session_id = os.getenv("SESSIONID", "")
+        httpclient.cookies.set("fixly_session_id", session_id, ".fixly.pl")
+
+        # Attach custom httpx.Auth interceptor
+        httpclient.auth = HttpAuth(auth_service)
+
+        # Refresh the token if needed
+        await auth_service.getAccessToken()
+
+        # 6. Start the actual logic
+        if auth_service.isLoggedIn():
+            await web_notifications_client.init()
+
+            topic = web_notifications_client.generate_notification_topic_key()
+            await web_notifications_client.subscribe(topic)
+
+            print("Bot is running. Listening for messages...")
+
+            try:
+                await asyncio.Event().wait()
+
+            except asyncio.CancelledError:
+                print("KeyboardInterrupt detected. Shutting down gracefully...")
+            except Exception as e:
+                print(f"An unexpected error occurred: {e}")
+            finally:
+                print("Disconnecting MQTT...")
+                web_notifications_client.destroy()
+
+                print("Saving token state...")
+                with open("/data/token.json", "w") as f:
+                    json.dump(
+                        {
+                            "refreshToken": auth_service.storage.refreshToken,
+                            "accessToken": auth_service.storage.accessToken,
+                            "expiresAt": (
+                                auth_service.storage.expiresAt.timestamp()
+                                if auth_service.storage.expiresAt
+                                else 0
+                            ),
+                        },
+                        f,
+                        indent=4,
+                    )
+        else:
+            print("User is not logged in. Could not start bot.")
+
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass

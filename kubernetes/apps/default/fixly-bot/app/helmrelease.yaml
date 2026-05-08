@@ -1,0 +1,85 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: fixly-bot
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: fixly-bot
+  interval: 1h
+  values:
+    controllers:
+      fixly-bot:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          pip-install:
+            image:
+              repository: python
+              tag: 3.14-slim@sha256:5b3879b6f3cb77e712644d50262d05a7c146b7312d784a18eff7ff5462e77033
+            command:
+              - "pip3"
+              - "install"
+              - "--no-cache-dir"
+              - "--target"
+              - "/packages"
+              - "httpx"
+              - "paho-mqtt>=2.1.0"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+        containers:
+          app:
+            image:
+              repository: python
+              tag: 3.14-slim@sha256:5b3879b6f3cb77e712644d50262d05a7c146b7312d784a18eff7ff5462e77033
+            env:
+              - name: PYTHONPATH
+                value: "/packages"
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            command:
+              - "python"
+              - "-u"
+              - "/app/main.py"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: {drop: ["ALL"]}
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 128Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /data
+      packages:
+        type: emptyDir
+        globalMounts:
+          - path: /packages
+      script:
+        type: configMap
+        name: "{{ .Release.Name }}-configmap"
+        globalMounts:
+          - path: /app
+      tmp:
+        type: emptyDir
