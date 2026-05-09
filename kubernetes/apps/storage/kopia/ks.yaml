@@ -7,7 +7,7 @@ metadata:
 spec:
   components:
     - ../../../../components/auth-proxy
-    - ../../../../components/nfs-scaler
+    - ../../../../components/zeroscaler
   dependsOn:
     - name: volsync
       namespace: storage

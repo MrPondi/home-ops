@@ -6,8 +6,8 @@ metadata:
   name: zwave
 spec:
   components:
-    - ../../../../components/volsync
     - ../../../../components/auth-proxy
+    - ../../../../components/volsync
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph

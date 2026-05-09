@@ -6,9 +6,9 @@ metadata:
   name: qbittorrent
 spec:
   components:
-    - ../../../../components/nfs-scaler
-    - ../../../../components/volsync
     - ../../../../components/auth-proxy
+    - ../../../../components/volsync
+    - ../../../../components/zeroscaler
   dependsOn:
     - name: multus-networks
       namespace: kube-system

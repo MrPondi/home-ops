@@ -3,7 +3,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: keda
+  name: blackbox-exporter
 spec:
   allowCrossNamespaceImport: true
   instanceSelector:
@@ -12,4 +12,4 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  url: https://raw.githubusercontent.com/kedacore/keda/refs/heads/main/config/grafana/keda-dashboard.json
+  url: https://grafana.com/api/dashboards/7587/revisions/3/download
