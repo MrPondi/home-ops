@@ -77,22 +77,6 @@ async def main():
             finally:
                 print("Disconnecting MQTT...")
                 web_notifications_client.destroy()
-
-                print("Saving token state...")
-                with open("/data/token.json", "w") as f:
-                    json.dump(
-                        {
-                            "refreshToken": auth_service.storage.refreshToken,
-                            "accessToken": auth_service.storage.accessToken,
-                            "expiresAt": (
-                                auth_service.storage.expiresAt.timestamp()
-                                if auth_service.storage.expiresAt
-                                else 0
-                            ),
-                        },
-                        f,
-                        indent=4,
-                    )
         else:
             print("User is not logged in. Could not start bot.")
 

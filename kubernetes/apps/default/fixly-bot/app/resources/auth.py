@@ -1,3 +1,4 @@
+import json
 import asyncio
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -45,6 +46,21 @@ class Auth:
 
                     if time_left < 0:
                         await self.refresh()
+
+                        with open("/data/token.json", "w") as f:
+                            json.dump(
+                                {
+                                    "refreshToken": self.storage.refreshToken,
+                                    "accessToken": self.storage.accessToken,
+                                    "expiresAt": (
+                                        self.storage.expiresAt.timestamp()
+                                        if self.storage.expiresAt
+                                        else 0
+                                    ),
+                                },
+                                f,
+                                indent=4,
+                            )
 
                         await asyncio.sleep(5)
                         continue
