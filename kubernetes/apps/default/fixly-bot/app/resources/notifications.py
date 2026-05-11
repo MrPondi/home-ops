@@ -116,6 +116,7 @@ class NotificationsClient:
     def _on_message(self, client, userdata, msg):
         try:
             payload = json.loads(msg.payload.decode("utf-8"))
+            print(f"\n📩 [Notification Received]: {payload}", self._loop)
             if payload.get("action") == "service_request-new":
                 print(
                     f"New request with customer {payload.get('tooltip', {}).get('title').strip().capitalize()}."
@@ -135,6 +136,10 @@ class NotificationsClient:
                         asyncio.run_coroutine_threadsafe(
                             chat_session.main(), self._loop
                         )
+                    else:
+                        print("No request id\n", msg.payload, "\n", payload)
+                else:
+                    print("Event loop not available for handling new request.")
             elif payload.get("action") == "service_request-canceled":
                 print(
                     f"Request with customer {payload.get('subject').strip().capitalize()} was canceled."
