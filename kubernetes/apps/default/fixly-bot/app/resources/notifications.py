@@ -125,7 +125,7 @@ class NotificationsClient:
                     request_id = tooltip.get("requestId")
 
                     if request_id:
-                        from .chat import Chat
+                        from chat import Chat
 
                         chat_session = Chat(
                             config=self.auth_service.config,
