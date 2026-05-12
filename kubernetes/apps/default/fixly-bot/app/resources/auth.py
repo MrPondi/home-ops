@@ -1,5 +1,5 @@
-import json
 import asyncio
+import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
@@ -47,21 +47,6 @@ class Auth:
                     if time_left < 0:
                         await self.refresh()
 
-                        with open("/data/token.json", "w") as f:
-                            json.dump(
-                                {
-                                    "refreshToken": self.storage.refreshToken,
-                                    "accessToken": self.storage.accessToken,
-                                    "expiresAt": (
-                                        self.storage.expiresAt.timestamp()
-                                        if self.storage.expiresAt
-                                        else 0
-                                    ),
-                                },
-                                f,
-                                indent=4,
-                            )
-
                         await asyncio.sleep(5)
                         continue
 
@@ -102,6 +87,22 @@ class Auth:
         self.storage = Storage()
         raise Exception("Credentials are invalid or expired. Please log in again.")
 
+    def dumpCredentials(self) -> None:
+        with open(self.config.data_dir / "token.json", "w") as f:
+            json.dump(
+                {
+                    "refreshToken": self.storage.refreshToken,
+                    "accessToken": self.storage.accessToken,
+                    "expiresAt": (
+                        self.storage.expiresAt.timestamp()
+                        if self.storage.expiresAt
+                        else 0
+                    ),
+                },
+                f,
+                indent=4,
+            )
+
     async def _refreshToken(self) -> bool:
         refresh_token = self.storage.refreshToken
         if not refresh_token:
@@ -135,6 +136,8 @@ class Auth:
 
             if not refresh_result:
                 self.clearCredentials()
+
+            self.dumpCredentials()
 
             return refresh_result
 

@@ -31,20 +31,28 @@ async def main():
         )
 
         # 4. Load initial credentials
+        token_file = config.data_dir / "token.json"
+
         creds = {
-            "userId": "0",
+            "userId": os.getenv("USERID", "0"),
             "isProvider": True,
         }
-        creds["userId"] = os.getenv("USERID", 0)
 
+        # Create empty token file if missing
+        if not token_file.exists():
+            token_file.write_text("{}")
+
+        # Load and merge token data
         try:
-            with open("/data/token.json", "r") as f:
-                token_data = json.load(f)
-                creds.update(token_data)
-        except FileNotFoundError:
-            raise FileNotFoundError(
-                "token.json not found. Please create the file with the necessary credentials before running the bot."
-            )
+            token_data = json.loads(token_file.read_text())
+
+            if not isinstance(token_data, dict):
+                raise ValueError("token.json must contain a JSON object")
+
+            creds.update(token_data)
+
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON in {token_file}: {e}") from e
 
         # 5. Set up the state
         auth_service.storeCredentials(creds)

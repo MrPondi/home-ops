@@ -116,18 +116,19 @@ class NotificationsClient:
     def _on_message(self, client, userdata, msg):
         try:
             payload = json.loads(msg.payload.decode("utf-8"))
-            print(f"\n📩 [Notification Received]: {payload}", self._loop)
+            tooltip = payload.get("tooltip", {})
             if payload.get("action") == "service_request-new":
                 print(
-                    f"New request with customer {payload.get('tooltip', {}).get('title').strip().capitalize()}."
+                    f"New request with customer {tooltip.get('title').strip().capitalize()}."
                 )
                 if self._loop:
-                    request_id = payload.get("requestId")
+                    request_id = tooltip.get("requestId")
 
                     if request_id:
                         from .chat import Chat
 
                         chat_session = Chat(
+                            config=self.auth_service.config,
                             chat_client=self,
                             httpclient=self.httpclient,
                             request_id=str(request_id),
@@ -136,18 +137,13 @@ class NotificationsClient:
                         asyncio.run_coroutine_threadsafe(
                             chat_session.main(), self._loop
                         )
-                    else:
-                        print("No request id\n", msg.payload, "\n", payload)
-                else:
-                    print("Event loop not available for handling new request.")
             elif payload.get("action") == "service_request-canceled":
                 print(
                     f"Request with customer {payload.get('subject').strip().capitalize()} was canceled."
                 )
             elif (
                 payload.get("action") == "sendNewMessagesAggregatedTooltip"
-                and payload.get("tooltip")
-                and payload["tooltip"].get("title") == "Odpisz zlecającym"
+                and tooltip.get("title") == "Odpisz zlecającym"
             ):
                 print("Someone opened fixly on their browser")
         except Exception as e:
