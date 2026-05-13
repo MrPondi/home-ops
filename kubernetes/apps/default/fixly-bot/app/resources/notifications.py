@@ -109,9 +109,13 @@ class NotificationsClient:
     def _on_disconnect(
         self, client, userdata, disconnect_flags, reason_code, properties=None
     ):
-
+        print(f"⚠️ Disconnected from MQTT broker. Reason code: {reason_code}")
         if self._ready_event:
             self._ready_event.clear()
+
+        if self._loop:
+            asyncio.run_coroutine_threadsafe(self.force_reconnect(), self._loop)
+
 
     def _on_message(self, client, userdata, msg):
         try:
