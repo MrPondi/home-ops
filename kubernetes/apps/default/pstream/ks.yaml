@@ -8,7 +8,7 @@ spec:
   components:
     - ../../../../components/volsync
   interval: 1h
-  path: ./kubernetes/apps/default/p-stream/backend
+  path: ./kubernetes/apps/default/pstream/backend
   postBuild:
     substitute:
       APP: pstream-backend
@@ -27,7 +27,7 @@ metadata:
   name: pstream-proxy
 spec:
   interval: 1h
-  path: ./kubernetes/apps/default/p-stream/proxy
+  path: ./kubernetes/apps/default/pstream/proxy
   prune: true
   sourceRef:
     kind: GitRepository
@@ -48,7 +48,7 @@ spec:
   #     - name: pstream-proxy
   #       namespace: default
   #   interval: 1h
-  #   path: ./kubernetes/apps/default/p-stream/client
+  #   path: ./kubernetes/apps/default/pstream/client
   #   prune: true
   #   sourceRef:
   #     kind: GitRepository
