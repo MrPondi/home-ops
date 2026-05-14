@@ -40,8 +40,10 @@ spec:
               - -c
               - |
                 cd /workspace
+
+                echo "only-built-dependencies=esbuild,@parcel/watcher,unrs-resolver" >> .npmrc
+
                 npx --yes pnpm install
-                npx pnpm install
                 npx pnpm build
                 npx pnpm start
             securityContext:
