@@ -1,11 +1,22 @@
 #!/usr/bin/env -S just --justfile
 
-set quiet := true
+set lazy
+set positional-arguments
+set quiet
 set shell := ['bash', '-euo', 'pipefail', '-c']
 
-mod bootstrap
-mod kube 'kubernetes'
-mod talos
+
+# Bootstrap Recipes
+[group: 'Bootstrap']
+mod bootstrap "bootstrap"
+
+# Kube Recipes
+[group: 'Kube']
+mod kube "kubernetes"
+
+# Talos Recipes
+[group: 'Talos']
+mod talos "talos"
 
 [private]
 default:
@@ -18,7 +29,3 @@ log lvl msg *args:
 [private]
 template file *args:
     minijinja-cli "{{ file }}" {{ args }}
-
-[doc('Force Flux to pull in changes from your Git repository')]
-reconcile:
-    flux --namespace flux-system reconcile kustomization flux-system --with-source

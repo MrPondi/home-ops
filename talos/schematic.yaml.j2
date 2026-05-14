@@ -1,15 +1,10 @@
 ---
 customization:
   extraKernelArgs:
-    - -init_on_alloc                      # Less security, faster puter
-    - init_on_alloc=0                     # Less security, faster puter
-    - init_on_free=0                      # Less security, faster puter
     - amd_iommu=on                        # PCI Passthrough
     - iommu=pt                            # PCI Passthrough
     - pcie_aspm=off                       # Disable PCIe ASPM
     - pcie_port_pm=off                    # Disable PCIe Port PM
-    - mitigations=off                     # Less security, faster puter
-    - talos.auditd.disabled=1             # Less security, faster puter
     {% if iso == 'true' %}
     - ip={{ ip | safe }}::10.0.30.1:255.255.255.0::eth0:off:10.0.30.1:1.1.1.1
     {% endif %}

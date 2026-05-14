@@ -31,6 +31,20 @@ spec:
             impersonation:
               username: "claims.preferred_username"
               groups: "variables.groups"
+      httpRoute:
+        enabled: true
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Flux Operator
+          gethomepage.dev/group: Infrastructure
+          gethomepage.dev/icon: flux-operator.svg
+          gethomepage.dev/description: GitOps deployment automation
+          gethomepage.dev/weight: "20"
+        hostnames:
+          - flux-operator.pondi.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
       networkPolicy:
         create: false
   valuesFrom:

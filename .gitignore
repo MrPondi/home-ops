@@ -16,7 +16,6 @@ kubeconfig
 talosconfig
 # Misc.
 .private/
-.task/
 .venv/
 __pycache__/
 .DS_Store

@@ -2,6 +2,8 @@
 # yaml-language-server: $schema=https://json.schemastore.org/helmfile
 
 helmDefaults:
+  args:
+    - --force-conflicts
   cleanupOnFail: true
   wait: true
   waitForJobs: true
@@ -14,22 +16,27 @@ releases:
     values:
       - ./templates/values.yaml.gotmpl
     hooks:
-      - # Wait for Cilium CRDs to be available
-        command: bash
+      - # Wait for CRDs to be available
+        command: kubectl
         args:
-          - -c
-          - until kubectl get crd ciliumloadbalancerippools.cilium.io &>/dev/null; do sleep 5; done
+          - wait
+          - --for=create
+          # - crd/ciliumbgpadvertisements.cilium.io
+          # - crd/ciliumbgpclusterconfigs.cilium.io
+          # - crd/ciliumbgppeerconfigs.cilium.io
+          - crd/ciliumloadbalancerippools.cilium.io
+          - --timeout=2m
         events:
           - postsync
         showlogs: true
-      - # Apply Cilium Resources
+      - # Apply Resources
         command: kubectl
         args:
           - apply
-          - --namespace=kube-system
+          - --namespace={{ .Release.Namespace }}
           - --server-side
-          - --field-manager=kustomize-controller
-          - --filename=../../kubernetes/apps/kube-system/cilium/app/networking.yaml
+          - --force-conflicts
+          - --filename=../../kubernetes/apps/{{ .Release.Namespace }}/{{ .Release.Name }}/app/networking.yaml
         events:
           - postsync
         showlogs: true
@@ -50,11 +57,13 @@ releases:
     values:
       - ./templates/values.yaml.gotmpl
     hooks:
-      - # Wait for ExternalSecrets CRDs to be available
-        command: bash
+      - # Wait for CRDs to be available
+        command: kubectl
         args:
-          - -c
-          - until kubectl get crd certificates.cert-manager.io &>/dev/null; do sleep 5; done
+          - wait
+          - --for=create
+          - crd/certificates.cert-manager.io
+          - --timeout=2m
         events:
           - postsync
         showlogs: true
@@ -64,7 +73,7 @@ releases:
           - apply
           - --namespace=external-secrets
           - --server-side
-          - --field-manager=kustomize-controller
+          - --force-conflicts
           - --filename=../../kubernetes/apps/external-secrets/external-secrets/app/pki.yaml
           - --filename=../../kubernetes/apps/external-secrets/external-secrets/app/certificate.yaml
         events:
@@ -79,10 +88,12 @@ releases:
       - ./templates/values.yaml.gotmpl
     hooks:
       - # Wait for ExternalSecrets CRDs to be available
-        command: bash
+        command: kubectl
         args:
-          - -c
-          - until kubectl get crd clustersecretstores.external-secrets.io &>/dev/null; do sleep 5; done
+          - wait
+          - --for=create
+          - crd/clustersecretstores.external-secrets.io
+          - --timeout=2m
         events:
           - postsync
         showlogs: true
@@ -91,8 +102,8 @@ releases:
         args:
           - apply
           - --server-side
-          - --field-manager=kustomize-controller
-          - --filename=../../kubernetes/apps/external-secrets/external-secrets/store/clustersecretstore.yaml
+          - --force-conflicts
+          - --filename=../../kubernetes/apps/{{ .Release.Namespace }}/{{ .Release.Name }}/store/clustersecretstore.yaml
         events:
           - postsync
         showlogs: true
