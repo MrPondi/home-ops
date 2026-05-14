@@ -11,7 +11,7 @@ glob = ["*.just", ".justfile"]
 stage_fixed = true
 
 [pre-commit.commands.format-yaml]
-run = "yamlfmt {staged_files}"
+run = "~/go/bin/yamlfmt {staged_files}"
 glob = ["*.yaml"]
 exclude = ["*.sops.yaml"]
 stage_fixed = true
