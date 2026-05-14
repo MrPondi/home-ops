@@ -78,6 +78,7 @@ class Chat:
                 "Referer": f"https://fixly.pl/mojefixly/oferta/{self.request_id}",
             },
         )
+        print(f"[Chat {self.request_id}] startConversation response: {response.text}")
         response.raise_for_status()
 
         if response.json().get("data", {}).get("startConversation"):
