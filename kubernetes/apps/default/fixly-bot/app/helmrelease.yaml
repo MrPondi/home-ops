@@ -32,10 +32,6 @@ spec:
                 chmod 600 ~/.netrc
                 git clone https://github.com/MrPondi/FixlyBot.git /workspace
                 rm -f ~/.netrc
-            resources:
-              limits:
-                cpu: 50m
-                memory: 128Mi
         containers:
           app:
             image:
@@ -64,7 +60,6 @@ spec:
               requests:
                 cpu: 10m
               limits:
-                cpu: 200m
                 memory: 128Mi
     defaultPodOptions:
       securityContext:

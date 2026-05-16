@@ -10,7 +10,7 @@ components:
 resources:
   - ./namespace.yaml
   - ./college-timetable/ks.yaml
-  # - ./fixly-bot/ks.yaml
+  - ./fixly-bot/ks.yaml
   - ./home-assistant/ks.yaml
   - ./homepage/ks.yaml
   - ./mosquitto/ks.yaml
