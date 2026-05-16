@@ -181,8 +181,8 @@ spec:
         passwordKey: DB_PASSWORD
     cronjob:
       enabled: true
-      type: sidecar
-      sidecar:
+      type: cronjob
+      cronjob:
         securityContext:
           runAsNonRoot: true
           runAsUser: 33
