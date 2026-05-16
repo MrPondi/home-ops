@@ -6,14 +6,4 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
-configMapGenerator:
-  - name: fixly-bot-configmap
-    files:
-      - main.py=./resources/main.py
-      - config.py=./resources/config.py
-      - auth.py=./resources/auth.py
-      - httpauth.py=./resources/httpauth.py
-      - chat.py=./resources/chat.py
-      - notifications.py=./resources/notifications.py
-generatorOptions:
-  disableNameSuffixHash: true
+  - ./pvc.yaml

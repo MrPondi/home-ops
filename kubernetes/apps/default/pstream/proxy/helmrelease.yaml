@@ -36,8 +36,9 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - sh
-              - -c
+              - "sh"
+              - "-c"
+            args:
               - |
                 cd /workspace
 

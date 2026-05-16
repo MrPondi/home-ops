@@ -51,8 +51,8 @@ spec:
               repository: python
               tag: 3.14-slim@sha256:7a500125bc50693f2214e842a621440a1b1b9cbb2188f74ab045d29ed2ea5856
             env:
-              - name: PYTHONPATH
-                value: "/packages"
+              TZ: Europe/Warsaw
+              PYTHONPATH: "/packages"
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -112,8 +112,8 @@ spec:
               repository: python
               tag: 3.14-slim@sha256:7a500125bc50693f2214e842a621440a1b1b9cbb2188f74ab045d29ed2ea5856
             env:
-              - name: PYTHONPATH
-                value: "/packages"
+              TZ: Europe/Warsaw
+              PYTHONPATH: "/packages"
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"

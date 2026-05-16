@@ -15,26 +15,26 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          pip-install:
+          clone:
             image:
-              repository: python
-              tag: 3.14-slim@sha256:7a500125bc50693f2214e842a621440a1b1b9cbb2188f74ab045d29ed2ea5856
+              repository: alpine/git
+              tag: 2.52.0@sha256:d453f54c83320412aa89c391b076930bd8569bc1012285e8c68ce2d4435826a3
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
             command:
-              - "pip3"
-              - "install"
-              - "--no-cache-dir"
-              - "--target"
-              - "/packages"
-              - "httpx"
-              - "paho-mqtt>=2.1.0"
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              - "sh"
+              - "-c"
+            args:
+              - |
+                export HOME=/tmp
+                echo "machine github.com login x-access-token password $GITHUB_TOKEN" > ~/.netrc
+                chmod 600 ~/.netrc
+                git clone https://github.com/MrPondi/FixlyBot.git /workspace
+                rm -f ~/.netrc
             resources:
-              requests:
-                cpu: 10m
               limits:
+                cpu: 50m
                 memory: 128Mi
         containers:
           app:
@@ -42,15 +42,20 @@ spec:
               repository: python
               tag: 3.14-slim@sha256:7a500125bc50693f2214e842a621440a1b1b9cbb2188f74ab045d29ed2ea5856
             env:
-              - name: PYTHONPATH
-                value: "/packages"
+              TZ: Europe/Warsaw
+              PYTHONUNBUFFERED: 1
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - "python"
-              - "-u"
-              - "/app/main.py"
+              - "sh"
+              - "-c"
+            args:
+              - |
+                cd /workspace
+                python -m venv /venv
+                /venv/bin/pip install --no-cache-dir .
+                exec /venv/bin/fixlybot
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -59,6 +64,7 @@ spec:
               requests:
                 cpu: 10m
               limits:
+                cpu: 50m
                 memory: 128Mi
     defaultPodOptions:
       securityContext:
@@ -72,14 +78,13 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /data
-      packages:
+      venv:
+        existingClaim: "{{ .Release.Name }}-venv"
+        globalMounts:
+          - path: /venv
+      workspace:
         type: emptyDir
         globalMounts:
-          - path: /packages
-      script:
-        type: configMap
-        name: "{{ .Release.Name }}-configmap"
-        globalMounts:
-          - path: /app
+          - path: /workspace
       tmp:
         type: emptyDir

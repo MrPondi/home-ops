@@ -87,7 +87,7 @@ sync resource:
     done
 
 [doc('View a secret')]
-view-secret ns secret:
+view-secret ns secret="":
     kubectl view-secret -n {{ ns }} {{ secret }}
 
 [doc('View helm template')]
