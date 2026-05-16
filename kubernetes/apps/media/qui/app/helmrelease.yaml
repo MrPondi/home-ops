@@ -22,6 +22,9 @@ spec:
             env:
               QUI__HOST: 0.0.0.0
               QUI__PORT: &port 80
+              QUI__METRICS_ENABLED: true
+              QUI__METRICS_HOST: 0.0.0.0
+              QUI__METRICS_PORT: &metricsPort 8080
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
@@ -69,6 +72,12 @@ spec:
         ports:
           http:
             port: *port
+          metrics:
+            port: *metricsPort
+    serviceMonitor:
+      app:
+        endpoints:
+          - port: metrics
     route:
       app:
         annotations:
@@ -89,6 +98,10 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
