@@ -26,15 +26,15 @@ class Chat:
         This runs entirely in the background, independent of the global listener.
         """
         try:
-            details = await self.get_request_details()
-            if not details:
-                print(
-                    f"[Chat {self.request_id}] No details found for request. aborting checks"
-                )
-            else:
-                print(
-                    f"[Chat {self.request_id}] Request details: \nDotyczy: {details.get('8080', {}).get('answer')}\nProjekt: {details.get('8081', {}).get('answer')}\nElementy: {details.get('8082', {}).get('answer')}\nPowierzchnia: {details.get('8083', {}).get('answer')}\nKiedy usługa powinna być wykonana?: {details.get('service-schedule', {}).get('answer')}"
-                )
+            # details = await self.get_request_details()
+            # if not details:
+            #     print(
+            #         f"[Chat {self.request_id}] No details found for request. aborting checks"
+            #     )
+            # else:
+            #     print(
+            #         f"[Chat {self.request_id}] Request details: \nDotyczy: {details.get('8080', {}).get('answer')}\nProjekt: {details.get('8081', {}).get('answer')}\nElementy: {details.get('8082', {}).get('answer')}\nPowierzchnia: {details.get('8083', {}).get('answer')}\nKiedy usługa powinna być wykonana?: {details.get('service-schedule', {}).get('answer')}"
+            #     )
 
             time_to_wait = random.randint(1, 3) * 60
             print(
@@ -98,6 +98,7 @@ class Chat:
                 "Referer": f"https://fixly.pl/mojefixly/oferta/{self.request_id}",
             },
         )
+        print(f"[Chat {self.request_id}] ProviderRequest response: {response.text}")
         response.raise_for_status()
 
         details = (
