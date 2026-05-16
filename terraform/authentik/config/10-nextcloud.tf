@@ -4,11 +4,12 @@ resource "authentik_property_mapping_provider_scope" "nextcloud-profile" {
   expression = <<EOF
 # Extract all groups the user is a member of
 groups = [group.name.removeprefix("nextcloud-") for group in request.user.ak_groups.all() if group.name.startswith("nextcloud-")]
+quota = request.user.group_attributes().get("nextcloud_quota")
 
 return {
     "name": request.user.name,
     "nc-groups": groups,
-    "quota": request.user.group_attributes().get("nextcloud_quota", None) * 1024 * 1024 * 1024, # Convert GB to Bytes
+    "quota": quota * 1024 * 1024 * 1024 if quota is not None else None, # Convert GB to Bytes
     "avatar": request.user.avatar,
     "is_admin": request.user.is_superuser or ak_is_group_member(request.user, name="Nextcloud Admins"),
     # Since attribute 'birthdate' is supported from NC version 30 onwards, this attribute can be mapped too. Accepted format: YYYY-MM-DD
