@@ -22,7 +22,7 @@ spec:
             command:
               - "git"
               - "clone"
-              - "https://github.com/MrPondi/simple-proxy.git"
+              - "https://github.com/okikio/mov-proxy.git"
               - "/workspace"
         containers:
           app:
@@ -42,11 +42,9 @@ spec:
               - |
                 cd /workspace
 
-                echo "only-built-dependencies=esbuild,@parcel/watcher,unrs-resolver" >> .npmrc
-
                 npx --yes pnpm install
-                npx pnpm build
-                npx pnpm start
+                npx --yes pnpm build
+                npx --yes pnpm start
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
