@@ -5,7 +5,7 @@ terraform {
     }
     bitwarden-secrets = {
       source = "registry.terraform.io/bitwarden/bitwarden-secrets"
-      version = "0.5.4-pre"
+      version = "1.0.0"
     }
     sops = {
       source = "carlpett/sops"
