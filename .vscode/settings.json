@@ -52,7 +52,7 @@
     "prometheusrule.yaml": "sentry",
     "entrypoint.sh": "docker",
     "kubeconfig": "kubernetes",
-    "talosconfig": "kubernetes"
+    "talosconfig": "kubernetes",
   },
   "material-icon-theme.folders.associations": {
     // top level
@@ -60,7 +60,7 @@
     ".private": "archive",
     ".renovate": "robot",
     "bootstrap": "seeders",
-    "bootstrap/helmfile.d": "helm",
+    "bootstrap/helmfile": "helm",
     "flux": "pipe",
     "talos": "linux",
     // namespaces
@@ -76,23 +76,23 @@
     "openebs-system": "base",
     "rook-ceph": "dump",
     "system-upgrade": "update",
-    "storage": "aws"
+    "storage": "aws",
   },
   "sops.defaults.ageKeyFile": "age.key",
   "terminal.integrated.fontSize": 14,
   "vs-kubernetes": {
     "vs-kubernetes.kubeconfig": "./kubeconfig",
-    "vs-kubernetes.knownKubeconfigs": ["./kubeconfig"]
+    "vs-kubernetes.knownKubeconfigs": ["./kubeconfig"],
   },
   "window.zoomLevel": 0,
   "yaml.schemaStore.enable": true,
   "yaml.schemas": {
-    "kubernetes": "./kubernetes/**/*.yaml"
+    "kubernetes": "./kubernetes/**/*.yaml",
   },
   "[just]": {
-    "editor.defaultFormatter": "nefrob.vscode-just-syntax"
+    "editor.defaultFormatter": "nefrob.vscode-just-syntax",
   },
   "[yaml]": {
-    "editor.defaultFormatter": "bluebrown.yamlfmt"
+    "editor.defaultFormatter": "bluebrown.yamlfmt",
   }
 }

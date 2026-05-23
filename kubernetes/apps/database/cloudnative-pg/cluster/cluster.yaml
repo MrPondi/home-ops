@@ -13,7 +13,6 @@ spec:
     podAntiAffinityType: required
   enableSuperuserAccess: true
   instances: 1
-  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql
   imageName: ghcr.io/cloudnative-pg/postgresql:18.1@sha256:2762d1dd965e3c84004f08d5a97526cd8b5395026bc3a1d804d84ffcfa83caa5
   plugins:
     - enabled: true

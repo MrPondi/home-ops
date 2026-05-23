@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Get Changed Files
         id: changed-files
@@ -36,101 +38,57 @@ jobs:
     name: Image Pull - Extract Images
     runs-on: ubuntu-latest
     outputs:
-      default: ${{ steps.extract.outputs.default }}
-      pull: ${{ steps.extract.outputs.pull }}
+      images: ${{ steps.extract.outputs.images }}
     steps:
-      - name: Checkout Default Branch
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          ref: ${{ github.event.repository.default_branch }}
-          path: default
-
-      - name: Gather Images (default)
-        uses: docker://ghcr.io/allenporter/flux-local:v8.0.1
-        with:
-          args: >-
-            get cluster
-            --all-namespaces
-            --path /github/workspace/default/kubernetes/flux/cluster
-            --enable-images
-            --only-images
-            --output json
-            --output-file /github/workspace/images-default.json
-
       - name: Checkout Pull Request Branch
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          persist-credentials: false
           path: pull
 
-      - name: Gather Images (pull)
-        uses: docker://ghcr.io/allenporter/flux-local:v8.0.1
+      - name: Checkout Default Branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          args: >-
-            get cluster
-            --all-namespaces
-            --path /github/workspace/pull/kubernetes/flux/cluster
-            --enable-images
-            --only-images
-            --output json
-            --output-file /github/workspace/images-pull.json
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+          path: default
+
+      - name: Setup Mise
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          tool_versions: |
+            github:home-operations/flate latest
+
+      - name: Gather Images
+        run: >-
+          flate diff images
+          --output json
+          --output-file images.json
+          --path ./pull
+          --path-orig ./default
 
       - name: Extract Images
         id: extract
-        run: |-
-          echo "default=$(jq --compact-output '.' images-default.json)" >> $GITHUB_OUTPUT
-          echo "pull=$(jq --compact-output '.' images-pull.json)" >> $GITHUB_OUTPUT
-
-          echo '## Default branch images' >> $GITHUB_STEP_SUMMARY
-          echo '```json' >> $GITHUB_STEP_SUMMARY
-          jq '.' images-default.json >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
-          echo '## Pull request images' >> $GITHUB_STEP_SUMMARY
-          echo '```json' >> $GITHUB_STEP_SUMMARY
-          jq '.' images-pull.json >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-
-  diff:
-    if: ${{ needs.extract.outputs.default != needs.extract.outputs.pull }}
-    needs: extract
-    name: Image Pull - Diff Images
-    runs-on: home-ops-runner
-    outputs:
-      images: ${{ steps.diff.outputs.images }}
-    steps:
-      - name: Diff Images
-        id: diff
-        run: |-
-          images=$(jq --compact-output --null-input \
-              --argjson f1 '${{ needs.extract.outputs.default }}' \
-              --argjson f2 '${{ needs.extract.outputs.pull }}' \
-              '$f2 - $f1' \
-          )
-          echo "images=${images}" >> $GITHUB_OUTPUT
-
-          echo '## New images to Pull' >> $GITHUB_STEP_SUMMARY
-          echo '```json' >> $GITHUB_STEP_SUMMARY
-          echo $images | jq >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+        run: echo "images=$(jq --compact-output '.' images.json)" >> $GITHUB_OUTPUT
 
   pull:
-    if: ${{ needs.diff.outputs.images != '[]' }}
-    needs: diff
+    if: ${{ needs.extract.outputs.images != '[]' }}
+    needs: extract
     name: Image Pull - Pull Images
     runs-on: home-ops-runner
     strategy:
       matrix:
-        image: ${{ fromJSON(needs.diff.outputs.images) }}
+        image: ${{ fromJSON(needs.extract.outputs.images) }}
       max-parallel: 4
       fail-fast: false
-    env:
-      MATRIX_IMAGE: ${{ matrix.image }}
     steps:
       - name: Install talosctl
-        run: curl -fsSL https://raw.githubusercontent.com/siderolabs/talos/b412ffdbc29d77a81aed88be62f21bc2999afcde/website/static/install | sh
+        run: curl -fsSL https://talos.dev/install | sh
 
       - name: Pull Image
-        run: talosctl --nodes $NODE image pull "${MATRIX_IMAGE}"
+        env:
+          IMAGE: ${{ matrix.image }}
+        run: talosctl --nodes "$NODE" image pull "$IMAGE"
 
   success:
     if: ${{ !cancelled() }}
