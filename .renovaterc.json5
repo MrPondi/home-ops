@@ -4,14 +4,8 @@
     "github>home-operations/renovate-presets#1.3.1",
     ":timezone(Europe/Warsaw)",
   ],
-  allowedEnv: [
-    "MISE_TRUSTED_CONFIG_PATHS"
-  ],
-  env: {
-    MISE_TRUSTED_CONFIG_PATHS: "/tmp/renovate/repos"
-  },
   lockFileMaintenance: {
-    enabled: true,
+    enabled: false,
     schedule: ["every weekend"],
   },
   packageRules: [
