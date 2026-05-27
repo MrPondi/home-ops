@@ -5,7 +5,7 @@
     ":timezone(Europe/Warsaw)",
   ],
   lockFileMaintenance: {
-    enabled: false,
+    enabled: true,
     schedule: ["every weekend"],
   },
   packageRules: [
