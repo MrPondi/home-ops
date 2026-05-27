@@ -22,6 +22,7 @@ spec:
             env:
               ACCEPT_EULA: Y
               TZ: Europe/Warsaw
+              MSSQL_PID: Express
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
