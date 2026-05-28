@@ -1,0 +1,87 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: truenas-ca-cert
+data:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDrTCCApWgAwIBAgIEA+q6EzANBgkqhkiG9w0BAQsFADCBgDELMAkGA1UEBhMC
+    VVMxEjAQBgNVBAoMCWlYc3lzdGVtczESMBAGA1UEAwwJbG9jYWxob3N0MSEwHwYJ
+    KoZIhvcNAQkBFhJpbmZvQGl4c3lzdGVtcy5jb20xEjAQBgNVBAgMCVRlbm5lc3Nl
+    ZTESMBAGA1UEBwwJTWFyeXZpbGxlMB4XDTI1MTAxMDE4MjkwN1oXDTI2MTExMTE4
+    MjkwN1owgYAxCzAJBgNVBAYTAlVTMRIwEAYDVQQKDAlpWHN5c3RlbXMxEjAQBgNV
+    BAMMCWxvY2FsaG9zdDEhMB8GCSqGSIb3DQEJARYSaW5mb0BpeHN5c3RlbXMuY29t
+    MRIwEAYDVQQIDAlUZW5uZXNzZWUxEjAQBgNVBAcMCU1hcnl2aWxsZTCCASIwDQYJ
+    KoZIhvcNAQEBBQADggEPADCCAQoCggEBAOExbSFqfrFhY9NLF50il99dCdV+XHzm
+    746huTUPbGex+vOTvnRCvYBK/4WIAs6wUZaong7DtwI36y4v3csxxDgUYcDMsLLR
+    /TRjPf4Uzdxi3Eeyfjo1QKBDgm6DI2aL0sjQrBd+Yn5dGqG31ghfNMnT1i6g6AOm
+    Nq9ygWeypCmznKNwwmqllJp1yMHeguB4K07QuYFx8aBAlgUw3401lhesE4r1Rqkk
+    KC8kPUHBxQTIR1xYXHaShdkwGLdz0WhtmNXyivL4uH0aV0qWh2mUSww9uVp32zKm
+    3qvM93sVhZmxq8u25IOKuiBh3znU9hTwHO/FmX6GqV1KNUC6LBsDaisCAwEAAaMt
+    MCswFAYDVR0RBA0wC4IJbG9jYWxob3N0MBMGA1UdJQQMMAoGCCsGAQUFBwMBMA0G
+    CSqGSIb3DQEBCwUAA4IBAQCEhXsNG/hS0wDrWS7dIbb9c3IjcmsBtCaimwwyZOco
+    Lh9vebfbb480WVJvZa2Ky/BkBRA3lsI0t1kolPnG7fNBWDcCPbTL58go6EiEbI8E
+    xNs8/UIokHtz9NGnUsgRmErB2gzunCJg469RDFz8+R/jEl9Jpq6xs56jXaoqllVN
+    omDu3Liv4xvxomWBI2LyRTGQSgsDYrRQeM64+zCKGJmAUuQsp10FlIDvl/rbWRTe
+    jn3zIym0Do++gDk1ijVcAGJHBtrmTGZDoP3ZwKcHcdI4XWC5qNR2jHHLYbe5TaUz
+    U2KP7ePn25bpcH1K7+f9sIx3CRDwBTtVZGlCUNrau0M7
+    -----END CERTIFICATE-----
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: truenas-backend
+spec:
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: https
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: truenas-backend-slice
+  labels:
+    kubernetes.io/service-name: truenas-backend
+addressType: IPv4
+ports:
+  - name: https
+    port: 443
+endpoints:
+  - addresses:
+      - 10.0.10.10
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/backendtlspolicy_v1alpha3.json
+apiVersion: gateway.networking.k8s.io/v1alpha3
+kind: BackendTLSPolicy
+metadata:
+  name: truenas-tls-policy
+spec:
+  targetRefs:
+    - kind: Service
+      name: truenas-backend
+      group: ""
+  validation:
+    hostname: "orion.pondi.dev"
+    caCertificateRefs:
+      - kind: ConfigMap
+        name: truenas-ca-cert
+        group: ""
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: truenas-route
+spec:
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+  hostnames:
+    - truenas.pondi.dev
+  rules:
+    - backendRefs:
+        - name: truenas-backend
+          port: 443

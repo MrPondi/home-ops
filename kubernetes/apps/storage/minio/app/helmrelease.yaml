@@ -73,7 +73,7 @@ spec:
         type: LoadBalancer
         annotations:
           lbipam.cilium.io/ips: 10.0.30.130
-        externalTrafficPolicy: Cluster
+        externalTrafficPolicy: Local
         ports:
           http:
             port: 9001

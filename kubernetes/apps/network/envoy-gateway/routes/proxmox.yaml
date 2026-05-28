@@ -50,7 +50,6 @@ apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
 metadata:
   name: proxmox-backend-slice
-  namespace: default # Must match Service
   labels:
     kubernetes.io/service-name: proxmox-backend
 addressType: IPv4
@@ -61,6 +60,7 @@ endpoints:
   - addresses:
       - 10.0.10.10
 ---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/backendtlspolicy_v1alpha3.json
 apiVersion: gateway.networking.k8s.io/v1alpha3
 kind: BackendTLSPolicy
 metadata:

@@ -17,7 +17,7 @@ permissions:
 jobs:
   filter:
     name: Image Pull - Filter
-    runs-on: home-ops-runner
+    runs-on: ${{ github.event.repository.name }}-runner
     outputs:
       any_changed: ${{ steps.changed-files.outputs.any_changed }}
     steps:
@@ -66,7 +66,7 @@ jobs:
     if: ${{ needs.extract.outputs.images != '[]' }}
     needs: extract
     name: Image Pull - Pull Images
-    runs-on: home-ops-runner
+    runs-on: ${{ github.event.repository.name }}-runner
     strategy:
       matrix:
         image: ${{ fromJSON(needs.extract.outputs.images) }}
@@ -89,7 +89,7 @@ jobs:
     if: ${{ !cancelled() }}
     needs: pull
     name: Image Pull - Success
-    runs-on: home-ops-runner
+    runs-on: ${{ github.event.repository.name }}-runner
     steps:
       - name: Any jobs failed?
         if: ${{ contains(needs.*.result, 'failure') }}

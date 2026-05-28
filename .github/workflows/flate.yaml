@@ -17,7 +17,7 @@ permissions:
 jobs:
   filter:
     name: Flate - Filter
-    runs-on: home-ops-runner
+    runs-on: ${{ github.event.repository.name }}-runner
     outputs:
       changed-files: ${{ steps.changed-files.outputs.changed_files }}
     steps:
@@ -31,7 +31,7 @@ jobs:
     if: ${{ needs.filter.outputs.changed-files != '[]' }}
     needs: filter
     name: Flate
-    runs-on: home-ops-runner
+    runs-on: ${{ github.event.repository.name }}-runner
     strategy:
       matrix:
         kind:
@@ -77,7 +77,7 @@ jobs:
     if: ${{ !cancelled() && needs.flate.result != 'skipped' }}
     needs: flate
     name: Flate - Comment
-    runs-on: home-ops-runner
+    runs-on: ${{ github.event.repository.name }}-runner
     permissions:
       contents: read
       pull-requests: write
@@ -171,7 +171,7 @@ jobs:
       - flate
       - comment
     name: Flate - Success
-    runs-on: home-ops-runner
+    runs-on: ${{ github.event.repository.name }}-runner
     steps:
       - name: Any jobs failed?
         if: ${{ contains(needs.*.result, 'failure') }}

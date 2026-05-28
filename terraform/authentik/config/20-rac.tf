@@ -14,11 +14,6 @@ resource "authentik_outpost" "rac" {
     "authentik_host_insecure": false,
     "kubernetes_json_patches": null,
     "kubernetes_service_type": "ClusterIP",
-    "kubernetes_disabled_components": ["ingress"],
-    "kubernetes_httproute_annotations": {},
-    "kubernetes_httproute_parent_refs": [{
-      "name": "envoy-internal",
-      "namespace": "network"
-    }],
+    "kubernetes_disabled_components": ["ingress", "httproute"],
   })
 }

@@ -95,10 +95,10 @@ resource "authentik_rbac_permission_role" "duo-provider-search" {
 }
 
 resource "authentik_outpost" "ldap" {
-  name = "LDAP Outpost"
+  name               = "LDAP Outpost"
   protocol_providers = [authentik_provider_ldap.duo.id]
   service_connection = data.authentik_service_connection_kubernetes.local.id
-  type = "ldap"
+  type               = "ldap"
   config = jsonencode({
     "log_level": "info",
     "refresh_interval": "minutes=5",
@@ -108,13 +108,36 @@ resource "authentik_outpost" "ldap" {
     "kubernetes_replicas": 1,
     "kubernetes_namespace": "security",
     "authentik_host_insecure": false,
-    "kubernetes_json_patches": null,
-    "kubernetes_service_type": "ClusterIP",
-    "kubernetes_disabled_components": ["ingress"],
-    "kubernetes_httproute_annotations": {},
-    "kubernetes_httproute_parent_refs": [{
-      "name": "envoy-internal",
-      "namespace": "network"
-    }],
+    "kubernetes_service_type": "LoadBalancer",
+    "kubernetes_disabled_components": ["ingress", "httproute"],
+    "kubernetes_json_patches": {
+      "service": [
+        {
+          "op"   : "add",
+          "path" : "/metadata/annotations",
+          "value": {}
+        },
+        {
+          "op"   : "add",
+          "path" : "/metadata/annotations/external-dns.alpha.kubernetes.io~1hostname",
+          "value": "ldap.pondi.dev"
+        },
+        {
+          "op"   : "add",
+          "path" : "/metadata/annotations/lbipam.cilium.io~1ips",
+          "value": "10.0.30.133"
+        },
+        {
+          "op"   : "add",
+          "path" : "/metadata/annotations/gatus.home-operations.com~1endpoint",
+          "value": "group: services"
+        },
+        {
+          "op"   : "add",
+          "path" : "/spec/externalTrafficPolicy",
+          "value": "Local"
+        }
+      ]
+    },
   })
 }
