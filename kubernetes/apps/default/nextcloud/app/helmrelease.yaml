@@ -121,8 +121,12 @@ spec:
           ); ?>
       hooks:
         post-installation: |-
-          printf "Install OIDC Login\n"
+          printf "Install Apps\n"
           php occ app:install oidc_login
+          php occ app:enable richdocuments
+          printf "Configure Collabora\n"
+          php occ config:app:set richdocuments wopi_url --value https://office.pondi.dev:443
+          php occ richdocuments:activate-config
           printf "Add missing DB indices\n"
           php occ db:add-missing-indices
           printf "Running maintenance repair\n"
@@ -188,7 +192,7 @@ spec:
            - host: "https://nextcloud.pondi.dev:443"
 
         extra_params: --o:ssl.enable=false --o:ssl.termination=true
-        server_name: collabora.pondi.dev:443
+        server_name: office.pondi.dev:443
 
         existingSecret:
           enabled: true
@@ -212,7 +216,7 @@ spec:
       route:
         enabled: true
         hostnames:
-        - "collabora.pondi.dev"
+        - "office.pondi.dev"
         parentRefs:
         - name: envoy-internal
           namespace: network
