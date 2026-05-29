@@ -17,8 +17,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/botxlab/lavamusic
-              tag: v4.7.0@sha256:3541b981b5389d04d4e0b534080a9a4c7c390da70aa3057ec55c6cd2d96f2181
+              repository: ghcr.io/bongodevs/lavamusic
+              tag: main@sha256:5011079946587ab37c50875dbe02324fe36b0a45399343e8da1fb74ceec7579b
             env:
               TZ: Europe/Warsaw
             envFrom:
