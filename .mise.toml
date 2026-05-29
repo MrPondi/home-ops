@@ -9,7 +9,7 @@ TALOSCONFIG = "{{config_root}}/talos/clusterconfig/talosconfig"
 
 
 [tools]
-"lefthook" = "2.1.8"
+"lefthook" = "2.1.9"
 "aqua:budimanjojo/talhelper" = "3.1.10"
 "aqua:charmbracelet/gum" = "0.17.0"
 "aqua:cilium/cilium-cli" = "0.19.4"
