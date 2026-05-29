@@ -8,8 +8,6 @@ spec:
   dependsOn:
     - name: flux-operator
       namespace: flux-system
-    - name: external-secrets-store
-      namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-instance/app
   prune: true
