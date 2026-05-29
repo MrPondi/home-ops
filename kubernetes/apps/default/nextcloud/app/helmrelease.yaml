@@ -179,6 +179,44 @@ spec:
         secretName: nextcloud-secret
         usernameKey: DB_USER
         passwordKey: DB_PASSWORD
+
+    collabora:
+      enabled: true
+
+      collabora:
+        aliasgroups:
+           - host: "https://nextcloud.pondi.dev:443"
+
+        extra_params: --o:ssl.enable=false --o:ssl.termination=true
+        server_name: collabora.pondi.dev:443
+
+        existingSecret:
+          enabled: true
+          secretName: nextcloud-secret
+          usernameKey: COLLABORA_USERNAME
+          passwordKey: COLLABORA_PASSWORD
+
+      prometheus:
+        servicemonitor:
+            enabled: true
+        rules:
+            enabled: true
+      grafana:
+        dashboards:
+            enabled: true
+
+      route:
+        enabled: true
+        hostnames:
+        - "collabora.pondi.dev"
+        parentRefs:
+        - name: envoy-internal
+          namespace: network
+        matches:
+          - path:
+              type: PathPrefix
+              value: "/"
+
     cronjob:
       enabled: true
       type: cronjob
@@ -205,6 +243,6 @@ spec:
     startupProbe:
       enabled: true
     metrics:
-      enabled: false
+      enabled: true
       serviceMonitor:
         enabled: true
