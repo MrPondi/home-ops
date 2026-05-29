@@ -125,13 +125,6 @@ spec:
             'oidc_login_update_avatar' => true,
             'oidc_login_code_challenge_method' => 'S256',
           ); ?>
-        collabora.config.php: |-
-          <?php
-          $CONFIG = array (
-            'richdocuments' => array(
-              'wopi_url' => 'https://office.pondi.dev',
-            ),
-          );
       hooks:
         post-installation: |-
           printf "Install Apps\n"
@@ -236,10 +229,13 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-        matches:
-          - path:
-              type: PathPrefix
-              value: "/"
+        rules:
+          - matches:
+              - path:
+                  type: PathPrefix
+                  value: "/"
+            timeouts:
+              backendRequest: 3600s
 
     cronjob:
       enabled: true
