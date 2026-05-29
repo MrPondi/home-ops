@@ -130,7 +130,7 @@ resource "authentik_outpost" "ldap" {
         {
           "op"   : "add",
           "path" : "/metadata/annotations/gatus.home-operations.com~1endpoint",
-          "value": "group: services"
+          "value": "name: ldap outpost\ngroup: services"
         },
         {
           "op"   : "add",

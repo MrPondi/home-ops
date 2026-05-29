@@ -60,6 +60,12 @@ spec:
         proxy.config.php: |-
           <?php
           $CONFIG = array (
+            'trusted_domains' =>
+              [
+                'nextcloud',
+                'nextcloud.pondi.dev',
+                'office.pondi.dev',
+              ],
             'trusted_proxies' => array(
               0 => '127.0.0.1',
               1 => '10.42.0.0/16',
@@ -119,13 +125,20 @@ spec:
             'oidc_login_update_avatar' => true,
             'oidc_login_code_challenge_method' => 'S256',
           ); ?>
+        collabora.config.php: |-
+          <?php
+          $CONFIG = array (
+            'richdocuments' => array(
+              'wopi_url' => 'https://office.pondi.dev',
+            ),
+          );
       hooks:
         post-installation: |-
           printf "Install Apps\n"
           php occ app:install oidc_login
           php occ app:enable richdocuments
           printf "Configure Collabora\n"
-          php occ config:app:set richdocuments wopi_url --value https://office.pondi.dev:443
+          php occ config:app:set richdocuments wopi_url --value https://office.pondi.dev
           php occ richdocuments:activate-config
           printf "Add missing DB indices\n"
           php occ db:add-missing-indices
@@ -189,10 +202,10 @@ spec:
 
       collabora:
         aliasgroups:
-           - host: "https://nextcloud.pondi.dev:443"
+          - host: "https://nextcloud.pondi.dev:443"
 
-        extra_params: --o:ssl.enable=false --o:ssl.termination=true
-        server_name: office.pondi.dev:443
+        extra_params: --o:ssl.termination=true --o:ssl.enable=false --o:security.capabilities=false
+        server_name: office.pondi.dev
 
         existingSecret:
           enabled: true
@@ -211,15 +224,18 @@ spec:
             release: "kube-prometheus-stack"
       grafana:
         dashboards:
-            enabled: true
+          enabled: true
 
       route:
         enabled: true
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            name: collabora
         hostnames:
-        - "office.pondi.dev"
+          - "office.pondi.dev"
         parentRefs:
-        - name: envoy-internal
-          namespace: network
+          - name: envoy-internal
+            namespace: network
         matches:
           - path:
               type: PathPrefix
