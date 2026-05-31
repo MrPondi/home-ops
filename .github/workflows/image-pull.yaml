@@ -56,7 +56,7 @@ jobs:
           FLATE_PATH: ./kubernetes/flux/cluster
         run: |
           echo 'images<<EOF' >> $GITHUB_OUTPUT
-          flate diff images >> $GITHUB_OUTPUT
+          flate diff images --allow-missing-secrets >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   pull:
