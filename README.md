@@ -62,7 +62,6 @@ This Git repository contains the following directories under [Kubernetes](./kube
 └── 📁 flux       # Flux system configuration
 ```
 
-
 ### Cluster layout
 
 Here's how Flux orchestrates application deployments with dependencies. Most applications are deployed as `HelmRelease` resources that depend on other `HelmRelease`'s, while some `Kustomization`'s depend on other `Kustomization`'s. Occasionally, an application may have dependencies on both types. The diagram below illustrates this: `atuin` won't deploy or upgrade until `rook-ceph-cluster` is successfully installed and healthy.
@@ -88,6 +87,7 @@ graph LR
     E -->|Creates| F
     E -.->|Depends on| B
 ```
+
 </details>
 
 ---
@@ -96,24 +96,22 @@ graph LR
 
 I use two separate [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) deployments in my cluster to automate DNS management for both internal and external services:
 
-* **Private DNS:** One instance syncs internal records to my UCG Fiber using the [ExternalDNS webhook provider for UniFi](https://github.com/kashalls/external-dns-unifi-webhook).
-* **Public DNS:** A second instance manages public-facing records and syncs them to Cloudflare.
+- **Private DNS:** One instance syncs internal records to my UCG Fiber using the [ExternalDNS webhook provider for UniFi](https://github.com/kashalls/external-dns-unifi-webhook).
+- **Public DNS:** A second instance manages public-facing records and syncs them to Cloudflare.
 
 This separation is controlled through two dedicated gateways `internal` and `external`. Each ExternalDNS deployment watches only the routes associated with its respective gateway, ensuring that private records go to UniFi and public records go to Cloudflare.
-
 
 ---
 
 ## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2699_fe0f/512.gif" alt="⚙" width="20" height="20"> Hardware
 
-
-| Device                        | OS Disk         | Data Disk                   | RAM   | OS               | Purpose                 |
-|-------------------------------|-----------------|-----------------------------|-------|------------------|-------------------------|
-| MS-A2 (AMD Ryzen™ 9 9955HX)   | 1.92TB M.2      | 4TB M.2                     | 64GB  | Proxmox          | Hypervisor              |
-| QNAP TS-464                   | 256TB M.2       | 3×8TB HDD + 1TB M.2         | 8GB   | TrueNAS SCALE CE | NFS Storage             |
-| UniFi Cloud Gateway Fiber     | -               | -                           | -     | UniFi OS         | Router                  |
-| UniFi Network Video Recorder  | -               | 1x6TB HDD                   | -     | UniFi OS         | NVR                     |
-| APC BX1600MI Back-UPS         | -               | -                           | -     | -                | Backup Power            |
+| Device                       | OS Disk    | Data Disk           | RAM  | OS               | Purpose      |
+| ---------------------------- | ---------- | ------------------- | ---- | ---------------- | ------------ |
+| MS-A2 (AMD Ryzen™ 9 9955HX)  | 1.92TB M.2 | 4TB M.2             | 64GB | Proxmox          | Hypervisor   |
+| QNAP TS-464                  | 256TB M.2  | 3×8TB HDD + 1TB M.2 | 8GB  | TrueNAS SCALE CE | NFS Storage  |
+| UniFi Cloud Gateway Fiber    | -          | -                   | -    | UniFi OS         | Router       |
+| UniFi Network Video Recorder | -          | 1x6TB HDD           | -    | UniFi OS         | NVR          |
+| APC BX1600MI Back-UPS        | -          | -                   | -    | -                | Backup Power |
 
 ---
 
@@ -133,6 +131,6 @@ Huge thanks to the Home Operations community and especially [@JamesTurland](http
 
 If you're starting your own homelab journey, check out:
 
-* [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template)
-* [kubesearch.dev](https://kubesearch.dev)
-* [Home Operations Discord](https://discord.gg/home-operations)
+- [onedr0p/cluster-template](https://github.com/onedr0p/cluster-template)
+- [kubesearch.dev](https://kubesearch.dev)
+- [Home Operations Discord](https://discord.gg/home-operations)

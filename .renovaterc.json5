@@ -1,9 +1,6 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: [
-    "github>home-operations/renovate-presets#1.3.1",
-    ":timezone(Europe/Warsaw)",
-  ],
+  extends: ["github>home-operations/renovate-presets#1.3.1", ":timezone(Europe/Warsaw)"],
   lockFileMaintenance: {
     enabled: true,
     schedule: ["every weekend"],
@@ -16,7 +13,14 @@
       automerge: true,
       automergeType: "pr",
       matchUpdateTypes: ["digest"],
-      matchPackageNames: ["/home-operations/", "/seerr-team/", "/autobrr/", "python", "nginx", "node"],
+      matchPackageNames: [
+        "/home-operations/",
+        "/seerr-team/",
+        "/autobrr/",
+        "python",
+        "nginx",
+        "node",
+      ],
       ignoreTests: false,
     },
     {
@@ -158,11 +162,9 @@
     {
       customType: "regex",
       description: "Process Lavalink plugin dependencies",
-      managerFilePatterns: [
-        "/lavalink/.*\\.yaml(?:\\.j2)?$/",
-      ],
+      managerFilePatterns: ["/lavalink/.*\\.yaml(?:\\.j2)?$/"],
       matchStrings: [
-        "- dependency: \"(?<depName>[^:]+:[^:]+):(?<currentValue>[^\"]+)\"[^\\n]*\\n\\s+repository:\\s*\"(?<registryUrl>[^\"]+)\"",
+        '- dependency: "(?<depName>[^:]+:[^:]+):(?<currentValue>[^"]+)"[^\\n]*\\n\\s+repository:\\s*"(?<registryUrl>[^"]+)"',
       ],
       datasourceTemplate: "maven",
     },

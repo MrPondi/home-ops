@@ -13,4 +13,3 @@ configMapGenerator:
       - freespace_rapid.sh=./resources/freespace_rapid.sh
 generatorOptions:
   disableNameSuffixHash: true
-
