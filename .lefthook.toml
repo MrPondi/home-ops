@@ -2,12 +2,3 @@
 git_url = "https://github.com/home-operations/.github"
 ref = "main"
 configs = ["lefthook.common.toml"]
-
-[pre-commit.commands.format-yaml]
-skip = true
-
-[pre-commit.commands.format-oxfmt]
-run = "oxfmt {staged_files}"
-glob = ["*.yml", "*.yaml"]
-exclude = ["*.sops.yaml"]
-stage_fixed = true
