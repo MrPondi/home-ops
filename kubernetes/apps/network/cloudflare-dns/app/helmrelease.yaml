@@ -35,7 +35,7 @@ spec:
     sources:
       - "crd"
       - "gateway-httproute"
-    txtPrefix: k8s.
+    txtPrefix: k8s.%{record_type}-
     txtOwnerId: default
     domainFilters:
       - "pondi.dev"
