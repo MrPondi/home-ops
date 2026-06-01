@@ -35,10 +35,23 @@ spec:
           gethomepage.dev/icon: victorialogs.svg
           gethomepage.dev/description: Log aggregation system
           gethomepage.dev/weight: "20"
+          gethomepage.dev/app: victoria-logs-single
         hostnames:
           - victoria-logs.pondi.dev
         parentRefs:
           - name: envoy-internal
             namespace: network
+        extraRules:
+          - filters:
+              - type: RequestRedirect
+                requestRedirect:
+                  path:
+                    type: ReplaceFullPath
+                    replaceFullPath: /select/vmui/
+                  statusCode: 302
+            matches:
+              - path:
+                  type: Exact
+                  value: /
       serviceMonitor:
         enabled: true
