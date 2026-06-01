@@ -156,6 +156,12 @@
       matchDatasources: ["github-releases"],
       addLabels: ["renovate/github-release"],
     },
+    // Pelican panel versioning
+    {
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/pelican-dev/panel"],
+      versioning: "semver",
+    },
   ],
 
   customManagers: [
