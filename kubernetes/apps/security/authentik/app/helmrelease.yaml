@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -20,7 +19,7 @@ spec:
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
         readOnlyRootFilesystem: true
-        capabilities: {drop: ["ALL"]}
+        capabilities: { drop: ["ALL"] }
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -84,7 +83,6 @@ spec:
         secretName: authentik-secret
         accountId: GEOIP_ACCOUNT_ID
         licenseKey: GEOIP_LICENSE_KEY
-
     prometheus:
       rules:
         enabled: true

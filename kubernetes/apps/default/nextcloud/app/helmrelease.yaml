@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/main/helmrelease-helm-v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -12,7 +11,6 @@ spec:
   values:
     deploymentAnnotations:
       reloader.stakater.com/auto: "true"
-
     httpRoute:
       enabled: true
       annotations:
@@ -35,7 +33,6 @@ spec:
             - path:
                 type: PathPrefix
                 value: "/"
-
     nextcloud:
       host: nextcloud.pondi.dev
       existingSecret:
@@ -55,7 +52,6 @@ spec:
           port: 25
           secure: NONE
           authtype: NONE
-
       configs:
         proxy.config.php: |-
           <?php
@@ -175,8 +171,7 @@ spec:
         fsGroup: 33
         fsGroupChangePolicy: OnRootMismatch
         readOnlyRootFilesystem: true
-        capabilities: {drop: ["ALL"]}
-
+        capabilities: { drop: ["ALL"] }
     internalDatabase:
       enabled: false
     externalDatabase:
@@ -189,23 +184,18 @@ spec:
         secretName: nextcloud-secret
         usernameKey: DB_USER
         passwordKey: DB_PASSWORD
-
     collabora:
       enabled: true
-
       collabora:
         aliasgroups:
           - host: "https://nextcloud.pondi.dev:443"
-
         extra_params: --o:ssl.termination=true --o:ssl.enable=false --o:security.capabilities=false
         server_name: office.pondi.dev
-
         existingSecret:
           enabled: true
           secretName: nextcloud-secret
           usernameKey: COLLABORA_USERNAME
           passwordKey: COLLABORA_PASSWORD
-
       prometheus:
         servicemonitor:
           enabled: true
@@ -218,7 +208,6 @@ spec:
       grafana:
         dashboards:
           enabled: true
-
       route:
         enabled: true
         annotations:
@@ -236,7 +225,6 @@ spec:
                   value: "/"
             timeouts:
               backendRequest: 3600s
-
     cronjob:
       enabled: true
       type: cronjob

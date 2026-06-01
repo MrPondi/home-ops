@@ -4,7 +4,10 @@ ref = "main"
 configs = ["lefthook.common.toml"]
 
 [pre-commit.commands.format-yaml]
-run = "~/go/bin/yamlfmt {staged_files}"
+skip = true
+
+[pre-commit.commands.format-oxfmt]
+run = "oxfmt {staged_files}"
 glob = ["*.yml", "*.yaml"]
 exclude = ["*.sops.yaml"]
 stage_fixed = true
