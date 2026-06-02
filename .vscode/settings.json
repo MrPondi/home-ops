@@ -16,27 +16,33 @@
   "files.trimTrailingWhitespace": true,
   "material-icon-theme.files.customClones": [
     {
-      "name": "external-secrets",
+      "name": "external-secret",
       "base": "lock",
-      "color": "#298cef",
+      "color": "#B0B447",
       "fileNames": ["externalsecret.yaml"]
+    },
+    {
+      "name": "push-secret",
+      "base": "lock",
+      "color": "#F0906E",
+      "fileNames": ["pushsecret.yaml"]
     },
     {
       "name": "ocirepository",
       "base": "installation",
-      "color": "#7fe93a",
+      "color": "#7FE93A",
       "fileNames": ["ocirepository.yaml"]
     },
     {
       "name": "kustomization",
       "base": "serverless",
-      "color": "#e9b13a",
+      "color": "#E9B13A",
       "fileNames": ["kustomization.yaml"]
     },
     {
       "name": "ks",
       "base": "serverless",
-      "color": "#3a72e9",
+      "color": "#3A72E9",
       "fileNames": ["ks.yaml"]
     }
   ],
@@ -80,10 +86,6 @@
   },
   "sops.defaults.ageKeyFile": "age.key",
   "terminal.integrated.fontSize": 14,
-  "vs-kubernetes": {
-    "vs-kubernetes.kubeconfig": "/home/pondi/home-ops/kubeconfig",
-    "vs-kubernetes.knownKubeconfigs": ["/home/pondi/home-ops/kubeconfig"]
-  },
   "window.zoomLevel": 0,
   "yaml.schemaStore.enable": true,
   "yaml.schemas": {

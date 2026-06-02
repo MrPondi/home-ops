@@ -13,6 +13,7 @@ spec:
       fixly-bot:
         annotations:
           reloader.stakater.com/auto: "true"
+          secret.reloader.stakater.com/reload: "{{ .Release.Name }}-secret"
         initContainers:
           clone:
             image:
@@ -61,21 +62,46 @@ spec:
               limits:
                 memory: 128Mi
     defaultPodOptions:
+      automountServiceAccountToken: true
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
+    rbac:
+      roles:
+        fixly-bot:
+          type: Role
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              resourceNames:
+                - "{{ .Release.Name }}-secret"
+              verbs:
+                - get
+                - patch
+                - update
+                - create
+      bindings:
+        fixly-bot:
+          type: RoleBinding
+          roleRef:
+            identifier: "{{ .Release.Name }}"
+          subjects:
+            - identifier: "{{ .Release.Name }}"
     persistence:
-      config:
-        existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /data
       venv:
-        existingClaim: "{{ .Release.Name }}-venv"
+        type: emptyDir
         globalMounts:
           - path: /venv
+      # pip-cache:
+      #   existingClaim: "{{ .Release.Name }}-pip-cache"
+      #   globalMounts:
+      #     - path: /root/.cache/pip
+      # TODO: figure out how to create this PVC without an additional file
       workspace:
         type: emptyDir
         globalMounts:

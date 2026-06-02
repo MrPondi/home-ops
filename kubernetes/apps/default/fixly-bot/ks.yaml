@@ -5,16 +5,8 @@ kind: Kustomization
 metadata:
   name: fixly-bot
 spec:
-  components:
-    - ../../../../components/volsync
-  dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/default/fixly-bot/app
-  postBuild:
-    substitute:
-      APP: fixly-bot
   prune: true
   sourceRef:
     kind: GitRepository
