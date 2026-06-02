@@ -89,9 +89,9 @@ spec:
         fixly-bot:
           type: RoleBinding
           roleRef:
-            identifier: "{{ .Release.Name }}"
+            identifier: fixly-bot
           subjects:
-            - identifier: "{{ .Release.Name }}"
+            - identifier: fixly-bot
     persistence:
       venv:
         type: emptyDir
