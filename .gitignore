@@ -1,37 +1,17 @@
-# Secrets
-*.pub
-*.key
-*.decrypted~*.yaml
-*.decrypted~*.json
-/age.key
-/cloudflare-tunnel.json
-/github-deploy.key
-/github-deploy.key.pub
-/github-push-token.txt
-# Template config files
-/cluster.yaml
-/nodes.yaml
-# Kubernetes
-kubeconfig
-talosconfig
-# Misc.
+.claude/
 .private/
 .venv/
-__pycache__/
+*.crt
+*.env
+*.iso
+*.key
+.decrypted~*
 .DS_Store
 Thumbs.db
+kubeconfig
+talosconfig
 
-# Terraform state & plans
+.terraform/
 *.tfstate
 *.tfstate.*
-.terraform/
-.terraform.lock.hcl
-*.tfplan*
-
-# Terraform credentials / env (sensitive)
-credentials.auto.tfvars
-*.auto.tfvars.json
-credentials.sh
-.env
 .bw-provider-state
-id_rsa
