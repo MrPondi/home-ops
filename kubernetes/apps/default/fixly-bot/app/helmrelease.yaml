@@ -79,7 +79,7 @@ spec:
               resources:
                 - secrets
               resourceNames:
-                - "{{ .Release.Name }}-secret"
+                - "{{ .Release.Name }}-state"
               verbs:
                 - get
                 - patch
