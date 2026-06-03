@@ -75,7 +75,7 @@ volsync state:
     flux -n volsync-system {{ state }} helmrelease volsync
     kubectl -n volsync-system scale deployment volsync --replicas {{ if state != "suspend" { "1" } else { "0" } }}
 
-[arg('resource', pattern='hr|ks|gitrepo|ocirepo|es')]
+[arg('resource', pattern='hr|ks|gitrepo|ocirepo|es|ps')]
 [doc('Sync a resource')]
 [script]
 sync resource:
