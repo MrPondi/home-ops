@@ -78,8 +78,16 @@ volsync state:
 [arg('resource', pattern='hr|ks|gitrepo|ocirepo|es|ps')]
 [doc('Sync a resource')]
 [script]
-sync resource:
-    kubectl get {{ resource }} --no-headers -A | while read -r ns name _; do
+sync resource namespace="" name="":
+    GET_ARGS="{{ name }}"
+
+    if [ -n "{{ namespace }}" ]; then
+        GET_ARGS="$GET_ARGS -n {{ namespace }}"
+    else
+        GET_ARGS="$GET_ARGS -A"
+    fi
+
+    kubectl get {{ resource }} $GET_ARGS -o custom-columns=NS:.metadata.namespace,NAME:.metadata.name --no-headers | while read -r ns name _; do
         kubectl -n "$ns" annotate --field-manager flux-client-side-apply --overwrite {{ resource }} "$name" \
             "force-sync=$(date +%s)" \
             "reconcile.fluxcd.io/requestedAt=$(date +%s)" \
