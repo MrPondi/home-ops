@@ -9,6 +9,7 @@ TALOSCONFIG = "{{config_root}}/talos/clusterconfig/talosconfig"
 [tools]
 lefthook = "2.1.9"
 shellcheck = "0.11.0"
+flux2 = "2.8.8"
 gum = "0.17.0"
 helm = "4.2.0"
 helmfile = "1.5.2"
