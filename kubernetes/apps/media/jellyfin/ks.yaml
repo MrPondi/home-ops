@@ -9,12 +9,10 @@ spec:
     - ../../../../components/volsync
     - ../../../../components/zeroscaler
   dependsOn:
+    - name: longhorn
+      namespace: longhorn-system
     - name: intel-gpu-resource-driver
       namespace: kube-system
-    - name: cloudflare-tunnel
-      namespace: network
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/media/jellyfin/app
   postBuild:

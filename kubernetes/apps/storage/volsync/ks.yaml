@@ -28,6 +28,7 @@ metadata:
 spec:
   dependsOn:
     - name: volsync
+      namespace: storage
   interval: 1h
   path: ./kubernetes/apps/storage/volsync/maintenance
   prune: true
