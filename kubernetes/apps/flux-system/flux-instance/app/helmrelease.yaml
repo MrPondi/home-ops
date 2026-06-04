@@ -24,7 +24,7 @@ spec:
         kind: GitRepository
         url: "ssh://git@github.com/MrPondi/home-ops.git"
         pullSecret: github-deploy-key
-        ref: "refs/heads/main"
+        ref: "refs/heads/longhorn-switch"
         path: kubernetes/flux/cluster
       kustomize:
         patches:
