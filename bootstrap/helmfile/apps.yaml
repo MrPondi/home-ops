@@ -114,18 +114,6 @@ releases:
           enabled: false
     needs:
       - external-secrets/external-secrets
-    hooks:
-      - # Apply required ExternalSecret
-        command: kubectl
-        args:
-          - apply
-          - --namespace={{ .Release.Namespace }}
-          - --server-side
-          - --force-conflicts
-          - --filename=../../kubernetes/apps/{{ .Release.Namespace }}/{{ .Release.Name }}/app/externalsecret.yaml
-        events:
-          - presync
-        showlogs: true
 
   - name: flux-instance
     namespace: flux-system

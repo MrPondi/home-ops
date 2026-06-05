@@ -16,7 +16,7 @@ default:
 [doc('Bootstrap a Talos & Kubernetes cluster end-to-end')]
 cluster: talhelper nodes k8s (kubeconfig "node") base apps kubeconfig
 
-[doc('Prepare talhelper')]
+[private]
 [script]
 [working-directory('../talos')]
 talhelper:
