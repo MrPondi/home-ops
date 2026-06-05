@@ -7,5 +7,7 @@ brew "minijinja-cli"
 brew "oxfmt"
 # Find security issues in GitHub Actions setups
 brew "zizmor"
+# Editor of encrypted files
+brew "sops"
 # Render and diff Flux GitOps repositories offline, without a cluster
 cask "home-operations/tap/flate"

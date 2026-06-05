@@ -22,12 +22,15 @@ spec:
       snapshotterReplicaCount: 1
 
     defaultSettings:
-      allowCollectingLonghornUsageMetrics: false
+      createDefaultDiskLabeledNodes: true
+
+      defaultDataPath: /dev/sdb
+      storageReservedPercentageForDefaultDisk: 5
       defaultReplicaCount: '{"v1":"1","v2":"1"}'
 
       v1DataEngine: false
       v2DataEngine: true
-      v2DataEngineHugepageEnabled: true
+      allowCollectingLonghornUsageMetrics: false
       dataEngineHugepageEnabled: true
 
       allowVolumeCreationWithDegradedAvailability: true
