@@ -24,6 +24,12 @@ nodes:
       secureboot: false
     talosImageURL: factory.talos.dev/installer/d23a7e9650c1c58a18ebe5073e961d591611d32260264c90cb9603e85070eb82
     controlPlane: true
+    userVolumes:
+      - name: longhorn-data
+        volumeType: disk
+        provisioning:
+          diskSelector:
+            match: disk.dev_path == '/dev/sdb'
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "bc:24:11:68:28:1c"
@@ -44,12 +50,10 @@ nodes:
 patches:
   - "@./patches/global/machine-features.yaml"
   - "@./patches/global/machine-files.yaml"
-  - "@./patches/global/machine-kernel.yaml"
   - "@./patches/global/machine-kubelet.yaml"
   - "@./patches/global/machine-labels.yaml"
   - "@./patches/global/machine-network.yaml"
   - "@./patches/global/machine-sysctls.yaml"
-  # - "@./patches/global/machine-time.yaml"
 
 # Controller patches
 controlPlane:

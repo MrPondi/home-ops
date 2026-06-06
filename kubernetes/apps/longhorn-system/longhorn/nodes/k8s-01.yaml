@@ -9,10 +9,10 @@ spec:
   evictionRequested: false
   disks:
     sdb-disk:
-      path: /dev/sdb
+      path: /var/mnt/longhorn
       allowScheduling: true
       evictionRequested: false
       storageReserved: 32212254720 # 30GB reserved
       tags:
         - nvme
-      diskType: block
+      diskType: filesystem
