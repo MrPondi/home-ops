@@ -64,7 +64,6 @@
     // top level
     ".github/workflows": "ci",
     ".private": "archive",
-    ".renovate": "robot",
     "bootstrap": "seeders",
     "bootstrap/helmfile": "helm",
     "flux": "pipe",
@@ -80,7 +79,6 @@
     "network": "connection",
     "observability": "event",
     "openebs-system": "base",
-    "rook-ceph": "dump",
     "system-upgrade": "update",
     "storage": "aws"
   },

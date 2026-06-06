@@ -1,38 +1,3 @@
-variable "proxmox_api_url" {
-  description = "The URL for the Proxmox API."
-  type        = string
-}
-
-variable "proxmox_api_token" {
-  description = "The Proxmox API token."
-  type        = string
-  sensitive   = true
-}
-
-variable "proxmox_username" {
-  description = "The Proxmox user name."
-  type        = string
-  sensitive   = true
-}
-
-variable "proxmox_password" {
-  description = "The Proxmox user password."
-  type        = string
-  sensitive   = true
-}
-
-variable "proxmox_ssh_user" {
-  description = "The SSH user for the Proxmox node."
-  type        = string
-  default     = "root"
-}
-
-variable "proxmox_ssh_password" {
-  description = "The SSH password for the Proxmox node."
-  type        = string
-  sensitive   = true
-}
-
 variable "nodes" {
   description = "A list of virtual machines to create."
   type = list(object({

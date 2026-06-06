@@ -9,7 +9,7 @@ components:
 
 resources:
   - ./namespace.yaml
-  - ./college-timetable/ks.yaml
+  # - ./college-timetable/ks.yaml
   # - ./dufs/ks.yaml
   - ./fixly-bot/ks.yaml
   # - ./home-assistant/ks.yaml
@@ -18,8 +18,8 @@ resources:
   # - ./musicbot/ks.yaml
   # - ./nextcloud/ks.yaml
   # - ./ollama/ks.yaml
-  - ./pstream/ks.yaml
+  # - ./pstream/ks.yaml
   # - ./pelican/ks.yaml
   # - ./ringback/ks.yaml
-  - ./smtp-relay/ks.yaml
+  # - ./smtp-relay/ks.yaml
   # - ./zwave/ks.yaml

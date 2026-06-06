@@ -22,7 +22,7 @@ module "configuration" {
   source = "./config"
 
   providers = {
-    authentik       = authentik
+    authentik         = authentik
     bitwarden-secrets = bitwarden-secrets
   }
 }
