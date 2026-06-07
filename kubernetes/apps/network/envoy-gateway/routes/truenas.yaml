@@ -65,7 +65,7 @@ spec:
       name: truenas-backend
       group: ""
   validation:
-    hostname: "orion.pondi.dev"
+    hostname: qnap.pondi.dev
     caCertificateRefs:
       - kind: ConfigMap
         name: truenas-ca-cert
