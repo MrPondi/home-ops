@@ -29,7 +29,7 @@ nodes:
         volumeType: disk
         provisioning:
           diskSelector:
-            match: disk.dev_path == '/dev/sdb' && !system_disk
+            match: disk.dev_path == '/dev/sdb'
         filesystem:
           type: xfs
     networkInterfaces:

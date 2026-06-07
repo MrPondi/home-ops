@@ -9,7 +9,7 @@ spec:
   evictionRequested: false
   disks:
     sdb-disk:
-      path: /var/mnt/longhorn
+      path: /var/mnt/longhorn-storage
       allowScheduling: true
       evictionRequested: false
       storageReserved: 5368709120 # 5GB reserved

@@ -1,5 +1,6 @@
 [env]
 _.file = ["{{config_root}}/.secrets.env"]
+HOMEBREW_NO_ENV_HINTS = 1
 FLATE_PATH = '{{config_root}}/kubernetes/flux/cluster'
 KUBECONFIG = "{{config_root}}/kubeconfig"
 SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
