@@ -22,14 +22,16 @@ nodes:
     installDisk: "/dev/sda"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/d23a7e9650c1c58a18ebe5073e961d591611d32260264c90cb9603e85070eb82
+    talosImageURL: factory.talos.dev/installer/c290f5e7ca3ef598af59f686027758109dc0a7ca94791933d5a97e9c158140ce
     controlPlane: true
     userVolumes:
-      - name: longhorn-data
+      - name: longhorn-storage
         volumeType: disk
         provisioning:
           diskSelector:
-            match: disk.dev_path == '/dev/sdb'
+            match: disk.dev_path == '/dev/sdb' && !system_disk
+        filesystem:
+          type: xfs
     networkInterfaces:
       - deviceSelector:
           hardwareAddr: "bc:24:11:68:28:1c"

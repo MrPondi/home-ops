@@ -12,7 +12,7 @@ spec:
       path: /var/mnt/longhorn
       allowScheduling: true
       evictionRequested: false
-      storageReserved: 32212254720 # 30GB reserved
+      storageReserved: 5368709120 # 5GB reserved
       tags:
         - nvme
       diskType: filesystem
