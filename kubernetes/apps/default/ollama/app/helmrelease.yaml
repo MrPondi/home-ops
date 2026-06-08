@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ollama/ollama
-              tag: 0.30.3@sha256:94f691cb4561e28f9be252a95defa5a33c388651fde803ca260576d57f243a57
+              tag: 0.30.7@sha256:46399ef084d97b381955b5dc585c5d836dbe7ed3f79f170d1c04660fed511e3a
             securityContext:
               privileged: true
             env:
