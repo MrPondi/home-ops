@@ -31,12 +31,12 @@ spec:
       v1DataEngine: true
       v2DataEngine: false
       allowCollectingLonghornUsageMetrics: false
+      # dataEngineHugepageEnabled: true # Engine v2
 
       allowVolumeCreationWithDegradedAvailability: true
-      autoSalvage: true
 
-      nodeDownPodDeletionPolicy: do-nothing
-      nodeDrainPolicy: block-if-contains-last-replica
+      nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+      nodeDrainPolicy: allow-if-replica-is-stopped
 
       concurrentReplicaRebuildPerNodeLimit: 5
 
@@ -61,6 +61,9 @@ spec:
         gethomepage.dev/description: Storage cluster management interface
         gethomepage.dev/weight: "15"
         gethomepage.dev/app: longhorn
+    monitoring:
+      enabled: true
+      createPrometheusRules: true
     metrics:
       serviceMonitor:
         enabled: true
