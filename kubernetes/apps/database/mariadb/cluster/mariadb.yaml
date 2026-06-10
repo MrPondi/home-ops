@@ -31,20 +31,20 @@ spec:
     innodb_buffer_pool_size=1600MB
     max_allowed_packet=1GB
     log_warnings=0
-  # bootstrapFrom:
-  #   s3:
-  #     accessKeyIdSecretKeyRef:
-  #       name: mariadb-secret
-  #       key: MINIO_ACCESS_KEY
-  #     bucket: backups
-  #     endpoint: minio.storage.svc.cluster.local:9000
-  #     prefix: mariadb
-  #     secretAccessKeySecretKeyRef:
-  #       name: mariadb-secret
-  #       key: MINIO_SECRET_KEY
-  #     tls:
-  #       enabled: false
-  #   backupContentType: Physical
+  bootstrapFrom:
+    s3:
+      accessKeyIdSecretKeyRef:
+        name: mariadb-secret
+        key: MINIO_ACCESS_KEY
+      bucket: backups
+      endpoint: minio.storage.svc.cluster.local:9000
+      prefix: mariadb
+      secretAccessKeySecretKeyRef:
+        name: mariadb-secret
+        key: MINIO_SECRET_KEY
+      tls:
+        enabled: false
+    backupContentType: Physical
   # stagingStorage:
   #   persistentVolumeClaim:
   #     resources:

@@ -4,20 +4,25 @@ terraform {
       source  = "bpg/proxmox"
       version = "0.109.0"
     }
+    sops = {
+      source = "carlpett/sops"
+    }
   }
+}
+
+data "sops_file" "secret" {
+  source_file = "../secret.sops.json"
 }
 
 
 provider "proxmox" {
-  endpoint  = var.proxmox_api_url
-  # api_token = var.proxmox_api_token
-  username = var.proxmox_username
-  password = var.proxmox_password
+  endpoint  = "https://pve.internal:8006"
+  api_token = data.sops_file.secret.data["PROXMOX_TOKEN"]
   insecure  = true
   ssh {
     agent = true
-    username = var.proxmox_ssh_user
-    private_key = file("id_rsa")
+    username = "root"
+    private_key = base64decode(data.sops_file.secret.data["PROXMOX_SSH_KEY"])
   }
 }
 

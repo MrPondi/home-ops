@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/longhorn.io/node_v1beta2.json
 apiVersion: longhorn.io/v1beta2
 kind: Node
 metadata:
@@ -8,12 +9,10 @@ spec:
   evictionRequested: false
   disks:
     sdb-disk:
-      path: /dev/sdb
+      path: /var/mnt/longhorn-storage
       allowScheduling: true
       evictionRequested: false
-      storageReserved: 32212254720 # 30GB reserved
+      storageReserved: 5368709120 # 5GB reserved
       tags:
-        - storage
-        - ssd
         - nvme
-      diskType: block
+      diskType: filesystem

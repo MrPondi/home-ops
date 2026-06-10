@@ -13,6 +13,7 @@ spec:
     podAntiAffinityType: required
   enableSuperuserAccess: true
   instances: 1
+  enablePDB: false # Not for single node clusters
   imageName: ghcr.io/cloudnative-pg/postgresql:18.4@sha256:8ff3abd13383e619797f974b4fcdda6de0c2cfdad90eb47e1cd95d41fe26bf80
   plugins:
     - enabled: true
@@ -54,16 +55,16 @@ spec:
         - "ro"
   monitoring:
     enablePodMonitor: true
-    # bootstrap:
-    #   recovery:
-    #     source: source
-    # externalClusters:
-    #   - name: source
-    #     plugin:
-    #       enabled: true
-    #       isWALArchiver: true
-    #       name: barman-cloud.cloudnative-pg.io
-    #       parameters: *barmanParameters
+  bootstrap:
+    recovery:
+      source: source
+  externalClusters:
+    - name: source
+      plugin:
+        enabled: true
+        isWALArchiver: true
+        name: barman-cloud.cloudnative-pg.io
+        parameters: *barmanParameters
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/scheduledbackup_v1.json
 apiVersion: postgresql.cnpg.io/v1

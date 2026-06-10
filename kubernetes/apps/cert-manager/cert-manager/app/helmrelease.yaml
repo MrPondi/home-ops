@@ -21,4 +21,4 @@ spec:
         enabled: true
     webhook:
       podDisruptionBudget:
-        enabled: true
+        enabled: false # Not for single node clusters

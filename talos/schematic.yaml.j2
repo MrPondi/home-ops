@@ -5,14 +5,16 @@ customization:
     - iommu=pt                            # PCI Passthrough
     - pcie_aspm=off                       # Disable PCIe ASPM
     - pcie_port_pm=off                    # Disable PCIe Port PM
+    - i915.force_probe=56a6               # Intel GPU (i915) Force Probe
     {% if iso == 'true' %}
     - ip={{ ip | safe }}::10.0.30.1:255.255.255.0::eth0:off:10.0.30.1:1.1.1.1
     {% endif %}
   systemExtensions:
     officialExtensions:
       - siderolabs/amd-ucode              # AMD CPU Microcode
-      - siderolabs/i915                   # Intel GPU
       - siderolabs/mei                    # Intel GPU
-      - siderolabs/nfsrahead              # NFS Performance
-      - siderolabs/iscsi-tools            # iSCSI Tools
-      - siderolabs/qemu-guest-agent       # QEMU Guest Agent
+      - siderolabs/i915                   # Intel GPU
+      - siderolabs/gasket-driver          # Google Coral
+      - siderolabs/iscsi-tools            # Longhorn
+      - siderolabs/util-linux-tools       # Longhorn
+      - siderolabs/qemu-guest-agent       # Guest Agent

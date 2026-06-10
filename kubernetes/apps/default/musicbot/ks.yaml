@@ -22,8 +22,8 @@ metadata:
   name: lavalink
 spec:
   dependsOn:
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+    - name: longhorn
+      namespace: longhorn-system
     - name: yt-cipher
       namespace: default
   interval: 1h
