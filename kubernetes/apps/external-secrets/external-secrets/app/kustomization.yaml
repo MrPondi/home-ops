@@ -7,5 +7,5 @@ resources:
   - ./certificate.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
-  - ./pdb.yaml
+  # - ./pdb.yaml # Not for single node clusters
   - ./pki.yaml
