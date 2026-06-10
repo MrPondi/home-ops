@@ -160,18 +160,19 @@ spec:
               key: NEXTCLOUD_OIDC_CLIENT_SECRET
       extraVolumes:
         - name: tmp
-          EmptyDir: {}
+          emptyDir: {}
       extraVolumeMounts:
         - name: tmp
           mountPath: "/tmp"
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"] }
       podSecurityContext:
         runAsNonRoot: true
         runAsUser: 33
         runAsGroup: 33
         fsGroup: 33
         fsGroupChangePolicy: OnRootMismatch
-        readOnlyRootFilesystem: true
-        capabilities: { drop: ["ALL"] }
     internalDatabase:
       enabled: false
     externalDatabase:
@@ -233,8 +234,6 @@ spec:
           runAsNonRoot: true
           runAsUser: 33
           runAsGroup: 33
-          fsGroup: 33
-          fsGroupChangePolicy: OnRootMismatch
           readOnlyRootFilesystem: true
     persistence:
       enabled: true
