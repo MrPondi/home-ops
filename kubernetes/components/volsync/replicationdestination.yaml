@@ -18,7 +18,7 @@ spec:
     cacheStorageClassName: ${VOLSYNC_CACHE_STORAGECLASS:=openebs-hostpath}
     capacity: ${VOLSYNC_CAPACITY:=5Gi}
     # With Longhorn: https://github.com/backube/volsync/issues/1504
-    cleanupCachePVC: false
+    cleanupCachePVC: true
     cleanupTempPVC: false
     copyMethod: Snapshot
     enableFileDeletion: true
