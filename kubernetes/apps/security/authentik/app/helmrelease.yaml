@@ -18,8 +18,6 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
-        readOnlyRootFilesystem: true
-        capabilities: { drop: ["ALL"] }
       volumes:
         - name: data
           persistentVolumeClaim:
@@ -70,6 +68,10 @@ spec:
           parentRefs:
             - name: envoy-internal
               namespace: network
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: { drop: ["ALL"] }
     worker:
       resources:
         requests:
@@ -77,6 +79,10 @@ spec:
           memory: 256Mi
         limits:
           memory: 1.5Gi
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities: { drop: ["ALL"] }
     geoip:
       enabled: false
       existingSecret:
