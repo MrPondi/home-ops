@@ -22,7 +22,7 @@ nodes:
     installDisk: "/dev/sda"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/612523922050a7187fdf1240916858fc861d53bcef4a53a39578f01657cae7c4
+    talosImageURL: factory.talos.dev/installer/3066b4896f2afce30beef890e880d5ad5081f6194d83f8e1b665226147e5faf0
     controlPlane: true
     userVolumes:
       - name: longhorn-storage
