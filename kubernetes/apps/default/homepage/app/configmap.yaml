@@ -56,12 +56,12 @@ data:
             key: {{HOMEPAGE_VAR_CLOUDFLARE_API_TOKEN}}
       - TrueNas:
           icon: truenas.svg
-          href: https://qnap.internal
+          href: https://truenas.pondi.dev
           description: NFS Storage
           weight: "4"
           widget:
             type: truenas
-            url: https://qnap.internal
+            url: https://truenas.pondi.dev
             version: 2
             key: {{HOMEPAGE_VAR_TRUENAS_API_KEY}}
             fields: ["uptime", "alerts"]

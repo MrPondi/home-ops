@@ -21,10 +21,10 @@ spec:
           conditions: ["[STATUS] == 200"]
         gethomepage.dev/enabled: "true"
         gethomepage.dev/name: Konflate
-        gethomepage.dev/group: Infrastructure
+        gethomepage.dev/group: Monitoring & Operations
         gethomepage.dev/icon: /icons/konflate.svg
         gethomepage.dev/description: Pull request review tool
-        gethomepage.dev/weight: "25"
+        gethomepage.dev/weight: "40"
       parentRefs:
         - name: envoy-external
           namespace: network

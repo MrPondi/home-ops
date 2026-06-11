@@ -36,10 +36,10 @@ spec:
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Flux Operator
-          gethomepage.dev/group: Infrastructure
+          gethomepage.dev/group: Monitoring & Operations
           gethomepage.dev/icon: flux-operator.svg
           gethomepage.dev/description: GitOps deployment automation
-          gethomepage.dev/weight: "20"
+          gethomepage.dev/weight: "35"
         hostnames:
           - flux-operator.pondi.dev
         parentRefs:
