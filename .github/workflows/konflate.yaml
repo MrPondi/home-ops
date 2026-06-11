@@ -14,7 +14,7 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
+  issues: read
 
 env:
   KONFLATE_DOMAIN: konflate.pondi.dev
