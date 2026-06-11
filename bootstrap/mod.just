@@ -69,9 +69,6 @@ base: ready
     if ! kustomize build {{ source_directory() }}/kustomize/apps | just template - | kubectl apply --server-side --force-conflicts -f -; then
         just log fatal "Failed to apply base manifests" "stage" "$(basename "$0")" "file" "$f"
     fi
-    if ! sops exec-file "{{ source_directory() }}/secrets.sops.yaml" "kubectl apply --server-side --filename {}"; then
-        just log fatal "Failed to apply sops secrets" "stage" "$(basename "$0")"
-    fi
     if ! helmfile -f "{{ source_directory() }}/helmfile/crds.yaml" template -q | yq ea -e 'select(.kind == "CustomResourceDefinition")' | kubectl apply --server-side --force-conflicts -f -; then
         just log fatal "Failed to apply base crds" "stage" "$(basename "$0")"
     fi

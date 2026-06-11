@@ -64,59 +64,6 @@ url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0
 checksum = "sha256:b2be80531c6babc8d4e0e6ca95773d58118a2e1582ae006aace08dbc55503072"
 url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Windows_x86_64.zip"
 
-[[tools."aqua:getsops/sops"]]
-version = "3.13.1"
-backend = "aqua:getsops/sops"
-
-[tools."aqua:getsops/sops"."platforms.linux-arm64"]
-checksum = "sha256:19576fb1734dbf8fb77eda0cf0f3a2218f99bf4d33b814318e5e10d6babb9820"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.arm64"
-
-[tools."aqua:getsops/sops"."platforms.linux-arm64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools."aqua:getsops/sops"."platforms.linux-arm64-musl"]
-checksum = "sha256:19576fb1734dbf8fb77eda0cf0f3a2218f99bf4d33b814318e5e10d6babb9820"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.arm64"
-
-[tools."aqua:getsops/sops"."platforms.linux-arm64-musl".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools."aqua:getsops/sops"."platforms.linux-x64"]
-checksum = "sha256:620a9d7e3352ababeca6908cea24a6e8b14ce89a448ddbd3f94f1ef3398f470a"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.amd64"
-
-[tools."aqua:getsops/sops"."platforms.linux-x64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools."aqua:getsops/sops"."platforms.linux-x64-musl"]
-checksum = "sha256:620a9d7e3352ababeca6908cea24a6e8b14ce89a448ddbd3f94f1ef3398f470a"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.amd64"
-
-[tools."aqua:getsops/sops"."platforms.linux-x64-musl".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools."aqua:getsops/sops"."platforms.macos-arm64"]
-checksum = "sha256:a2c0dd37eb031068af6ef213b78cfa67b7f1afd76c2e5cc404257f42bbc8367d"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.darwin.arm64"
-
-[tools."aqua:getsops/sops"."platforms.macos-arm64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools."aqua:getsops/sops"."platforms.macos-x64"]
-checksum = "sha256:dad79d1b1dea767ca38ffaa50e10330a3e807dd13c853ef9c880567acef4f1ef"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.darwin.amd64"
-
-[tools."aqua:getsops/sops"."platforms.macos-x64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools."aqua:getsops/sops"."platforms.windows-x64"]
-checksum = "sha256:4654e53fff6d0a1842facd3a0ed5a66a8ab6164004b0ad4ca2d5e2b1c5473b65"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.amd64.exe"
-
-[tools."aqua:getsops/sops"."platforms.windows-x64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
 [[tools."aqua:hashicorp/terraform"]]
 version = "1.15.5"
 backend = "aqua:hashicorp/terraform"
@@ -375,45 +322,6 @@ url = "https://github.com/fluxcd/flux2/releases/download/v2.8.8/flux_2.8.8_windo
 
 [tools.flux2."platforms.windows-x64".provenance.slsa]
 url = "https://github.com/fluxcd/flux2/releases/download/v2.8.8/provenance.intoto.jsonl"
-
-[[tools."github:bitwarden/sdk"]]
-version = "bws-v1.0.0"
-backend = "github:bitwarden/sdk"
-
-[tools."github:bitwarden/sdk"."platforms.linux-arm64"]
-checksum = "sha256:20a3dcb9e3ce7716a1dc3c0e1c76cea9d5e2bf75094cbb5aad54ced4304929cb"
-url = "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-aarch64-unknown-linux-gnu-1.0.0.zip"
-url_api = "https://api.github.com/repos/bitwarden/sdk-sm/releases/assets/195116607"
-
-[tools."github:bitwarden/sdk"."platforms.linux-arm64-musl"]
-checksum = "sha256:20a3dcb9e3ce7716a1dc3c0e1c76cea9d5e2bf75094cbb5aad54ced4304929cb"
-url = "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-aarch64-unknown-linux-gnu-1.0.0.zip"
-url_api = "https://api.github.com/repos/bitwarden/sdk-sm/releases/assets/195116607"
-
-[tools."github:bitwarden/sdk"."platforms.linux-x64"]
-checksum = "sha256:9077fb7b336a62abc8194728fea8753afad8b0baa3a18723fc05fc02fdb53568"
-url = "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-x86_64-unknown-linux-gnu-1.0.0.zip"
-url_api = "https://api.github.com/repos/bitwarden/sdk-sm/releases/assets/195116605"
-
-[tools."github:bitwarden/sdk"."platforms.linux-x64-musl"]
-checksum = "sha256:9077fb7b336a62abc8194728fea8753afad8b0baa3a18723fc05fc02fdb53568"
-url = "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-x86_64-unknown-linux-gnu-1.0.0.zip"
-url_api = "https://api.github.com/repos/bitwarden/sdk-sm/releases/assets/195116605"
-
-[tools."github:bitwarden/sdk"."platforms.macos-arm64"]
-checksum = "sha256:5dd716878e5627220aa254cbe4e41e978f226f72d9117fc195046709db363e20"
-url = "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-aarch64-apple-darwin-1.0.0.zip"
-url_api = "https://api.github.com/repos/bitwarden/sdk-sm/releases/assets/195116595"
-
-[tools."github:bitwarden/sdk"."platforms.macos-x64"]
-checksum = "sha256:7e06cbc0f3543dd68585a22bf1ce09eca1d413322aa22554a713cf97de60495a"
-url = "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-x86_64-apple-darwin-1.0.0.zip"
-url_api = "https://api.github.com/repos/bitwarden/sdk-sm/releases/assets/195116591"
-
-[tools."github:bitwarden/sdk"."platforms.windows-x64"]
-checksum = "sha256:69b8d0fb2facc8cec4dd2b8157a3496ecaaa376ee1b0fd822012192ce7437505"
-url = "https://github.com/bitwarden/sdk-sm/releases/download/bws-v1.0.0/bws-x86_64-pc-windows-msvc-1.0.0.zip"
-url_api = "https://api.github.com/repos/bitwarden/sdk-sm/releases/assets/195116600"
 
 [[tools.gum]]
 version = "0.17.0"
@@ -684,59 +592,6 @@ url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellche
 [tools.shellcheck."platforms.windows-x64"]
 checksum = "sha256:8a4e35ab0b331c85d73567b12f2a444df187f483e5079ceffa6bda1faa2e740e"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.zip"
-
-[[tools.sops]]
-version = "3.13.1"
-backend = "aqua:getsops/sops"
-
-[tools.sops."platforms.linux-arm64"]
-checksum = "sha256:19576fb1734dbf8fb77eda0cf0f3a2218f99bf4d33b814318e5e10d6babb9820"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.arm64"
-
-[tools.sops."platforms.linux-arm64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools.sops."platforms.linux-arm64-musl"]
-checksum = "sha256:19576fb1734dbf8fb77eda0cf0f3a2218f99bf4d33b814318e5e10d6babb9820"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.arm64"
-
-[tools.sops."platforms.linux-arm64-musl".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools.sops."platforms.linux-x64"]
-checksum = "sha256:620a9d7e3352ababeca6908cea24a6e8b14ce89a448ddbd3f94f1ef3398f470a"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.amd64"
-
-[tools.sops."platforms.linux-x64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools.sops."platforms.linux-x64-musl"]
-checksum = "sha256:620a9d7e3352ababeca6908cea24a6e8b14ce89a448ddbd3f94f1ef3398f470a"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.linux.amd64"
-
-[tools.sops."platforms.linux-x64-musl".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools.sops."platforms.macos-arm64"]
-checksum = "sha256:a2c0dd37eb031068af6ef213b78cfa67b7f1afd76c2e5cc404257f42bbc8367d"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.darwin.arm64"
-
-[tools.sops."platforms.macos-arm64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools.sops."platforms.macos-x64"]
-checksum = "sha256:dad79d1b1dea767ca38ffaa50e10330a3e807dd13c853ef9c880567acef4f1ef"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.darwin.amd64"
-
-[tools.sops."platforms.macos-x64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
-
-[tools.sops."platforms.windows-x64"]
-checksum = "sha256:4654e53fff6d0a1842facd3a0ed5a66a8ab6164004b0ad4ca2d5e2b1c5473b65"
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.amd64.exe"
-
-[tools.sops."platforms.windows-x64".provenance.slsa]
-url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
 
 [[tools.talhelper]]
 version = "3.1.11"
