@@ -20,30 +20,23 @@ spec:
           failedJobsHistory: 1
           ttlSecondsAfterFinished: 86400
         initContainers:
-          pip-install:
+          clone:
             image:
-              repository: python
-              tag: 3.14-slim@sha256:d7a925f9eb9639a93e455b9f12c167569358818c0f62b51b88edbc8fcf34c421
+              repository: alpine/git
+              tag: 2.52.0@sha256:4a0e72d49596a1f5d3701aeedafdadc5c0da4062be4657c7bdc4017387f591cc
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
             command:
-              - "pip3"
-              - "install"
-              - "--no-cache-dir"
-              - "--target"
-              - "/packages"
-              - "beautifulsoup4"
-              - "caldav>=3.0.1"
-              - "httpx"
-              - "icalendar"
-              - "rich"
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 128Mi
+              - "sh"
+              - "-c"
+            args:
+              - |
+                export HOME=/tmp
+                echo "machine github.com login x-access-token password $GITHUB_TOKEN" > ~/.netrc
+                chmod 600 ~/.netrc
+                git clone https://github.com/MrPondi/CollegeTimetable.git /workspace
+                rm -f ~/.netrc
         containers:
           app:
             image:
@@ -51,14 +44,19 @@ spec:
               tag: 3.14-slim@sha256:d7a925f9eb9639a93e455b9f12c167569358818c0f62b51b88edbc8fcf34c421
             env:
               TZ: Europe/Warsaw
-              PYTHONPATH: "/packages"
+              PYTHONUNBUFFERED: 1
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - "python"
-              - "-u"
-              - "/app/populate_lecturers.py"
+              - "sh"
+              - "-c"
+            args:
+              - |
+                cd /workspace
+                python -m venv /venv
+                /venv/bin/pip install --no-cache-dir .
+                exec /venv/bin/populate-lecturers
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -70,7 +68,7 @@ spec:
                 memory: 128Mi
         pod:
           restartPolicy: Never
-      college-timetable:
+      timetable-sync:
         type: cronjob
         cronjob:
           schedule: 0 * * * *
@@ -80,30 +78,23 @@ spec:
           failedJobsHistory: 1
           ttlSecondsAfterFinished: 86400
         initContainers:
-          pip-install:
+          clone:
             image:
-              repository: python
-              tag: 3.14-slim@sha256:d7a925f9eb9639a93e455b9f12c167569358818c0f62b51b88edbc8fcf34c421
+              repository: alpine/git
+              tag: 2.52.0@sha256:4a0e72d49596a1f5d3701aeedafdadc5c0da4062be4657c7bdc4017387f591cc
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
             command:
-              - "pip3"
-              - "install"
-              - "--no-cache-dir"
-              - "--target"
-              - "/packages"
-              - "beautifulsoup4"
-              - "caldav>=3.0.1"
-              - "httpx"
-              - "icalendar"
-              - "rich"
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 128Mi
+              - "sh"
+              - "-c"
+            args:
+              - |
+                export HOME=/tmp
+                echo "machine github.com login x-access-token password $GITHUB_TOKEN" > ~/.netrc
+                chmod 600 ~/.netrc
+                git clone https://github.com/MrPondi/CollegeTimetable.git /workspace
+                rm -f ~/.netrc
         containers:
           app:
             image:
@@ -111,14 +102,19 @@ spec:
               tag: 3.14-slim@sha256:d7a925f9eb9639a93e455b9f12c167569358818c0f62b51b88edbc8fcf34c421
             env:
               TZ: Europe/Warsaw
-              PYTHONPATH: "/packages"
+              PYTHONUNBUFFERED: 1
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - "python"
-              - "-u"
-              - "/app/sync.py"
+              - "sh"
+              - "-c"
+            args:
+              - |
+                cd /workspace
+                python -m venv /venv
+                /venv/bin/pip install --no-cache-dir .
+                exec /venv/bin/college
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -142,14 +138,9 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /data
-      packages:
+      workspace:
         type: emptyDir
         globalMounts:
-          - path: /packages
-      script:
-        type: configMap
-        name: "{{ .Release.Name }}-configmap"
-        globalMounts:
-          - path: /app
+          - path: /workspace
       tmp:
         type: emptyDir
