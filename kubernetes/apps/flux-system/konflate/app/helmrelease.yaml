@@ -19,6 +19,12 @@ spec:
       annotations:
         gatus.home-operations.com/endpoint: |-
           conditions: ["[STATUS] == 200"]
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Konflate
+        gethomepage.dev/group: Infrastructure
+        gethomepage.dev/icon: /icons/konflate.svg
+        gethomepage.dev/description: Pull request review tool
+        gethomepage.dev/weight: "25"
       parentRefs:
         - name: envoy-external
           namespace: network

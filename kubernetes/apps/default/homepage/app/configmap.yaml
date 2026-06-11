@@ -48,7 +48,7 @@ data:
       - Cloudflare Tunnel:
           icon: cloudflare.svg
           description: External access
-          weight: "25"
+          weight: "50"
           widget:
             type: cloudflared
             accountid: {{HOMEPAGE_VAR_CLOUDFLARE_ACCOUNT_ID}}
