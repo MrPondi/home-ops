@@ -57,14 +57,6 @@ machine:
       imageGCLowThresholdPercent: 60
       maxPods: 240
       serializeImagePulls: false
-    extraMounts:
-      - destination: /var/mnt/longhorn
-        type: bind
-        source: /var/mnt/longhorn
-        options:
-          - bind
-          - rshared
-          - rw
     image: ghcr.io/siderolabs/kubelet:v1.36.1
     nodeIP:
       validSubnets:
