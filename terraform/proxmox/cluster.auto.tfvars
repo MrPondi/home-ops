@@ -12,7 +12,7 @@ network_bridge = "Kubernet"
 nodes = [
   # Control Plane Node
   {
-    name = "k8s-01",
+    name = "k8s-0",
     node = "orion",
     vmid = 3000,
     iso_file = "local:iso/talos-orion01.img",

@@ -3,7 +3,7 @@
 apiVersion: longhorn.io/v1beta2
 kind: Node
 metadata:
-  name: k8s-01
+  name: k8s-0
 spec:
   allowScheduling: true
   evictionRequested: false
