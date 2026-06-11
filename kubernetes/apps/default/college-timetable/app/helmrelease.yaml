@@ -138,6 +138,15 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /data
+      venv:
+        type: emptyDir
+        globalMounts:
+          - path: /venv
+      # pip-cache:
+      #   existingClaim: "{{ .Release.Name }}-pip-cache"
+      #   globalMounts:
+      #     - path: /root/.cache/pip
+      # TODO: figure out how to create this PVC without an additional file
       workspace:
         type: emptyDir
         globalMounts:
