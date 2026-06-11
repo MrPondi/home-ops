@@ -26,7 +26,7 @@ log lvl msg *args:
 
 [private]
 template file *args: bitwarden
-    minijinja-cli "{{ file }}" {{ args }} | vals eval -f -
+    minijinja-cli --env "{{ file }}" {{ args }} | vals eval -f -
 
 [private]
 [script]

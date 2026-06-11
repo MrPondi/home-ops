@@ -4,7 +4,7 @@ HOMEBREW_NO_ENV_HINTS = 1
 FLATE_PATH = '{{config_root}}/kubernetes/flux/cluster'
 KUBECONFIG = "{{config_root}}/kubeconfig"
 SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
-TALOSCONFIG = "{{config_root}}/talos/clusterconfig/talosconfig"
+TALOSCONFIG = "{{config_root}}/talosconfig"
 
 
 [tools]
@@ -17,7 +17,6 @@ helmfile = "1.5.3"
 jq = "1.8.1"
 kubectl = "1.36.1"
 kustomize = "5.8.1"
-talhelper = "3.1.11"
 talosctl = "1.13.4"
 yq = "4.53.3"
 terraform = "1.15.6"
