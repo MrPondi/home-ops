@@ -49,8 +49,6 @@
   "material-icon-theme.files.associations": {
     "*.gotmpl": "smarty",
     "*.sops.yaml": "lock",
-    "*.sops.json": "lock",
-    "*.backup": "changelog",
     "helmrelease.yaml": "helm",
     "grafanadashboard.yaml": "grafana-alloy",
     "pvc.yaml": "sequelize",
