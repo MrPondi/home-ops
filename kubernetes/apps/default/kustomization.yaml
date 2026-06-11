@@ -17,7 +17,6 @@ resources:
   - ./mosquitto/ks.yaml
   # - ./musicbot/ks.yaml
   - ./nextcloud/ks.yaml
-  # - ./ollama/ks.yaml
   - ./pstream/ks.yaml
   - ./pelican/ks.yaml
   # - ./ringback/ks.yaml
