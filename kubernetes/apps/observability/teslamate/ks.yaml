@@ -9,6 +9,9 @@ spec:
     - ../../../../components/auth-proxy
   interval: 1h
   path: ./kubernetes/apps/observability/teslamate/app
+  postBuild:
+    substitute:
+      APP: teslamate
   prune: true
   sourceRef:
     kind: GitRepository
