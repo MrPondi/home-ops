@@ -480,36 +480,36 @@ checksum = "sha256:34bf9659f8f04f3841a60131183b8e2acc44e260db4c93b889ff09718cacc
 url = "https://get.helm.sh/helm-v4.2.0-windows-amd64.tar.gz"
 
 [[tools.helmfile]]
-version = "1.5.2"
+version = "1.5.3"
 backend = "aqua:helmfile/helmfile"
 
 [tools.helmfile."platforms.linux-arm64"]
-checksum = "sha256:4488ca172141a2ad563ac99fffdd8f4761620b40e8e7878ab3fd0e436d4ec057"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.5.2/helmfile_1.5.2_linux_arm64.tar.gz"
+checksum = "sha256:05057e3ad11f651a5ed189b90193bc43c091cdd697e1bb5925f24babdb862ba7"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.5.3/helmfile_1.5.3_linux_arm64.tar.gz"
 
 [tools.helmfile."platforms.linux-arm64-musl"]
-checksum = "sha256:4488ca172141a2ad563ac99fffdd8f4761620b40e8e7878ab3fd0e436d4ec057"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.5.2/helmfile_1.5.2_linux_arm64.tar.gz"
+checksum = "sha256:05057e3ad11f651a5ed189b90193bc43c091cdd697e1bb5925f24babdb862ba7"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.5.3/helmfile_1.5.3_linux_arm64.tar.gz"
 
 [tools.helmfile."platforms.linux-x64"]
-checksum = "sha256:96e342ff19a45c2e36371f93cf6264f3ef285bbde0fc363e56cb53bdef3df1ff"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.5.2/helmfile_1.5.2_linux_amd64.tar.gz"
+checksum = "sha256:1a93e6889737eba70339860ba5a71799cd71a95d0c29daf636c09c76b63cd660"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.5.3/helmfile_1.5.3_linux_amd64.tar.gz"
 
 [tools.helmfile."platforms.linux-x64-musl"]
-checksum = "sha256:96e342ff19a45c2e36371f93cf6264f3ef285bbde0fc363e56cb53bdef3df1ff"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.5.2/helmfile_1.5.2_linux_amd64.tar.gz"
+checksum = "sha256:1a93e6889737eba70339860ba5a71799cd71a95d0c29daf636c09c76b63cd660"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.5.3/helmfile_1.5.3_linux_amd64.tar.gz"
 
 [tools.helmfile."platforms.macos-arm64"]
-checksum = "sha256:55e22265177e3d21fcf5a5dfed51f7deaf9c4f6bd460f3961263ebefd428579f"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.5.2/helmfile_1.5.2_darwin_arm64.tar.gz"
+checksum = "sha256:4cd54e6a8ccf69daf7a64ba073b1a7814d3084c5a0d8328a4c7f6f3693252553"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.5.3/helmfile_1.5.3_darwin_arm64.tar.gz"
 
 [tools.helmfile."platforms.macos-x64"]
-checksum = "sha256:1f3a84c4772ca475165b93b7da0b507808df809f41d08033627184b9e6dc75c4"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.5.2/helmfile_1.5.2_darwin_amd64.tar.gz"
+checksum = "sha256:c7bd24cd5fd25f9a2b656c67e8ede3526ff2ff524f708ea152e74f17a22a6214"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.5.3/helmfile_1.5.3_darwin_amd64.tar.gz"
 
 [tools.helmfile."platforms.windows-x64"]
-checksum = "sha256:e2d6e467bb9e1d993b3056678ec8a5ab5b9aa5d1b13855eda37959a13c176830"
-url = "https://github.com/helmfile/helmfile/releases/download/v1.5.2/helmfile_1.5.2_windows_amd64.tar.gz"
+checksum = "sha256:bc6caac8ea02a07e411f56d1dce018dbee96b37d2547fe06d3b108d869b7c03b"
+url = "https://github.com/helmfile/helmfile/releases/download/v1.5.3/helmfile_1.5.3_windows_amd64.tar.gz"
 
 [[tools.jq]]
 version = "1.8.1"
@@ -739,136 +739,136 @@ url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.am
 url = "https://github.com/getsops/sops/releases/download/v3.13.1/sops-v3.13.1.intoto.jsonl"
 
 [[tools.talhelper]]
-version = "3.1.10"
+version = "3.1.11"
 backend = "aqua:budimanjojo/talhelper"
 
 [tools.talhelper."platforms.linux-arm64"]
-checksum = "sha256:a3b725b3880e19cb92f3202fa9ff2d616f32b8622312db2eef0fd1cf8adc8273"
-url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.10/talhelper_linux_arm64.tar.gz"
+checksum = "sha256:dfcb10b679fd3780a041c99788c2d67908ff4c9a79e63224ad8a48f1c00e1410"
+url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.11/talhelper_linux_arm64.tar.gz"
 
 [tools.talhelper."platforms.linux-arm64-musl"]
-checksum = "sha256:a3b725b3880e19cb92f3202fa9ff2d616f32b8622312db2eef0fd1cf8adc8273"
-url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.10/talhelper_linux_arm64.tar.gz"
+checksum = "sha256:dfcb10b679fd3780a041c99788c2d67908ff4c9a79e63224ad8a48f1c00e1410"
+url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.11/talhelper_linux_arm64.tar.gz"
 
 [tools.talhelper."platforms.linux-x64"]
-checksum = "sha256:56657c596ae027354bf9c2bc58a2b6235cb743b7f9130bd748f3cc82c9870465"
-url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.10/talhelper_linux_amd64.tar.gz"
+checksum = "sha256:0951cc31b4b34d2c5e31efb9bf3c1a2b8be7e99401533e2d46fbb39f07ab38d8"
+url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.11/talhelper_linux_amd64.tar.gz"
 
 [tools.talhelper."platforms.linux-x64-musl"]
-checksum = "sha256:56657c596ae027354bf9c2bc58a2b6235cb743b7f9130bd748f3cc82c9870465"
-url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.10/talhelper_linux_amd64.tar.gz"
+checksum = "sha256:0951cc31b4b34d2c5e31efb9bf3c1a2b8be7e99401533e2d46fbb39f07ab38d8"
+url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.11/talhelper_linux_amd64.tar.gz"
 
 [tools.talhelper."platforms.macos-arm64"]
-checksum = "sha256:09e156fc7177a742df71a7cd9bcc1bb6731fd059e11d45731ebdfc536b27df26"
-url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.10/talhelper_darwin_arm64.tar.gz"
+checksum = "sha256:f7cdbc97612e64e8a3aa69e6ac073c763e449ce6d5885119d226eba5580569ef"
+url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.11/talhelper_darwin_arm64.tar.gz"
 
 [tools.talhelper."platforms.macos-x64"]
-checksum = "sha256:f5ed79ead5a4291d6ab31771494ca75b78461add6e59a75a59246ab15ce560da"
-url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.10/talhelper_darwin_amd64.tar.gz"
+checksum = "sha256:8611446bdf3862dd1c36f78b39146c832ead41d97c4f63863952f8f1da379ea1"
+url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.11/talhelper_darwin_amd64.tar.gz"
 
 [tools.talhelper."platforms.windows-x64"]
-checksum = "sha256:092e12cd232929b6d589d67a6eb0e4217ab421c5dcb9fd22595cb0f3be04a826"
-url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.10/talhelper_windows_amd64.tar.gz"
+checksum = "sha256:7bf1aad1fbe0c3c6a866e02731e71db500bbd2ac0c965958309e61edbc14ee3c"
+url = "https://github.com/budimanjojo/talhelper/releases/download/v3.1.11/talhelper_windows_amd64.tar.gz"
 
 [[tools.talosctl]]
-version = "1.13.3"
+version = "1.13.4"
 backend = "aqua:siderolabs/talos"
 
 [tools.talosctl."platforms.linux-arm64"]
-checksum = "sha256:549bcdf2bce9552bc6aee69bd6fb5b0618efb048831cdf729b3dbf92b59f3ae0"
-url = "https://github.com/siderolabs/talos/releases/download/v1.13.3/talosctl-linux-arm64"
+checksum = "sha256:71cb14ab72aee8bd89d3ee08931747a9238a10025a689dc4117d532d4c6c444f"
+url = "https://github.com/siderolabs/talos/releases/download/v1.13.4/talosctl-linux-arm64"
 provenance = "cosign"
 
 [tools.talosctl."platforms.linux-arm64-musl"]
-checksum = "sha256:549bcdf2bce9552bc6aee69bd6fb5b0618efb048831cdf729b3dbf92b59f3ae0"
-url = "https://github.com/siderolabs/talos/releases/download/v1.13.3/talosctl-linux-arm64"
+checksum = "sha256:71cb14ab72aee8bd89d3ee08931747a9238a10025a689dc4117d532d4c6c444f"
+url = "https://github.com/siderolabs/talos/releases/download/v1.13.4/talosctl-linux-arm64"
 provenance = "cosign"
 
 [tools.talosctl."platforms.linux-x64"]
-checksum = "sha256:50e87176dc532fd82b3136f321e8c292e175c98a4c6573c505b07fef21e476cf"
-url = "https://github.com/siderolabs/talos/releases/download/v1.13.3/talosctl-linux-amd64"
+checksum = "sha256:aae1dadd238f9dfbc9790d117a114424b2d59200ee12872d0d9f89e178a69aae"
+url = "https://github.com/siderolabs/talos/releases/download/v1.13.4/talosctl-linux-amd64"
 provenance = "cosign"
 
 [tools.talosctl."platforms.linux-x64-musl"]
-checksum = "sha256:50e87176dc532fd82b3136f321e8c292e175c98a4c6573c505b07fef21e476cf"
-url = "https://github.com/siderolabs/talos/releases/download/v1.13.3/talosctl-linux-amd64"
+checksum = "sha256:aae1dadd238f9dfbc9790d117a114424b2d59200ee12872d0d9f89e178a69aae"
+url = "https://github.com/siderolabs/talos/releases/download/v1.13.4/talosctl-linux-amd64"
 provenance = "cosign"
 
 [tools.talosctl."platforms.macos-arm64"]
-checksum = "sha256:badbf454e3fea46018af69b8704b7acdccb7a70906538619da6bdabc382c8f05"
-url = "https://github.com/siderolabs/talos/releases/download/v1.13.3/talosctl-darwin-arm64"
+checksum = "sha256:2d86630f623486d247dac8eb0db1e2f9f581c4aebd201a193e4eaf7eb13392fa"
+url = "https://github.com/siderolabs/talos/releases/download/v1.13.4/talosctl-darwin-arm64"
 provenance = "cosign"
 
 [tools.talosctl."platforms.macos-x64"]
-checksum = "sha256:e283191829456c5e24c2619f54f1e28864b8140b142979c2c42d7564c1aaf4da"
-url = "https://github.com/siderolabs/talos/releases/download/v1.13.3/talosctl-darwin-amd64"
+checksum = "sha256:bdee0433a4ef7668cea884b80b536f018160b0f998429d7440388c62a76e2062"
+url = "https://github.com/siderolabs/talos/releases/download/v1.13.4/talosctl-darwin-amd64"
 provenance = "cosign"
 
 [tools.talosctl."platforms.windows-x64"]
-checksum = "sha256:22d2c65571cb023b16ece5ef58e14f8e5e6f1e35927f8db8271b35ce22eb6c96"
-url = "https://github.com/siderolabs/talos/releases/download/v1.13.3/talosctl-windows-amd64.exe"
+checksum = "sha256:c3500946ad95b49fce4e8e6222c7a992ac76f6f4e490ce3984fc2176f1821c73"
+url = "https://github.com/siderolabs/talos/releases/download/v1.13.4/talosctl-windows-amd64.exe"
 provenance = "cosign"
 
 [[tools.terraform]]
-version = "1.15.5"
+version = "1.15.6"
 backend = "aqua:hashicorp/terraform"
 
 [tools.terraform."platforms.linux-arm64"]
-checksum = "sha256:06e7b48de826146c6d9331ba35b13da12332d8392be30d1dd6b789ba4713fff0"
-url = "https://releases.hashicorp.com/terraform/1.15.5/terraform_1.15.5_linux_arm64.zip"
+checksum = "sha256:404c9cfa43728d31005f6e7a848b8a7cc701320067d9d87d8850031a5beb37b0"
+url = "https://releases.hashicorp.com/terraform/1.15.6/terraform_1.15.6_linux_arm64.zip"
 
 [tools.terraform."platforms.linux-arm64-musl"]
-checksum = "sha256:06e7b48de826146c6d9331ba35b13da12332d8392be30d1dd6b789ba4713fff0"
-url = "https://releases.hashicorp.com/terraform/1.15.5/terraform_1.15.5_linux_arm64.zip"
+checksum = "sha256:404c9cfa43728d31005f6e7a848b8a7cc701320067d9d87d8850031a5beb37b0"
+url = "https://releases.hashicorp.com/terraform/1.15.6/terraform_1.15.6_linux_arm64.zip"
 
 [tools.terraform."platforms.linux-x64"]
-checksum = "sha256:702b2136af6728c8ff037f843dd2dbce2b7ad88786b7381d1d72aefa250f601c"
-url = "https://releases.hashicorp.com/terraform/1.15.5/terraform_1.15.5_linux_amd64.zip"
+checksum = "sha256:a7150d3b0e1b5c466ad42e8c499954a3c54645f8b56b385fa025d34f7e88faa9"
+url = "https://releases.hashicorp.com/terraform/1.15.6/terraform_1.15.6_linux_amd64.zip"
 
 [tools.terraform."platforms.linux-x64-musl"]
-checksum = "sha256:702b2136af6728c8ff037f843dd2dbce2b7ad88786b7381d1d72aefa250f601c"
-url = "https://releases.hashicorp.com/terraform/1.15.5/terraform_1.15.5_linux_amd64.zip"
+checksum = "sha256:a7150d3b0e1b5c466ad42e8c499954a3c54645f8b56b385fa025d34f7e88faa9"
+url = "https://releases.hashicorp.com/terraform/1.15.6/terraform_1.15.6_linux_amd64.zip"
 
 [tools.terraform."platforms.macos-arm64"]
-checksum = "sha256:01137660510005b918bba82154866fbeac4393163d8277c2abe861dfb5842c3c"
-url = "https://releases.hashicorp.com/terraform/1.15.5/terraform_1.15.5_darwin_arm64.zip"
+checksum = "sha256:8d4c6791a744332bc7ca3962c61ab2ed8e5d25a7299f176f5edffb9cb525e85f"
+url = "https://releases.hashicorp.com/terraform/1.15.6/terraform_1.15.6_darwin_arm64.zip"
 
 [tools.terraform."platforms.macos-x64"]
-checksum = "sha256:3687d07c034b3e7deed5b072cd8ae2b34835bcb139baec3fc4f5fd534dabf5ed"
-url = "https://releases.hashicorp.com/terraform/1.15.5/terraform_1.15.5_darwin_amd64.zip"
+checksum = "sha256:ec7e3c2d314b5b0c975b6f7f8c6094d1806cb98f64f79e6f971cc87f786eb6e0"
+url = "https://releases.hashicorp.com/terraform/1.15.6/terraform_1.15.6_darwin_amd64.zip"
 
 [tools.terraform."platforms.windows-x64"]
-checksum = "sha256:2f652dd854af7b7fbb51301afc55b5ef1d3f6e287be7889d4cc3818df891cd38"
-url = "https://releases.hashicorp.com/terraform/1.15.5/terraform_1.15.5_windows_amd64.zip"
+checksum = "sha256:56b4d3a157e346f8fc1e94254d0a944e6fec81f58ddd43eb274b8e0ebb56e334"
+url = "https://releases.hashicorp.com/terraform/1.15.6/terraform_1.15.6_windows_amd64.zip"
 
 [[tools.yq]]
-version = "4.53.2"
+version = "4.53.3"
 backend = "aqua:mikefarah/yq"
 
 [tools.yq."platforms.linux-arm64"]
-checksum = "sha256:03061b2a50c7a498de2bbb92d7cb078ce433011f085a4994117c2726be4106ea"
-url = "https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_linux_arm64"
+checksum = "sha256:578648e463a11c1b6db6010cbf41eafed6bee79466fcffa1bb446672cf7945ea"
+url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_arm64"
 
 [tools.yq."platforms.linux-arm64-musl"]
-checksum = "sha256:03061b2a50c7a498de2bbb92d7cb078ce433011f085a4994117c2726be4106ea"
-url = "https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_linux_arm64"
+checksum = "sha256:578648e463a11c1b6db6010cbf41eafed6bee79466fcffa1bb446672cf7945ea"
+url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_arm64"
 
 [tools.yq."platforms.linux-x64"]
-checksum = "sha256:d56bf5c6819e8e696340c312bd70f849dc1678a7cda9c2ad63eebd906371d56b"
-url = "https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_linux_amd64"
+checksum = "sha256:fa52a4e758c63d38299163fbdd1edfb4c4963247918bf9c1c5d31d84789eded4"
+url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_amd64"
 
 [tools.yq."platforms.linux-x64-musl"]
-checksum = "sha256:d56bf5c6819e8e696340c312bd70f849dc1678a7cda9c2ad63eebd906371d56b"
-url = "https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_linux_amd64"
+checksum = "sha256:fa52a4e758c63d38299163fbdd1edfb4c4963247918bf9c1c5d31d84789eded4"
+url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_amd64"
 
 [tools.yq."platforms.macos-arm64"]
-checksum = "sha256:541ba2287560df70f561955e2d7f7e1cd00cf2a15a884f6b5c87a4bfa887bc07"
-url = "https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_darwin_arm64"
+checksum = "sha256:877de31753a4dd2401aa048937aa9a7fc4d5f6ce858cf31508c5802954297213"
+url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_darwin_arm64"
 
 [tools.yq."platforms.macos-x64"]
-checksum = "sha256:616b0a0f6a5b79d746f05a169c2b9bb40dee00c605ef165b9a1c1681bba738ac"
-url = "https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_darwin_amd64"
+checksum = "sha256:b4ba1ecce3c47f00803f4f964de38394326c7a32eb6540616e04fb2935a0f08d"
+url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_darwin_amd64"
 
 [tools.yq."platforms.windows-x64"]
-checksum = "sha256:2aee32f1de46a20672f48c25df3018839798bd509143f2ce05fdab1550ff5592"
-url = "https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_windows_amd64.exe"
+checksum = "sha256:e279bc506a452eeafcdf364f91a025455e402a8001169083caf01f4b64a544e2"
+url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_windows_amd64.exe"
