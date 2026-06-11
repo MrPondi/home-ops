@@ -26,6 +26,7 @@ resource "authentik_provider_oauth2" "minio" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
+      redirect_uri_type = "authorization",
       url           = "https://minio.pondi.dev/oauth_callback",
     }
   ]

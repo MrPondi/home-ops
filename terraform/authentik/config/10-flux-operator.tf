@@ -19,6 +19,7 @@ resource "authentik_provider_oauth2" "flux-operator" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
+      redirect_uri_type = "authorization",
       url           = "https://flux-operator.pondi.dev/oauth2/callback",
     }
   ]

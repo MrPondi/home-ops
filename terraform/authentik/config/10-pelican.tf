@@ -13,6 +13,7 @@ resource "authentik_provider_oauth2" "pelican" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
+      redirect_uri_type = "authorization",
       url           = "https://gamepanel.pondi.dev/auth/oauth/callback/authentik",
     }
   ]

@@ -33,6 +33,7 @@ resource "authentik_provider_oauth2" "nextcloud" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
+      redirect_uri_type = "authorization",
       url           = "https://nextcloud.pondi.dev/apps/oidc_login/oidc",
     }
   ]

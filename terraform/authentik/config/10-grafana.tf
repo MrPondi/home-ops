@@ -27,6 +27,7 @@ resource "authentik_provider_oauth2" "grafana" {
   allowed_redirect_uris = [
     {
       matching_mode = "strict",
+      redirect_uri_type = "authorization",
       url           = "https://grafana.pondi.dev/login/generic_oauth",
     }
   ]
