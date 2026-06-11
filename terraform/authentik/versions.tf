@@ -2,13 +2,15 @@ terraform {
   required_providers {
     authentik = {
       source  = "goauthentik/authentik"
+      version = "2026.5.0"
     }
     bitwarden-secrets = {
-      source = "registry.terraform.io/bitwarden/bitwarden-secrets"
+      source  = "bitwarden/bitwarden-secrets"
       version = "1.0.0"
     }
     sops = {
-      source = "carlpett/sops"
+      source  = "carlpett/sops"
+      version = "1.4.1"
     }
   }
 }
