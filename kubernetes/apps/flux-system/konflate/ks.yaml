@@ -3,14 +3,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: dufs
+  name: konflate
 spec:
   interval: 1h
-  path: ./kubernetes/apps/default/dufs/app
+  path: ./kubernetes/apps/flux-system/konflate/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: default
+  targetNamespace: flux-system
   wait: false
