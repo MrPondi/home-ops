@@ -6,7 +6,7 @@ metadata:
   name: zwave
 spec:
   components:
-    # - ../../../../components/auth-proxy
+    - ../../../../components/auth-proxy
     - ../../../../components/volsync
   dependsOn:
     - name: longhorn

@@ -6,7 +6,7 @@ metadata:
   name: kopia
 spec:
   components:
-    # - ../../../../components/auth-proxy
+    - ../../../../components/auth-proxy
     - ../../../../components/zeroscaler
   dependsOn:
     - name: volsync
