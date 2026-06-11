@@ -14,6 +14,8 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
+  issues: read
 
 env:
   KONFLATE_DOMAIN: konflate.pondi.dev
@@ -22,9 +24,6 @@ jobs:
   comment:
     name: Konflate - Comment
     runs-on: ${{ github.event.repository.name }}-runner
-    permissions:
-      pull-requests: write
-      issues: write
     steps:
       - name: Fetch rendered summary
         id: fetch
