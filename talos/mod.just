@@ -24,8 +24,8 @@ download-image version node:
 
 [doc('Generate Talos machine image link')]
 [script]
-get-image version node:
-    export SCHEMATIC="$(just talos schematic-id true {{ node }})"
+get-image version ip:
+    export SCHEMATIC="$(just talos schematic-id true {{ ip }})"
     echo "https://factory.talos.dev/image/${SCHEMATIC}/{{ version }}/nocloud-amd64.iso"
 
 [doc('Render Talos config for a node')]

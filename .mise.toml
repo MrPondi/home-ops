@@ -5,6 +5,7 @@ FLATE_PATH = '{{config_root}}/kubernetes/flux/cluster'
 KUBECONFIG = "{{config_root}}/kubeconfig"
 SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
 TALOSCONFIG = "{{config_root}}/talosconfig"
+MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
 
 
 [tools]
