@@ -9,8 +9,6 @@ spec:
     name: nextcloud
   interval: 1h
   values:
-    deploymentAnnotations:
-      reloader.stakater.com/auto: "true"
     httpRoute:
       enabled: true
       annotations:
@@ -158,21 +156,9 @@ spec:
             secretKeyRef:
               name: nextcloud-secret
               key: NEXTCLOUD_OIDC_CLIENT_SECRET
-      extraVolumes:
-        - name: tmp
-          emptyDir: {}
-      extraVolumeMounts:
-        - name: tmp
-          mountPath: "/tmp"
       securityContext:
         allowPrivilegeEscalation: false
         capabilities: { drop: ["ALL"] }
-      podSecurityContext:
-        runAsNonRoot: true
-        runAsUser: 33
-        runAsGroup: 33
-        fsGroup: 33
-        fsGroupChangePolicy: OnRootMismatch
     internalDatabase:
       enabled: false
     externalDatabase:
@@ -229,12 +215,6 @@ spec:
     cronjob:
       enabled: true
       type: cronjob
-      cronjob:
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 33
-          runAsGroup: 33
-          readOnlyRootFilesystem: true
     persistence:
       enabled: true
       existingClaim: nextcloud
