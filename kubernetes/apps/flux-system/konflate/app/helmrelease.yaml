@@ -16,6 +16,7 @@ spec:
       prComments: true
       publicUrl: https://{{ .Release.Name }}.pondi.dev
       mergeCommand: gh pr merge {{ .Number }} -sd --repo {{ .Repo }}
+      mcp: true
     secret:
       existingSecret: konflate-secret
     httpRoute:
