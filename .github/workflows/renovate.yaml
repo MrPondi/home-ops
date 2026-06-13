@@ -1,0 +1,89 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Renovate
+
+on: []
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - .renovaterc.json5
+  # schedule:
+  #   - cron: 20 * * * *
+  # workflow_dispatch:
+  #   inputs:
+  #     dryRun:
+  #       description: Dry Run
+  #       type: boolean
+  #       default: false
+  #       required: true
+  #     logLevel:
+  #       description: Log Level
+  #       type: choice
+  #       default: debug
+  #       options:
+  #         - debug
+  #         - info
+  #       required: true
+  #     version:
+  #       description: Renovate Version
+  #       default: latest
+  #       required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  main:
+    name: Renovate
+    runs-on: ${{ github.event.repository.name }}-runner
+    permissions:
+      packages: read
+    steps:
+      - name: Get Secrets
+        id: get-secrets
+        uses: bitwarden/sm-action@27c0c9dcab679d7250dbab91227c85b49ffa5e0f # v3.0.0
+        with:
+          access_token: ${{ secrets.BW_ACCESS_TOKEN }}
+          set_env: false
+          secrets: |
+            9f534146-1be6-4446-88d8-b44c0127ad61 > GITHUB_BOT
+            3d93d9c5-69c4-4166-a7f4-b46800c28b6e > GITHUB_BOT_APP_PRIVATE_KEY
+
+      - name: Generate Token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          client-id: ${{ fromJson(steps.get-secrets.outputs.GITHUB_BOT).GITHUB_BOT_APP_CLIENT_ID }}
+          private-key: ${{ steps.get-secrets.outputs.GITHUB_BOT_APP_PRIVATE_KEY }}
+          permission-checks: write
+          permission-contents: write
+          permission-issues: write
+          permission-pull-requests: write
+          permission-statuses: write
+          permission-vulnerability-alerts: read
+          permission-workflows: write
+
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Run Renovate
+        uses: renovatebot/github-action@8217b3fc286df088d7c27f3255fe8414463bc0fd # v46.1.15
+        env:
+          LOG_LEVEL: ${{ inputs.logLevel || 'debug' }}
+          RENOVATE_AUTODISCOVER: true
+          RENOVATE_AUTODISCOVER_FILTER: ${{ github.repository }}
+          RENOVATE_DRY_RUN: ${{ inputs.dryRun }}
+          RENOVATE_INTERNAL_CHECKS_FILTER: strict
+          RENOVATE_PLATFORM: github
+          RENOVATE_PLATFORM_COMMIT: true
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          renovate-version: ${{ inputs.version || 'latest' }}
