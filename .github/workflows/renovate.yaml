@@ -2,33 +2,33 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Renovate
 
-on: []
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - .renovaterc.json5
-  # schedule:
-  #   - cron: 20 * * * *
-  # workflow_dispatch:
-  #   inputs:
-  #     dryRun:
-  #       description: Dry Run
-  #       type: boolean
-  #       default: false
-  #       required: true
-  #     logLevel:
-  #       description: Log Level
-  #       type: choice
-  #       default: debug
-  #       options:
-  #         - debug
-  #         - info
-  #       required: true
-  #     version:
-  #       description: Renovate Version
-  #       default: latest
-  #       required: true
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .renovaterc.json5
+  schedule:
+    - cron: 20 * * * *
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: Dry Run
+        type: boolean
+        default: false
+        required: true
+      logLevel:
+        description: Log Level
+        type: choice
+        default: debug
+        options:
+          - debug
+          - info
+        required: true
+      version:
+        description: Renovate Version
+        default: latest
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
