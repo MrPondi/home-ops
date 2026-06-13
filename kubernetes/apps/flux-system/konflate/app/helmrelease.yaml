@@ -15,8 +15,9 @@ spec:
       statusChecks: true
       prComments: true
       publicUrl: https://{{ .Release.Name }}.pondi.dev
+      mergeCommand: gh pr merge {{ .Number }} --repo {{ .Repo }} --squash --delete-branch
     secret:
-      existingSecret: konflate-webhook-token-secret
+      existingSecret: konflate-secret
     httpRoute:
       enabled: true
       annotations:
