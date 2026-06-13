@@ -228,7 +228,13 @@ spec:
               backendRequest: 3600s
     cronjob:
       enabled: true
-      type: sidecar
+      type: cronjob
+      cronjob:
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 33
+          runAsGroup: 33
+          readOnlyRootFilesystem: true
     persistence:
       enabled: true
       existingClaim: nextcloud

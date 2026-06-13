@@ -21,7 +21,7 @@ spec:
             command:
               - "git"
               - "clone"
-              - "https://github.com/okikio/mov-proxy.git"
+              - "https://github.com/MrPondi/mov-proxy.git"
               - "/workspace"
         containers:
           app:
