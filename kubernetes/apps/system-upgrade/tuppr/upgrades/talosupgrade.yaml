@@ -18,5 +18,5 @@ spec:
     - apiVersion: longhorn.io/v1beta2
       kind: Node
       expr: |-
-        status.conditions["Ready"].status == "True" &&
-        status.conditions["Schedulable"].status == "True"
+        status.conditions.filter(c, c.type == "Ready").all(c, c.status == "True") &&
+        status.conditions.filter(c, c.type == "Schedulable").all(c, c.status == "True")
