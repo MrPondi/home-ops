@@ -18,6 +18,7 @@ spec:
         key: wordpress
 
 ---
+# yaml-language-server: $schema=https://schemas.hydaz.com/k8s.mariadb.com/user_v1alpha1.json
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: User
 metadata:
