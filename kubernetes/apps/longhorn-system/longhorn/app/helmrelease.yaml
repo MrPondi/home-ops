@@ -13,7 +13,7 @@ spec:
     persistence:
       defaultClass: true
       defaultClassReplicaCount: 1
-      dataEngine: v2
+      dataEngine: v1
 
     csi:
       attacherReplicaCount: 1
@@ -22,25 +22,23 @@ spec:
       snapshotterReplicaCount: 1
 
     defaultSettings:
-      allowCollectingLonghornUsageMetrics: false
+      createDefaultDiskLabeledNodes: true
+
+      defaultDataPath: /var/lib/longhorn
+      storageOverProvisioningPercentage: 100000
+      storageReservedPercentageForDefaultDisk: 25
       defaultReplicaCount: '{"v1":"1","v2":"1"}'
 
-      v1DataEngine: false
-      v2DataEngine: true
-      v2DataEngineHugepageEnabled: true
-      dataEngineHugepageEnabled: true
-
-      allowVolumeCreationWithDegradedAvailability: true
-      autoSalvage: true
+      v1DataEngine: true
+      v2DataEngine: false
+      allowCollectingLonghornUsageMetrics: false
+      # dataEngineHugepageEnabled: true # Engine v2
 
       nodeDownPodDeletionPolicy: do-nothing
-      nodeDrainPolicy: block-if-contains-last-replica
-
-      concurrentReplicaRebuildPerNodeLimit: 5
+      nodeDrainPolicy: allow-if-replica-is-stopped
 
     longhornUI:
       replicas: 1
-      affinity: {}
 
     httproute:
       enabled: true
@@ -59,6 +57,9 @@ spec:
         gethomepage.dev/description: Storage cluster management interface
         gethomepage.dev/weight: "15"
         gethomepage.dev/app: longhorn
+    monitoring:
+      enabled: true
+      createPrometheusRules: true
     metrics:
       serviceMonitor:
         enabled: true

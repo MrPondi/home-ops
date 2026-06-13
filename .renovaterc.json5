@@ -1,6 +1,6 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["github>home-operations/renovate-presets#1.3.1", ":timezone(Europe/Warsaw)"],
+  extends: ["github>home-operations/renovate-presets#2.0.0", ":timezone(Europe/Warsaw)"],
   lockFileMaintenance: {
     enabled: true,
     schedule: ["every weekend"],
@@ -113,16 +113,6 @@
       },
       minimumGroupSize: 5,
     },
-    {
-      description: "Rook-Ceph Group",
-      groupName: "rook-ceph",
-      matchDatasources: ["docker"],
-      matchPackageNames: ["/rook-ceph/", "/rook-ceph-cluster/"],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-      },
-      minimumGroupSize: 2,
-    },
     // Labeling rules
     {
       matchUpdateTypes: ["major"],
@@ -139,22 +129,6 @@
     {
       matchUpdateTypes: ["digest"],
       addLabels: ["type/digest"],
-    },
-    {
-      matchDatasources: ["docker"],
-      addLabels: ["renovate/container"],
-    },
-    {
-      matchDatasources: ["helm"],
-      addLabels: ["renovate/helm"],
-    },
-    {
-      matchManagers: ["github-actions"],
-      addLabels: ["renovate/github-action"],
-    },
-    {
-      matchDatasources: ["github-releases"],
-      addLabels: ["renovate/github-release"],
     },
     // Pelican panel versioning
     {

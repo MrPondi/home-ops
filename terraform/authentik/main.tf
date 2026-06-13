@@ -1,5 +1,5 @@
 data "sops_file" "secret" {
-  source_file = "../secret.sops.json"
+  source_file = "../secrets.sops.yaml"
 }
 
 provider "bitwarden-secrets" {
@@ -19,10 +19,9 @@ provider "authentik" {
 }
 
 module "configuration" {
-  source = "./config"
-
+  source = "./configuration"
   providers = {
-    authentik       = authentik
+    authentik         = authentik
     bitwarden-secrets = bitwarden-secrets
   }
 }

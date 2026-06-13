@@ -107,4 +107,4 @@ template-release ns ks path:
 
 [private]
 render-local-ks ns ks:
-    flate build ks --namespace "{{ ns }}" --path "{{ justfile_directory() }}/kubernetes" --output yaml "{{ ks }}"
+    flate build ks --namespace "{{ ns }}" --path "{{ justfile_directory() }}/kubernetes" --output yaml  --allow-missing-secrets "{{ ks }}"

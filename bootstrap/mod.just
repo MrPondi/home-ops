@@ -3,8 +3,6 @@ set quiet
 set script-interpreter := ['bash', '-euo', 'pipefail']
 set shell := ['bash', '-euo', 'pipefail', '-c']
 
-kubernetes_dir := justfile_dir() + '/kubernetes'
-
 controller := `talosctl config info -o yaml | yq -e '.endpoints[0]'`
 nodes := `talosctl config info -o yaml | yq -e '.nodes | join (" ")'`
 
@@ -14,17 +12,7 @@ default:
 
 [confirm('Bootstrap cluster? [y|N]')]
 [doc('Bootstrap a Talos & Kubernetes cluster end-to-end')]
-cluster: talhelper nodes k8s (kubeconfig "node") base apps kubeconfig
-
-[doc('Prepare talhelper')]
-[script]
-[working-directory('../talos')]
-talhelper:
-    just log info "Running stage..." "stage" "$0"
-    if ! [ -f talsecret.sops.yaml ]; then \
-        talhelper gensecret | sops --filename-override talos/talsecret.sops.yaml --encrypt /dev/stdin > talsecret.sops.yaml; \
-    fi
-    just talos gen-config
+cluster: nodes k8s (kubeconfig "node") base apps kubeconfig
 
 [private]
 [script]
@@ -68,9 +56,6 @@ base: ready
     just log info "Running stage..." "stage" "$(basename "$0")"
     if ! kustomize build {{ source_directory() }}/kustomize/apps | just template - | kubectl apply --server-side --force-conflicts -f -; then
         just log fatal "Failed to apply base manifests" "stage" "$(basename "$0")" "file" "$f"
-    fi
-    if ! sops exec-file "{{ source_directory() }}/secrets.sops.yaml" | kubectl apply --server-side --force-conflicts -f -; then
-        just log fatal "Failed to apply sops secrets" "stage" "$(basename "$0")"
     fi
     if ! helmfile -f "{{ source_directory() }}/helmfile/crds.yaml" template -q | yq ea -e 'select(.kind == "CustomResourceDefinition")' | kubectl apply --server-side --force-conflicts -f -; then
         just log fatal "Failed to apply base crds" "stage" "$(basename "$0")"

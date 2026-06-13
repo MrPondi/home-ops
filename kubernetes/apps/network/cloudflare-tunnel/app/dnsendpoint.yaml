@@ -9,4 +9,4 @@ spec:
     - dnsName: "external.pondi.dev"
       recordType: CNAME
       targets:
-        - "782e1d05-bfbd-4e93-b13c-08b65e569e61.cfargotunnel.com"
+        - ${CLOUDFLARE_TUNNEL_ID}.cfargotunnel.com

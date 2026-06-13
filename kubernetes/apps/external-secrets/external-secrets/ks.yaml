@@ -38,10 +38,6 @@ spec:
       current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
   interval: 1h
   path: ./kubernetes/apps/external-secrets/external-secrets/store
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: bitwarden-secret
   prune: true
   sourceRef:
     kind: GitRepository

@@ -10,14 +10,12 @@ components:
 resources:
   - ./namespace.yaml
   - ./college-timetable/ks.yaml
-  # - ./dufs/ks.yaml
   - ./fixly-bot/ks.yaml
   - ./home-assistant/ks.yaml
   - ./homepage/ks.yaml
   - ./mosquitto/ks.yaml
   # - ./musicbot/ks.yaml
   - ./nextcloud/ks.yaml
-  # - ./ollama/ks.yaml
   - ./pstream/ks.yaml
   - ./pelican/ks.yaml
   # - ./ringback/ks.yaml
