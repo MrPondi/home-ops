@@ -55,14 +55,14 @@ spec:
               limits:
                 memory: 4Gi
     defaultPodOptions:
-      # annotations:
-      #   k8s.v1.cni.cncf.io/networks: |-
-      #     [{
-      #       "name": "vpn",
-      #       "namespace": "kube-system",
-      #       "ips": ["10.0.40.10/24"],
-      #       "mac": "32:0b:d8:1f:b6:e4"
-      #     }]
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [{
+            "name": "vpn",
+            "namespace": "kube-system",
+            "ips": ["10.0.40.10/24"],
+            "mac": "32:0b:d8:1f:b6:e4"
+          }]
       terminationGracePeriodSeconds: 300
       securityContext:
         runAsNonRoot: true
@@ -77,15 +77,15 @@ spec:
         ports:
           http:
             port: *port
-      bittorrent:
-        type: LoadBalancer
-        annotations:
-          lbipam.cilium.io/ips: 10.0.30.123
-        externalTrafficPolicy: Local
-        ports:
-          bittorrent-tcp:
-            port: *torrentPort
-            protocol: TCP
+      # bittorrent:
+      #   type: LoadBalancer
+      #   annotations:
+      #     lbipam.cilium.io/ips: 10.0.30.123
+      #   externalTrafficPolicy: Local
+      #   ports:
+      #     bittorrent-tcp:
+      #       port: *torrentPort
+      #       protocol: TCP
     route:
       app:
         annotations:
