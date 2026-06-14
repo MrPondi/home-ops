@@ -18,6 +18,7 @@ cluster: nodes k8s (kubeconfig "node") base apps kubeconfig
 [script]
 nodes:
     just log info "Running stage..." "stage" "$(basename "$0")"
+    just bitwarden
     for n in {{ nodes }}; do
         if ! op=$(just --yes talos apply-node "$n" --insecure 2>&1); then
             if [[ "$op" == *"certificate required"* ]]; then
