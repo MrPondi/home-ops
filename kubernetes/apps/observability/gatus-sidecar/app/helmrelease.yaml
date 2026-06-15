@@ -1,0 +1,68 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gatus-sidecar
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: gatus-sidecar
+  interval: 1h
+  values:
+    deploymentAnnotations:
+      reloader.stakater.com/auto: "true"
+    gatus:
+      delayStartSeconds: "5"
+      env:
+        TZ: Europe/Warsaw
+      envFrom:
+        - secretRef:
+            name: "{{ .Release.Name }}-secret"
+    sidecar:
+      kinds:
+        httproute:
+          enable: true
+          auto: true
+        service:
+          enable: true
+    httpRoute:
+      enabled: true
+      annotations:
+        gatus.home-operations.com/enabled: "false"
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Gatus
+        gethomepage.dev/group: Monitoring & Operations
+        gethomepage.dev/icon: gatus.svg
+        gethomepage.dev/description: Service health monitoring
+        gethomepage.dev/weight: "0"
+        gethomepage.dev/widget.type: gatus
+        gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
+      hostnames:
+        - "{{ .Release.Name }}.pondi.dev"
+        - status.pondi.dev
+      parentRefs:
+        - name: envoy-external
+          namespace: network
+    monitoring:
+      serviceMonitor:
+        enabled: true
+    config:
+      existingConfigMap: "{{ .Release.Name }}-configmap"
+      items:
+        - key: config.yaml
+          path: config.yaml
+        - key: business.yaml
+          path: business.yaml
+        # - key: buddy.yaml
+        #   path: buddy.yaml
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      accessMode: ReadWriteOnce
+      size: 5Gi
+    resources:
+      requests:
+        cpu: 100m
+      limits:
+        memory: 512Mi
