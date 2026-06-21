@@ -11,13 +11,14 @@ resources:
   - ./namespace.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
+  - ./brrpolice/ks.yaml
+  - ./chaski/ks.yaml
   - ./deduparr/ks.yaml
   - ./jellyfin/ks.yaml
-  - ./brrpolice/ks.yaml
-  - ./seerr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
   - ./qui/ks.yaml
   - ./radarr/ks.yaml
   - ./recyclarr/ks.yaml
+  - ./seerr/ks.yaml
   - ./sonarr/ks.yaml
