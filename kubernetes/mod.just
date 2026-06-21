@@ -1,3 +1,4 @@
+set default-script
 set quiet
 set script-interpreter := ['bash', '-euo', 'pipefail']
 set shell := ['bash', '-euo', 'pipefail', '-c']
@@ -21,7 +22,6 @@ delete-ks ns ks:
     just kube render-local-ks "{{ ns }}" "{{ ks }}" | kubectl delete -f -
 
 [doc('Open a shell on a node')]
-[script]
 node-shell node:
     kubectl debug node/{{ node }} -n default -it --image="mirror.gcr.io/ubuntu:latest" --profile sysadmin
     name=$(kubectl get pods -n default --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}')
@@ -32,14 +32,12 @@ node-shell node:
     fi
 
 [doc('Prune pods in Failed, Pending, or Succeeded state')]
-[script]
 prune-pods:
     for phase in Failed Pending Succeeded; do
         kubectl delete pods -A --field-selector status.phase="$phase" --ignore-not-found=true
     done
 
 [doc('Restore a PVC from VolSync')]
-[script]
 restore ns app previous='0':
     flux -n {{ ns }} suspend kustomization {{ app }}
     flux -n {{ ns }} suspend helmrelease {{ app }}
@@ -62,7 +60,6 @@ restore ns app previous='0':
     kubectl -n {{ ns }} wait pod --for=condition=ready --selector="app.kubernetes.io/name={{ app }}" --timeout=5m
 
 [doc('Snapshot VolSync PVCs')]
-[script]
 snapshot:
     kubectl get replicationsources --no-headers -A | while read -r ns name _; do
         kubectl -n "$ns" patch replicationsources "$name" --type merge -p '{"spec":{"trigger":{"manual":"$(date +%s)"}}}'
@@ -77,7 +74,6 @@ volsync state:
 
 [arg('resource', pattern='hr|ks|gitrepo|ocirepo|es|ps')]
 [doc('Sync a resource')]
-[script]
 sync resource namespace="" name="":
     GET_ARGS="{{ name }}"
 
@@ -101,9 +97,9 @@ view-secret ns secret="":
 [doc('View helm template')]
 template-release ns ks path:
     helm template \
-    "$(yq -r '.metadata.name' apps/{{ ns }}/{{ ks }}/{{ path }}/helmrelease.yaml)" \
-    "$(yq -r '.spec.url' apps/{{ ns }}/{{ ks }}/{{ path }}/ocirepository.yaml)" \
-    -f <(yq '.spec.values' apps/{{ ns }}/{{ ks }}/{{ path }}/helmrelease.yaml)
+    "$(yq -r -e '.metadata.name' apps/{{ ns }}/{{ ks }}/{{ path }}/helmrelease.yaml)" \
+    "$(yq -r -e '.spec.url' apps/{{ ns }}/{{ ks }}/{{ path }}/ocirepository.yaml)" \
+    -f <(yq -r -e '.spec.values' apps/{{ ns }}/{{ ks }}/{{ path }}/helmrelease.yaml)
 
 [private]
 render-local-ks ns ks:
