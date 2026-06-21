@@ -12,7 +12,6 @@ resources:
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
   - ./brrpolice/ks.yaml
-  - ./chaski/ks.yaml
   - ./deduparr/ks.yaml
   - ./jellyfin/ks.yaml
   - ./prowlarr/ks.yaml
