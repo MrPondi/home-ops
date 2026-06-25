@@ -19,11 +19,11 @@ The homelab runs on a **Proxmox hypervisor**, which provides the virtualization 
 - **Talos VM** - Hosts the Kubernetes control plane
 - **Docker VM** - Pelican Game Servers
 
-This hybrid approach maintains a clean, immutable Kubernetes environment while preserving flexibility for legacy applications and services that don't require Kubernetes orchestration.
+This hybrid approach maintains a clean, immutable Kubernetes environment while preserving flexibility for legacy applications and services that don't allow for Kubernetes orchestration.
 
 ## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f331/512.gif" alt="🌱" width="20" height="20"> Kubernetes
 
-The cluster runs on [Talos Linux](https://github.com/siderolabs/talos) - an immutable, minimal operating system purpose-built for Kubernetes. It currently operates as a **single-node setup** on an [MS-A2](https://store.minisforum.com/products/minisforum-ms-a2) workstation running Proxmox, with workloads and block storage coexisting on the same hardware. [Rook](https://github.com/rook/rook) provides persistent storage within the cluster, while a separate ZFS server handles NFS/SMB shares, media storage, and backups.
+The cluster runs on [Talos Linux](https://github.com/siderolabs/talos) - an immutable, minimal operating system purpose-built for Kubernetes. It currently operates as a **single-node setup** on an [MS-A2](https://store.minisforum.com/products/minisforum-ms-a2) workstation running Proxmox, with workloads and block storage coexisting on the same hardware. [Longhorn](https://github.com/longhorn/longhorn) provides persistent storage within the cluster, while a separate ZFS server handles NFS/SMB shares, media storage, and backups.
 
 The architecture is designed for future expansion - additional MS-A2 nodes can be added later to enable high availability and distributed storage.
 
@@ -38,7 +38,7 @@ If you’d like to build something similar, the [onedr0p/cluster-template](https
 - [envoy-gateway](https://github.com/envoyproxy/gateway): Modern ingress controller for cluster traffic management.
 - [external-dns](https://github.com/kubernetes-sigs/external-dns): Automated DNS record synchronization for ingress resources.
 - [external-secrets](https://github.com/external-secrets/external-secrets): Kubernetes secrets management integrated with [Bitwarden Secrets Manager](https://bitwarden.com/products/secrets-manager/).
-- [rook](https://github.com/rook/rook): Cloud-native distributed storage orchestrator for persistent storage.
+- [longhorn](https://github.com/longhorn/longhorn): Cloud-native distributed storage orchestrator for persistent storage.
 - [volsync](https://github.com/backube/volsync): Advanced backup and recovery solution for persistent volume claims.
 
 ### GitOps
@@ -64,7 +64,7 @@ This Git repository contains the following directories under [Kubernetes](./kube
 
 ### Cluster layout
 
-Here's how Flux orchestrates application deployments with dependencies. Most applications are deployed as `HelmRelease` resources that depend on other `HelmRelease`'s, while some `Kustomization`'s depend on other `Kustomization`'s. Occasionally, an application may have dependencies on both types. The diagram below illustrates this: `atuin` won't deploy or upgrade until `rook-ceph-cluster` is successfully installed and healthy.
+Here's how Flux orchestrates application deployments with dependencies. Most applications are deployed as `HelmRelease` resources that depend on other `HelmRelease`'s, while some `Kustomization`'s depend on other `Kustomization`'s. Occasionally, an application may have dependencies on both types. The diagram below illustrates this: `atuin` won't deploy or upgrade until `k8s-0` is successfully installed and healthy.
 
 <details>
   <summary>Click to see a high-level architecture diagram</summary>
@@ -74,10 +74,10 @@ graph LR
     classDef kustom fill:#43A047,stroke:#2E7D32,stroke-width:3px,color:#fff,font-weight:bold,rx:10,ry:10
     classDef helm fill:#1976D2,stroke:#0D47A1,stroke-width:3px,color:#fff,font-weight:bold,rx:10,ry:10
 
-    A["📦 Kustomization<br/>rook-ceph"]:::kustom
-    B["📦 Kustomization<br/>rook-ceph-cluster"]:::kustom
-    C["🎯 HelmRelease<br/>rook-ceph"]:::helm
-    D["🎯 HelmRelease<br/>rook-ceph-cluster"]:::helm
+    A["📦 Kustomization<br/>longhorn"]:::kustom
+    B["📦 Kustomization<br/>longhorn-config"]:::kustom
+    C["🎯 HelmRelease<br/>longhorn"]:::helm
+    D["💾 Node<br/>k8s-0"]:::helm
     E["📦 Kustomization<br/>atuin"]:::kustom
     F["🎯 HelmRelease<br/>atuin"]:::helm
 
@@ -96,7 +96,7 @@ graph LR
 
 I use two separate [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) deployments in my cluster to automate DNS management for both internal and external services:
 
-- **Private DNS:** One instance syncs internal records to my UCG Fiber using the [ExternalDNS webhook provider for UniFi](https://github.com/kashalls/external-dns-unifi-webhook).
+- **Private DNS:** One instance syncs internal records to my UCG Fiber using the [ExternalDNS webhook provider for UniFi](https://github.com/home-operations/external-dns-unifi-webhook).
 - **Public DNS:** A second instance manages public-facing records and syncs them to Cloudflare.
 
 This separation is controlled through two dedicated gateways `internal` and `external`. Each ExternalDNS deployment watches only the routes associated with its respective gateway, ensuring that private records go to UniFi and public records go to Cloudflare.
