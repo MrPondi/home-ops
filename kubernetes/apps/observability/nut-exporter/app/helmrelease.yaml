@@ -51,19 +51,15 @@ spec:
       app:
         ports:
           metrics:
-            enabled: true
-            protocol: TCP
             port: 9199
     serviceMonitor:
       app:
         enabled: true
         serviceName: nut-exporter
         endpoints:
-          - interval: 30s
-            path: /ups_metrics
+          - path: /ups_metrics
             port: metrics
             scheme: http
-            scrapeTimeout: 30s
             params:
               server:
                 - pve.internal
