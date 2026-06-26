@@ -66,9 +66,9 @@ spec:
             scrapeTimeout: 30s
             params:
               server:
-                - "pve.internal"
+                - pve.internal
               ups:
-                - "apc"
+                - apc
             metricRelabelings:
               - action: replace
                 replacement: apc
