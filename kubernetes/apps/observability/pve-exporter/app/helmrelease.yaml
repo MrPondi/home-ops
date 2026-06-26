@@ -63,3 +63,6 @@ spec:
               target:
                 - pve.internal
         serviceName: pve-exporter
+    persistence:
+      tmp:
+        type: emptyDir
