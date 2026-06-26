@@ -28,6 +28,12 @@
       "fileNames": ["pushsecret.yaml"]
     },
     {
+      "name": "securitypolicy",
+      "base": "contributing",
+      "color": "#7E57C2",
+      "fileNames": ["securitypolicy.yaml"]
+    },
+    {
       "name": "ocirepository",
       "base": "installation",
       "color": "#7FE93A",
