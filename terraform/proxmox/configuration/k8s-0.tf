@@ -85,13 +85,6 @@ resource "proxmox_virtual_environment_vm" "k8s-0" {
     rombar   = true
   }
 
-  hostpci {
-    device   = "hostpci2"
-    id       = "0000:06:00"
-    pcie     = false
-    rombar   = true
-  }
-
   usb {
     host = "10c4:ea60"
     usb3 = true
