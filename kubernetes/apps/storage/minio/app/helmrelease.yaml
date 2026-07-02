@@ -96,6 +96,7 @@ spec:
           gethomepage.dev/icon: minio.svg
           gethomepage.dev/description: S3-compatible object storage
           gethomepage.dev/weight: "5"
+          gethomepage.dev/app: minio
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:
