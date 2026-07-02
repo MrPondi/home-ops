@@ -98,10 +98,20 @@ spec:
           gethomepage.dev/weight: "5"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+      s3:
+        hostnames:
           - s3.pondi.dev
         parentRefs:
           - name: envoy-internal
             namespace: network
+        rules:
+          - backendRefs:
+              - name: minio
+                namespace: storage
+                port: 9000
     persistence:
       config:
         type: nfs
