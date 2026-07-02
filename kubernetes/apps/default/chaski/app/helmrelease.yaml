@@ -19,7 +19,7 @@ spec:
           name: chaski-secret
     config:
       targets:
-        seer:
+        seerr:
           apprise:
             url: pover://{{ env "PUSHOVER_USER_KEY" }}@{{ env "SEER_PUSHOVER_TOKEN" }}
         radarr:
@@ -28,18 +28,19 @@ spec:
         sonarr:
           apprise:
             url: pover://{{ env "PUSHOVER_USER_KEY" }}@{{ env "SONARR_PUSHOVER_TOKEN" }}
+      templates:
+        url: "https://{{ . }}.pondi.dev"
       routes:
-        seer-request:
-          target: seer
-          title: "New {{ if .payload.media.media_type  == 'movie' }}Movie{{ else }}TV Show{{ end }} requested"
+        seerr-request:
+          target: seerr
+          title: 'New {{ ternary "Movie" "TV Show" (eq .payload.media.media_type "movie") }} requested'
           message: |-
             User: {{ .payload.request.requestedBy_username }}
-            ImdbID: {{ .payload.media.media_imdbid }}
           params:
             priority: low
-            url: "seer.pondi.dev"
-            url_title: View Movie
-          whenExpr: payload.request != "null"
+            url: '{{ include "url" "seerr" }}/requests'
+            url_title: View Request
+          whenExpr: payload.request != null
         radarr-download:
           target: radarr
           title: "Movie {{ if .payload.isUpgrade }}Upgraded{{ else }}Added{{ end }}"
@@ -50,7 +51,7 @@ spec:
             Client: {{ .payload.downloadClient | default "unknown" }}
           params:
             priority: low
-            url: "{{ .payload.applicationUrl }}/movie/{{ .payload.movie.tmdbId }}"
+            url: '{{ .payload.applicationUrl | default (include "url" "radarr" ) }}/movie/{{ .payload.movie.tmdbId }}'
             url_title: View Movie
           whenExpr: payload.eventType == "Download"
         radarr-manual:
@@ -61,7 +62,7 @@ spec:
             Client: {{ .payload.downloadClient | default "unknown" }}
           params:
             priority: high
-            url: "{{ .payload.applicationUrl }}/activity/queue"
+            url: '{{ .payload.applicationUrl | default (include "url" "radarr" ) }}/activity/queue'
             url_title: View Queue
           whenExpr: payload.eventType == "ManualInteractionRequired"
         sonarr-download:
@@ -74,7 +75,7 @@ spec:
             Client: {{ .payload.downloadClient | default "unknown" }}
           params:
             priority: low
-            url: "{{ .payload.applicationUrl }}/series/{{ .payload.series.titleSlug }}"
+            url: '{{ .payload.applicationUrl | default (include "url" "sonarr" ) }}/series/{{ .payload.series.titleSlug }}'
             url_title: View Series
           whenExpr: payload.eventType == "Download"
         sonarr-manual:
@@ -85,7 +86,7 @@ spec:
             Client: {{ .payload.downloadClient | default "unknown" }}
           params:
             priority: high
-            url: "{{ .payload.applicationUrl }}/activity/queue"
+            url: '{{ .payload.applicationUrl | default (include "url" "sonarr" ) }}/activity/queue'
             url_title: View Queue
           whenExpr: payload.eventType == "ManualInteractionRequired"
     monitoring:
