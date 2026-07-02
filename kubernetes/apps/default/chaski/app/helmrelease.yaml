@@ -19,6 +19,9 @@ spec:
           name: chaski-secret
     config:
       targets:
+        seer:
+          apprise:
+            url: pover://{{ env "PUSHOVER_USER_KEY" }}@{{ env "SEER_PUSHOVER_TOKEN" }}
         radarr:
           apprise:
             url: pover://{{ env "PUSHOVER_USER_KEY" }}@{{ env "RADARR_PUSHOVER_TOKEN" }}
@@ -26,6 +29,17 @@ spec:
           apprise:
             url: pover://{{ env "PUSHOVER_USER_KEY" }}@{{ env "SONARR_PUSHOVER_TOKEN" }}
       routes:
+        seer-request:
+          target: seer
+          title: "New {{ if .payload.media.media_type  == 'movie' }}Movie{{ else }}TV Show{{ end }} requested"
+          message: |-
+            User: {{ .payload.request.requestedBy_username }}
+            ImdbID: {{ .payload.media.media_imdbid }}
+          params:
+            priority: low
+            url: "seer.pondi.dev"
+            url_title: View Movie
+          whenExpr: payload.request != "null"
         radarr-download:
           target: radarr
           title: "Movie {{ if .payload.isUpgrade }}Upgraded{{ else }}Added{{ end }}"
