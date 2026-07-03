@@ -21,7 +21,7 @@ spec:
       targets:
         seerr:
           apprise:
-            url: pover://{{ env "PUSHOVER_USER_KEY" }}@{{ env "SEER_PUSHOVER_TOKEN" }}
+            url: pover://{{ env "PUSHOVER_USER_KEY" }}@{{ env "SEERR_PUSHOVER_TOKEN" }}
         radarr:
           apprise:
             url: pover://{{ env "PUSHOVER_USER_KEY" }}@{{ env "RADARR_PUSHOVER_TOKEN" }}
@@ -33,8 +33,11 @@ spec:
       routes:
         seerr-request:
           target: seerr
-          title: 'New {{ ternary "Movie" "TV Show" (eq .payload.media.media_type "movie") }} requested'
+          title: "{{ .payload.event }}"
           message: |-
+            {{ .payload.subject }}
+            {{ .payload.message | ellipsis 300 }}
+
             User: {{ .payload.request.requestedBy_username }}
           params:
             priority: low
