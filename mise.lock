@@ -245,6 +245,7 @@ backend = "aqua:fluxcd/flux2"
 [tools.flux2."platforms.linux-arm64"]
 checksum = "sha256:76b4ed5535c04c32789743d7d2c29d1f7b5b3a4a269ef305c4c9757029ecce2a"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/flux_2.9.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/fluxcd/flux2/releases/assets/462295332"
 
 [tools.flux2."platforms.linux-arm64".provenance.slsa]
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intoto.jsonl"
@@ -252,6 +253,7 @@ url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intot
 [tools.flux2."platforms.linux-arm64-musl"]
 checksum = "sha256:76b4ed5535c04c32789743d7d2c29d1f7b5b3a4a269ef305c4c9757029ecce2a"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/flux_2.9.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/fluxcd/flux2/releases/assets/462295332"
 
 [tools.flux2."platforms.linux-arm64-musl".provenance.slsa]
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intoto.jsonl"
@@ -259,6 +261,7 @@ url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intot
 [tools.flux2."platforms.linux-x64"]
 checksum = "sha256:7aa9779fc7ec6d030e609dab7dbed8c6fc9e3a7f4670834ad02369268aaf341f"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/flux_2.9.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/fluxcd/flux2/releases/assets/462295343"
 
 [tools.flux2."platforms.linux-x64".provenance.slsa]
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intoto.jsonl"
@@ -266,6 +269,7 @@ url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intot
 [tools.flux2."platforms.linux-x64-musl"]
 checksum = "sha256:7aa9779fc7ec6d030e609dab7dbed8c6fc9e3a7f4670834ad02369268aaf341f"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/flux_2.9.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/fluxcd/flux2/releases/assets/462295343"
 
 [tools.flux2."platforms.linux-x64-musl".provenance.slsa]
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intoto.jsonl"
@@ -273,6 +277,7 @@ url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intot
 [tools.flux2."platforms.macos-arm64"]
 checksum = "sha256:b69f857a632683c38531093743a08be00bf172ea1eae65118f11c560b42f6466"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/flux_2.9.0_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/fluxcd/flux2/releases/assets/462295334"
 
 [tools.flux2."platforms.macos-arm64".provenance.slsa]
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intoto.jsonl"
@@ -280,6 +285,7 @@ url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intot
 [tools.flux2."platforms.macos-x64"]
 checksum = "sha256:f6b22502360a530d440f622a52753d8d152953bbf972dbae23fe25a0ad3447cb"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/flux_2.9.0_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/fluxcd/flux2/releases/assets/462295333"
 
 [tools.flux2."platforms.macos-x64".provenance.slsa]
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intoto.jsonl"
@@ -287,6 +293,7 @@ url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intot
 [tools.flux2."platforms.windows-x64"]
 checksum = "sha256:9d0a60c8398b13b2edce23ff36b3fac0166ad0a829ff9ead0d5ddcf8aac8f8c6"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/flux_2.9.0_windows_amd64.zip"
+url_api = "https://api.github.com/repos/fluxcd/flux2/releases/assets/462295342"
 
 [tools.flux2."platforms.windows-x64".provenance.slsa]
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.0/provenance.intoto.jsonl"
@@ -344,30 +351,37 @@ backend = "aqua:charmbracelet/gum"
 [tools.gum."platforms.linux-arm64"]
 checksum = "sha256:b0b9ed95cbf7c8b7073f17b9591811f5c001e33c7cfd066ca83ce8a07c576f9c"
 url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/290080957"
 
 [tools.gum."platforms.linux-arm64-musl"]
 checksum = "sha256:b0b9ed95cbf7c8b7073f17b9591811f5c001e33c7cfd066ca83ce8a07c576f9c"
 url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/290080957"
 
 [tools.gum."platforms.linux-x64"]
 checksum = "sha256:69ee169bd6387331928864e94d47ed01ef649fbfe875baed1bbf27b5377a6fdb"
 url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/290080949"
 
 [tools.gum."platforms.linux-x64-musl"]
 checksum = "sha256:69ee169bd6387331928864e94d47ed01ef649fbfe875baed1bbf27b5377a6fdb"
 url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/290080949"
 
 [tools.gum."platforms.macos-arm64"]
 checksum = "sha256:e2a4b8596efa05821d8c58d0c1afbcd7ad1699ba69c689cc3ff23a4a99c8b237"
 url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/290080948"
 
 [tools.gum."platforms.macos-x64"]
 checksum = "sha256:cd66576aeebe6cd19c771863c7e8d696e0e1d5387d1e7075666baa67c2052e53"
 url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Darwin_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/290080970"
 
 [tools.gum."platforms.windows-x64"]
 checksum = "sha256:b2be80531c6babc8d4e0e6ca95773d58118a2e1582ae006aace08dbc55503072"
 url = "https://github.com/charmbracelet/gum/releases/download/v0.17.0/gum_0.17.0_Windows_x86_64.zip"
+url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/290080922"
 
 [[tools.helm]]
 version = "4.2.2"
@@ -447,36 +461,43 @@ backend = "aqua:jqlang/jq"
 [tools.jq."platforms.linux-arm64"]
 checksum = "sha256:8b85c817833814ddca00a144c33705546355afccf0cf39b188f3cdb48b852309"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-linux-arm64"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012756"
 provenance = "github-attestations"
 
 [tools.jq."platforms.linux-arm64-musl"]
 checksum = "sha256:8b85c817833814ddca00a144c33705546355afccf0cf39b188f3cdb48b852309"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-linux-arm64"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012756"
 provenance = "github-attestations"
 
 [tools.jq."platforms.linux-x64"]
 checksum = "sha256:b1c22172dd303f3be49e935aa56aa48a8b7a46e0bc838b4997d3bb451495870f"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-linux-amd64"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012752"
 provenance = "github-attestations"
 
 [tools.jq."platforms.linux-x64-musl"]
 checksum = "sha256:b1c22172dd303f3be49e935aa56aa48a8b7a46e0bc838b4997d3bb451495870f"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-linux-amd64"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012752"
 provenance = "github-attestations"
 
 [tools.jq."platforms.macos-arm64"]
 checksum = "sha256:2d75340ba57a4b4b4c8708a21c2dc8e958a48aaa8bba13b27f77f6e4c0eca07e"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-macos-arm64"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012783"
 provenance = "github-attestations"
 
 [tools.jq."platforms.macos-x64"]
 checksum = "sha256:e94b266e3c26690550006abe63152b782280f4e14374accdf04cbde844f00bc0"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-macos-amd64"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012782"
 provenance = "github-attestations"
 
 [tools.jq."platforms.windows-x64"]
 checksum = "sha256:a6fc67fedaf9128a3309a1e2ebb8b986aeccf70122ee46d2cb4849e423f0c627"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-windows-amd64.exe"
+url_api = "https://api.github.com/repos/jqlang/jq/releases/assets/453012788"
 provenance = "github-attestations"
 
 [[tools.kubectl]]
@@ -518,30 +539,37 @@ backend = "aqua:kubernetes-sigs/kustomize"
 [tools.kustomize."platforms.linux-arm64"]
 checksum = "sha256:0953ea3e476f66d6ddfcd911d750f5167b9365aa9491b2326398e289fef2c142"
 url = "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.8.1/kustomize_v5.8.1_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/assets/353160971"
 
 [tools.kustomize."platforms.linux-arm64-musl"]
 checksum = "sha256:0953ea3e476f66d6ddfcd911d750f5167b9365aa9491b2326398e289fef2c142"
 url = "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.8.1/kustomize_v5.8.1_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/assets/353160971"
 
 [tools.kustomize."platforms.linux-x64"]
 checksum = "sha256:029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d"
 url = "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.8.1/kustomize_v5.8.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/assets/353160972"
 
 [tools.kustomize."platforms.linux-x64-musl"]
 checksum = "sha256:029a7f0f4e1932c52a0476cf02a0fd855c0bb85694b82c338fc648dcb53a819d"
 url = "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.8.1/kustomize_v5.8.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/assets/353160972"
 
 [tools.kustomize."platforms.macos-arm64"]
 checksum = "sha256:8886f8a78474e608cc81234f729fda188a9767da23e28925802f00ece2bab288"
 url = "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.8.1/kustomize_v5.8.1_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/assets/353160975"
 
 [tools.kustomize."platforms.macos-x64"]
 checksum = "sha256:ee7cf0c1e3592aa7bb66ba82b359933a95e7f2e0b36e5f53ed0a4535b017f2f8"
 url = "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.8.1/kustomize_v5.8.1_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/assets/353160974"
 
 [tools.kustomize."platforms.windows-x64"]
 checksum = "sha256:8ec7f5e815e526d4622c06df0a7793d8cfb6eb1c74f816b46166097fef8b26c6"
 url = "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v5.8.1/kustomize_v5.8.1_windows_amd64.zip"
+url_api = "https://api.github.com/repos/kubernetes-sigs/kustomize/releases/assets/353160980"
 
 [[tools.lefthook]]
 version = "2.1.9"
@@ -550,36 +578,43 @@ backend = "aqua:evilmartians/lefthook"
 [tools.lefthook."platforms.linux-arm64"]
 checksum = "sha256:d1bae1c9c26b35270dd675c93c33cecead885368ed078b3976ec23cdcedd28e8"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.9/lefthook_2.1.9_Linux_aarch64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/432862088"
 provenance = "github-attestations"
 
 [tools.lefthook."platforms.linux-arm64-musl"]
 checksum = "sha256:d1bae1c9c26b35270dd675c93c33cecead885368ed078b3976ec23cdcedd28e8"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.9/lefthook_2.1.9_Linux_aarch64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/432862088"
 provenance = "github-attestations"
 
 [tools.lefthook."platforms.linux-x64"]
 checksum = "sha256:e938f34bd05bafe1155888879a045ef4ee8cf5b4a56c9e5e9b0c2649f295636e"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.9/lefthook_2.1.9_Linux_x86_64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/432862064"
 provenance = "github-attestations"
 
 [tools.lefthook."platforms.linux-x64-musl"]
 checksum = "sha256:e938f34bd05bafe1155888879a045ef4ee8cf5b4a56c9e5e9b0c2649f295636e"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.9/lefthook_2.1.9_Linux_x86_64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/432862064"
 provenance = "github-attestations"
 
 [tools.lefthook."platforms.macos-arm64"]
 checksum = "sha256:808f8ef81a61e01eb41c1a2951e5639804f2372dc6a484bbeff726406745c77f"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.9/lefthook_2.1.9_MacOS_arm64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/432862040"
 provenance = "github-attestations"
 
 [tools.lefthook."platforms.macos-x64"]
 checksum = "sha256:371c3c75cb07a8cdf41295596d3981adc1f92dee7795001f7d471e1f36fe2a0e"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.9/lefthook_2.1.9_MacOS_x86_64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/432862047"
 provenance = "github-attestations"
 
 [tools.lefthook."platforms.windows-x64"]
 checksum = "sha256:1f29681dfbc36b9bdde52139cca6c4668ea4d51fd81e9127a3b78f49369db67e"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.9/lefthook_2.1.9_Windows_x86_64.gz"
+url_api = "https://api.github.com/repos/evilmartians/lefthook/releases/assets/432862077"
 provenance = "github-attestations"
 
 [[tools.shellcheck]]
@@ -589,30 +624,37 @@ backend = "aqua:koalaman/shellcheck"
 [tools.shellcheck."platforms.linux-arm64"]
 checksum = "sha256:12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14588"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.aarch64.tar.xz"
+url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056934"
 
 [tools.shellcheck."platforms.linux-arm64-musl"]
 checksum = "sha256:12b331c1d2db6b9eb13cfca64306b1b157a86eb69db83023e261eaa7e7c14588"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.aarch64.tar.xz"
+url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056934"
 
 [tools.shellcheck."platforms.linux-x64"]
 checksum = "sha256:8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz"
+url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056942"
 
 [tools.shellcheck."platforms.linux-x64-musl"]
 checksum = "sha256:8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.linux.x86_64.tar.xz"
+url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056942"
 
 [tools.shellcheck."platforms.macos-arm64"]
 checksum = "sha256:56affdd8de5527894dca6dc3d7e0a99a873b0f004d7aabc30ae407d3f48b0a79"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.darwin.aarch64.tar.xz"
+url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056932"
 
 [tools.shellcheck."platforms.macos-x64"]
 checksum = "sha256:3c89db4edcab7cf1c27bff178882e0f6f27f7afdf54e859fa041fca10febe4c6"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.darwin.x86_64.tar.xz"
+url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056930"
 
 [tools.shellcheck."platforms.windows-x64"]
 checksum = "sha256:8a4e35ab0b331c85d73567b12f2a444df187f483e5079ceffa6bda1faa2e740e"
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.zip"
+url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056944"
 
 [[tools.talosctl]]
 version = "1.13.5"
@@ -621,36 +663,43 @@ backend = "aqua:siderolabs/talos"
 [tools.talosctl."platforms.linux-arm64"]
 checksum = "sha256:bd053d8264c1b0c091cbaf15e7b414ab1cd14a56ddd5860f2e2ba01e5aee3bc3"
 url = "https://github.com/siderolabs/talos/releases/download/v1.13.5/talosctl-linux-arm64"
+url_api = "https://api.github.com/repos/siderolabs/talos/releases/assets/454773619"
 provenance = "cosign"
 
 [tools.talosctl."platforms.linux-arm64-musl"]
 checksum = "sha256:bd053d8264c1b0c091cbaf15e7b414ab1cd14a56ddd5860f2e2ba01e5aee3bc3"
 url = "https://github.com/siderolabs/talos/releases/download/v1.13.5/talosctl-linux-arm64"
+url_api = "https://api.github.com/repos/siderolabs/talos/releases/assets/454773619"
 provenance = "cosign"
 
 [tools.talosctl."platforms.linux-x64"]
 checksum = "sha256:cb12209727c0c4d57d74c0595f34d441ba491421e1d3c8a5142ed91028a20232"
 url = "https://github.com/siderolabs/talos/releases/download/v1.13.5/talosctl-linux-amd64"
+url_api = "https://api.github.com/repos/siderolabs/talos/releases/assets/454773627"
 provenance = "cosign"
 
 [tools.talosctl."platforms.linux-x64-musl"]
 checksum = "sha256:cb12209727c0c4d57d74c0595f34d441ba491421e1d3c8a5142ed91028a20232"
 url = "https://github.com/siderolabs/talos/releases/download/v1.13.5/talosctl-linux-amd64"
+url_api = "https://api.github.com/repos/siderolabs/talos/releases/assets/454773627"
 provenance = "cosign"
 
 [tools.talosctl."platforms.macos-arm64"]
 checksum = "sha256:5cfc42f5a51b01ea391c9760a1c5450517f7e85a74d145fd20b6abc4ac1df37e"
 url = "https://github.com/siderolabs/talos/releases/download/v1.13.5/talosctl-darwin-arm64"
+url_api = "https://api.github.com/repos/siderolabs/talos/releases/assets/454773663"
 provenance = "cosign"
 
 [tools.talosctl."platforms.macos-x64"]
 checksum = "sha256:b5808a8f650c53987d0133704259f3cdf31c081710bda598f9b4cab934abc78c"
 url = "https://github.com/siderolabs/talos/releases/download/v1.13.5/talosctl-darwin-amd64"
+url_api = "https://api.github.com/repos/siderolabs/talos/releases/assets/454773612"
 provenance = "cosign"
 
 [tools.talosctl."platforms.windows-x64"]
 checksum = "sha256:dd36d21d7157568387fa62e4f092b8a8536bb85f2362ababee493c503e48a0f2"
 url = "https://github.com/siderolabs/talos/releases/download/v1.13.5/talosctl-windows-amd64.exe"
+url_api = "https://api.github.com/repos/siderolabs/talos/releases/assets/454773628"
 provenance = "cosign"
 
 [[tools.terraform]]
@@ -692,27 +741,41 @@ backend = "aqua:mikefarah/yq"
 [tools.yq."platforms.linux-arm64"]
 checksum = "sha256:578648e463a11c1b6db6010cbf41eafed6bee79466fcffa1bb446672cf7945ea"
 url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_arm64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/440146727"
+provenance = "cosign"
 
 [tools.yq."platforms.linux-arm64-musl"]
 checksum = "sha256:578648e463a11c1b6db6010cbf41eafed6bee79466fcffa1bb446672cf7945ea"
 url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_arm64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/440146727"
+provenance = "cosign"
 
 [tools.yq."platforms.linux-x64"]
 checksum = "sha256:fa52a4e758c63d38299163fbdd1edfb4c4963247918bf9c1c5d31d84789eded4"
 url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_amd64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/440146735"
+provenance = "cosign"
 
 [tools.yq."platforms.linux-x64-musl"]
 checksum = "sha256:fa52a4e758c63d38299163fbdd1edfb4c4963247918bf9c1c5d31d84789eded4"
 url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_linux_amd64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/440146735"
+provenance = "cosign"
 
 [tools.yq."platforms.macos-arm64"]
-checksum = "sha256:877de31753a4dd2401aa048937aa9a7fc4d5f6ce858cf31508c5802954297213"
-url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_darwin_arm64"
+checksum = "sha256:b4ba1ecce3c47f00803f4f964de38394326c7a32eb6540616e04fb2935a0f08d"
+url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_darwin_amd64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/440146744"
+provenance = "cosign"
 
 [tools.yq."platforms.macos-x64"]
 checksum = "sha256:b4ba1ecce3c47f00803f4f964de38394326c7a32eb6540616e04fb2935a0f08d"
 url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_darwin_amd64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/440146744"
+provenance = "cosign"
 
 [tools.yq."platforms.windows-x64"]
 checksum = "sha256:e279bc506a452eeafcdf364f91a025455e402a8001169083caf01f4b64a544e2"
 url = "https://github.com/mikefarah/yq/releases/download/v4.53.3/yq_windows_amd64.exe"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/440146721"
+provenance = "cosign"
