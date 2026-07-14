@@ -1,0 +1,95 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hermes
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: hermes
+  interval: 1h
+  values:
+    controllers:
+      hermes:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: docker.io/nousresearch/hermes-agent
+              tag: v2026.7.7@sha256:ce3b39adf33fffae8cb19dcae74f971975b972efe91207f7d7539f80a0aae66a
+            args:
+              - gateway
+              - run
+            env:
+              TZ: Europe/Warsaw
+              HERMES_HOME: /opt/data
+              HOME: /opt/data
+              HERMES_DASHBOARD: true
+              HERMES_DASHBOARD_HOST: 0.0.0.0
+              HERMES_DASHBOARD_PORT: &port 9119
+            # probes:
+            #   startup:
+            #     enabled: true
+            #     custom: true
+            #     spec:
+            #       httpGet: &httpGet
+            #         path: /api/status
+            #         port: *port
+            #       initialDelaySeconds: 10
+            #       periodSeconds: 5
+            #       timeoutSeconds: 5
+            #       failureThreshold: 30
+            #   liveness:
+            #     enabled: true
+            #     custom: true
+            #     spec:
+            #       httpGet: *httpGet
+            #       periodSeconds: 30
+            #       timeoutSeconds: 5
+            #   readiness:
+            #     enabled: true
+            #     custom: true
+            #     spec:
+            #       httpGet: *httpGet
+            #       timeoutSeconds: 5
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 50m
+                memory: 512Mi
+              limits:
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 10000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Hermes Agent
+          gethomepage.dev/group: Home & Automation
+          gethomepage.dev/icon: mdi-robot-happy-outline
+          gethomepage.dev/description: Nous Hermes agent
+          gethomepage.dev/weight: "5"
+        hostnames:
+          - "{{ .Release.Name }}.pondi.dev"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /opt/data
+      tmp:
+        type: emptyDir
