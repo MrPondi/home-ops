@@ -20,8 +20,8 @@ spec:
               tag: 2025-latest@sha256:fafbdd0ced67edd292420ef8c4cc8fc17ebb4a06f56d2afa9f160a6edef96054
             env:
               ACCEPT_EULA: Y
-              TZ: Europe/Warsaw
               MSSQL_PID: Express
+              TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"

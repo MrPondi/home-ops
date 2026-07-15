@@ -43,8 +43,8 @@ spec:
               repository: python
               tag: 3.14-slim@sha256:d3400aa122fa42cf0af0dbe8ec3091b047eac5c8f7e3539f7135e86d855dc015
             env:
-              TZ: Europe/Warsaw
               PYTHONUNBUFFERED: 1
+              TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -101,8 +101,8 @@ spec:
               repository: python
               tag: 3.14-slim@sha256:d3400aa122fa42cf0af0dbe8ec3091b047eac5c8f7e3539f7135e86d855dc015
             env:
-              TZ: Europe/Warsaw
               PYTHONUNBUFFERED: 1
+              TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
