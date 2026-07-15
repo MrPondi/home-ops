@@ -1,3 +1,22 @@
+terraform {
+  backend "s3" {
+    bucket = "terraform-state"
+    key    = "authentik/terraform.tfstate"
+    region = "us-east-1"
+
+    endpoints = {
+      s3 = "http://10.0.30.130:9000"
+    }
+
+    use_path_style              = true
+    skip_s3_checksum            = true
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    skip_requesting_account_id  = true
+  }
+}
+
 data "sops_file" "secret" {
   source_file = "../secrets.sops.yaml"
 }

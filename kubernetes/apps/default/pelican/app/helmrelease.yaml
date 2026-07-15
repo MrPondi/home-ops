@@ -113,11 +113,9 @@ spec:
       php-config:
         type: configMap
         identifier: php-config
-        advancedMounts:
-          pelican:
-            app:
-              - path: /usr/local/etc/php/conf.d/uploads.ini
-                subPath: uploads.ini
+        globalMounts:
+          - path: /usr/local/etc/php/conf.d/uploads.ini
+            subPath: uploads.ini
       tmp:
         type: emptyDir
       app-private:
