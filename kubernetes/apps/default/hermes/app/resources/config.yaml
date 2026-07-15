@@ -1,2 +1,6 @@
 dashboard:
   public_url: https://hermes.pondi.dev
+  oauth:
+    provider: self-hosted
+    self_hosted:
+      issuer: https://auth.pondi.dev/application/o/hermes/
