@@ -14,7 +14,7 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          volume-permissions:
+          permissions-fix:
             image:
               repository: ghcr.io/home-operations/busybox
               tag: 1.38.0@sha256:7e2c04dd50ede647bf4a7a4c8dbd629dd4971cd139b9b88fb22bfc3c7a6c13df
@@ -33,6 +33,8 @@ spec:
                 chmod -R 770 /var/www/html/storage/framework
             securityContext:
               runAsUser: 0
+              runAsGroup: 0
+              runAsNonRoot: false
         containers:
           app:
             image:
@@ -70,7 +72,7 @@ spec:
                 memory: 2Gi
     defaultPodOptions:
       securityContext:
-        runAsNonRoot: false
+        runAsNonRoot: true
         runAsUser: 82
         runAsGroup: 82
         fsGroup: 82
