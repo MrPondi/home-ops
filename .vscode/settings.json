@@ -74,6 +74,7 @@
     "talos": "linux",
     // namespaces
     "actions-runner-system": "github",
+    "ai": "cline",
     "cert-manager": "guard",
     "default": "home",
     "external-secrets": "secure",

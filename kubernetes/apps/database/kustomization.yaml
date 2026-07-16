@@ -9,6 +9,7 @@ components:
 
 resources:
   - ./namespace.yaml
-  - ./mariadb/ks.yaml
   - ./cloudnative-pg/ks.yaml
+  - ./dragonfly-operator/ks.yaml
+  - ./mariadb/ks.yaml
   # - ./mssql/ks.yaml
