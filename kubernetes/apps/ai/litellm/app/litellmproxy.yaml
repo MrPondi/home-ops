@@ -64,5 +64,5 @@ spec:
     hostnames:
       - litellm.pondi.dev
     parentRefs:
-      - name: envoy-external
+      - name: envoy-internal
         namespace: network
