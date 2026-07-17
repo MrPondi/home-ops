@@ -36,12 +36,8 @@ resource "authentik_application" "hermes" {
   open_in_new_tab   = true
 }
 
-resource "authentik_group" "hermes-access" {
-  name         = "Hermes access"
-}
-
 resource "authentik_policy_binding" "hermes-access" {
   target = authentik_application.hermes.uuid
-  group  = authentik_group.hermes-access.id
+  group  = authentik_group.ai-access.id
   order  = 10
 }
