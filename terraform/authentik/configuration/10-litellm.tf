@@ -3,7 +3,7 @@ data "bitwarden-secrets_secret" "litellm" {
 }
 
 resource "authentik_provider_oauth2" "litellm" {
-  name          = "Litellm OAuth2 Provider"
+  name          = "LiteLLM OAuth2 Provider"
   client_id     = jsondecode(data.bitwarden-secrets_secret.litellm.value)["LITELLM_OIDC_CLIENT_ID"]
   client_secret = jsondecode(data.bitwarden-secrets_secret.litellm.value)["LITELLM_OIDC_CLIENT_SECRET"]
 
@@ -28,7 +28,7 @@ resource "authentik_provider_oauth2" "litellm" {
 }
 
 resource "authentik_application" "litellm" {
-  name              = "Litellm"
+  name              = "LiteLLM"
   slug              = "litellm"
   protocol_provider = authentik_provider_oauth2.litellm.id
   meta_icon         = "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/litellm.svg"
