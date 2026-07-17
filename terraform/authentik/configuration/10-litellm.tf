@@ -40,8 +40,8 @@ resource "authentik_group" "ai-access" {
   name         = "AI access"
 }
 
-resource "authentik_policy_binding" "litellm-access" {
-  target = authentik_application.litellm.uuid
-  group  = authentik_group.ai-access.id
-  order  = 10
-}
+# resource "authentik_policy_binding" "litellm-access" {
+#   target = authentik_application.litellm.uuid
+#   group  = authentik_group.ai-access.id
+#   order  = 10
+# }
