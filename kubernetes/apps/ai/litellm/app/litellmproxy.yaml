@@ -42,15 +42,15 @@ spec:
       value: INFO
     - name: LITELLM_MODE
       value: PRODUCTION
+    - name: PROXY_BASE_URL
+      value: "https://litellm.pondi.dev"
     - name: REDIS_HOST
       value: litellm-dragonfly.ai.svc.cluster.local
     - name: REDIS_PORT
       value: "6379"
-    - name: LITELLM_MASTER_KEY
-      valueFrom:
-        secretKeyRef:
-          name: litellm-secret
-          key: LITELLM_MASTER_KEY
+  envFrom:
+    - secretRef:
+        name: litellm-secret
   resources:
     requests:
       cpu: 100m
@@ -64,5 +64,5 @@ spec:
     hostnames:
       - litellm.pondi.dev
     parentRefs:
-      - name: envoy-internal
+      - name: envoy-external
         namespace: network
