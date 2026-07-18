@@ -127,7 +127,7 @@ spec:
           - path: /opt/data
       config:
         type: secret
-        name: "{{ .Release.Name }}-config"
+        name: "{{ .Release.Name }}-config-secret"
         defaultMode: 0755
         advancedMounts:
           hermes:
