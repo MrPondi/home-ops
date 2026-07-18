@@ -121,12 +121,12 @@ spec:
           - name: envoy-internal
             namespace: network
     persistence:
-      config:
+      data:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /opt/data
-      configmap:
-        type: configMap
+      config:
+        type: secret
         name: "{{ .Release.Name }}-config"
         defaultMode: 0755
         advancedMounts:

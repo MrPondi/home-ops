@@ -7,3 +7,9 @@ resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
   - ./pvc.yaml
+configMapGenerator:
+  - name: lavalink-config
+    files:
+      - application.yml=./resources/application.yml
+generatorOptions:
+  disableNameSuffixHash: true

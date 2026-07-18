@@ -51,7 +51,7 @@ spec:
     persistence:
       config:
         type: secret
-        name: "{{ .Release.Name }}-secret"
+        name: "{{ .Release.Name }}-config-secret"
         globalMounts:
           - path: /opt/Lavalink/application.yml
             subPath: application.yml

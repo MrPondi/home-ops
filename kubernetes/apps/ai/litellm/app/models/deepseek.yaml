@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: &name deepseek-v4-flash-free
+spec:
+  modelName: *name
+  params:
+    model: openai/deepseek-v4-flash-free
+    apiBase: https://opencode.ai/zen/v1
+    apiKeyRef:
+      name: litellm-secret
+      key: OPENCODE_API_KEY
+  info:
+    mode: chat
+    maxTokens: 384000
+    maxInputTokens: 1048560
+    maxOutputTokens: 384000
+    supportsFunctionCalling: true
+    supportsPromptCaching: true
+    extra:
+      inputCostPerToken: 0.0000001250
+      cacheCreationInputTokenCost: 0.0000001250
+      cacheReadInputTokenCost: 0.0000000125
+      outputCostPerToken: 0.0000004999

@@ -1,3 +1,30 @@
+providers:
+  litellm:
+    api: http://litellm.ai.svc.cluster.local:4000/v1
+    key: "{{ .LITELLM_MASTER_KEY }}"
+    models:
+      # qwen-local:
+      #   context_length: 148480
+      deepseek-v4-flash-free:
+        context_length: 1000000
+      big-pickle-free:
+        context_length: 200000
+      # minimax-m3:
+      #   context_length: 512000
+      # glm-5-2:
+      #   context_length: 1048560
+model:
+  default: deepseek-v4-flash-free
+  provider: litellm
+fallback_providers:
+  #   - provider: litellm
+  #     model: qwen-local
+  - provider: litellm
+    model: big-pickle-free
+#   - provider: litellm
+#     model: minimax-m3
+#   - provider: litellm
+#     model: glm-5-2
 agent:
   max_turns: 90
   gateway_timeout: 1800
@@ -16,3 +43,49 @@ approvals:
   cron_mode: deny
   mcp_reload_confirm: true
   destructive_slash_confirm: true
+command_allowlist:
+  - execute_code
+  - "curl *pondi.dev*"
+  - "curl *.ai.svc.cluster.local*"
+  - "wget *pondi.dev*"
+gateway:
+  platforms:
+    photon:
+      enabled: true
+      require_mention: true
+group_sessions_per_user: false
+# memory:
+#   auto_migrate: true
+#   auto_summarize:
+#     threshold: 50
+#   provider: memini
+# plugins:
+#   enabled:
+#     - memini
+mcp_servers:
+  homelab:
+    url: http://litellm.ai.svc.cluster.local:4000/mcp
+    headers:
+      Authorization: "Bearer {{ .LITELLM_MASTER_KEY }}"
+platform_toolsets:
+  cli:
+    - hermes-cli
+  photon:
+    - hermes-cli
+privacy:
+  redact_pii: true
+security:
+  redact_secrets: true
+  tirith_enabled: true
+  tirith_fail_open: true
+streaming:
+  enabled: false
+terminal:
+  backend: local
+  cwd: /opt/data/workspace
+  timeout: 180
+  persistent_shell: true
+toolsets:
+  - hermes-cli
+web:
+  search_backend: searxng
