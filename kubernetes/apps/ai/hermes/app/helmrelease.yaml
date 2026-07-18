@@ -15,7 +15,7 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          permissions-fix:
+          init:
             image:
               repository: ghcr.io/home-operations/busybox
               tag: 1.38.0@sha256:7e2c04dd50ede647bf4a7a4c8dbd629dd4971cd139b9b88fb22bfc3c7a6c13df
@@ -23,20 +23,9 @@ spec:
               - /bin/sh
               - -c
               - |
+                set -euo pipefail
                 chown 10000:10000 /run
                 chmod 755 /run
-            securityContext:
-              runAsUser: 0
-              runAsGroup: 0
-              runAsNonRoot: false
-          config:
-            image:
-              repository: ghcr.io/home-operations/busybox
-              tag: 1.38.0@sha256:7e2c04dd50ede647bf4a7a4c8dbd629dd4971cd139b9b88fb22bfc3c7a6c13df
-            command:
-              - /bin/sh
-              - -c
-              - |
                 cp /tmp/config.yaml /opt/data/config.yaml
                 chown 10000:10000 /opt/data/config.yaml
             securityContext:
@@ -54,36 +43,37 @@ spec:
               HERMES_HOME: /opt/data
               HERMES_DASHBOARD: true
               HERMES_DASHBOARD_HOST: 0.0.0.0
-              HERMES_DASHBOARD_PORT: &port 9119
+              HERMES_DASHBOARD_PORT: &dashboard-port 9119
+              WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
-            # probes:
-            #   startup:
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet: &httpGet
-            #         path: /api/status
-            #         port: *port
-            #       initialDelaySeconds: 10
-            #       periodSeconds: 5
-            #       timeoutSeconds: 5
-            #       failureThreshold: 30
-            #   liveness:
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet: *httpGet
-            #       periodSeconds: 30
-            #       timeoutSeconds: 5
-            #   readiness:
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet: *httpGet
-            #       timeoutSeconds: 5
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: &httpGet
+                    path: /api/status
+                    port: *dashboard-port
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *httpGet
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *httpGet
+                  timeoutSeconds: 5
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -105,12 +95,16 @@ spec:
       app:
         ports:
           http:
-            port: *port
+            port: *dashboard-port
+          whatsapp:
+            port: *whatsapp-port
     route:
       app:
         annotations:
+          gatus.home-operations.com/endpoint: |-
+            conditions: ["[STATUS] == 200"]
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: Hermes Agent
+          gethomepage.dev/name: Hermes Agent Dashboard
           gethomepage.dev/group: Home & Automation
           gethomepage.dev/icon: mdi-robot-happy-outline
           gethomepage.dev/description: Nous Hermes agent
@@ -131,7 +125,7 @@ spec:
         defaultMode: 0755
         advancedMounts:
           hermes:
-            config:
+            init:
               - path: /tmp/config.yaml
                 subPath: config.yaml
       run:
