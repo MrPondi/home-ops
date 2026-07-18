@@ -5,5 +5,5 @@ kind: Kustomization
 resources:
   - ./models/
   - ./externalsecret.yaml
-  - ./litellmproxy.yaml
+  - ./proxy.yaml
   - ./servicemonitor.yaml

@@ -1,7 +1,7 @@
 providers:
   litellm:
     api: http://litellm.ai.svc.cluster.local:4000/v1
-    key: "{{ .LITELLM_MASTER_KEY }}"
+    key_env: LITELLM_MASTER_KEY
     models:
       # qwen-local:
       #   context_length: 148480
