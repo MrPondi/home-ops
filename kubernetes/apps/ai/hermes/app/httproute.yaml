@@ -6,7 +6,7 @@ metadata:
   name: hermes-whatsapp-webhook
   annotations:
     gatus.home-operations.com/endpoint: |-
-      conditions: ["[STATUS] == 404"]
+      conditions: ["[STATUS] == 400"]
 spec:
   hostnames:
     - hermes-whatsapp-webhook.pondi.dev

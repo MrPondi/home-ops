@@ -24,8 +24,10 @@ spec:
               - -c
               - |
                 set -euo pipefail
-                chown 10000:10000 /run
+
+                chown 10000:10000 /run /opt/data
                 chmod 755 /run
+
                 cp /tmp/config.yaml /opt/data/config.yaml
                 chown 10000:10000 /opt/data/config.yaml
             securityContext:
@@ -101,8 +103,6 @@ spec:
     route:
       app:
         annotations:
-          gatus.home-operations.com/endpoint: |-
-            conditions: ["[STATUS] == 200"]
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Hermes Agent Dashboard
           gethomepage.dev/group: Home & Automation
