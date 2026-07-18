@@ -48,11 +48,11 @@ command_allowlist:
   - "curl *pondi.dev*"
   - "curl *.ai.svc.cluster.local*"
   - "wget *pondi.dev*"
-gateway:
-  platforms:
-    photon:
-      enabled: true
-      require_mention: true
+# gateway:
+#   platforms:
+#     photon:
+#       enabled: true
+#       require_mention: true
 group_sessions_per_user: false
 # memory:
 #   auto_migrate: true
@@ -87,5 +87,5 @@ terminal:
   persistent_shell: true
 toolsets:
   - hermes-cli
-web:
-  search_backend: searxng
+# web:
+#   search_backend: searxng
