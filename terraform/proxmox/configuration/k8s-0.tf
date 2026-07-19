@@ -47,6 +47,13 @@ resource "proxmox_virtual_environment_vm" "k8s-0" {
     ssd          = true
   }
 
+  disk {
+    datastore_id = "local-lvm"
+    interface    = "scsi2"
+    size         = 150
+    ssd          = true
+  }
+
   cdrom {
     interface = "ide2"
     file_id   = "local:iso/talos-orion.img"
