@@ -24,17 +24,6 @@ endpoints:
     alerts:
       - type: ntfy
 
-  - name: Centrum Robotów Koszących
-    group: business
-    url: https://centrumrobotowkoszacych.pl
-    interval: 1m
-    client:
-      dns-resolver: tcp://1.1.1.1:53
-    conditions:
-      - "[STATUS] == 200"
-    alerts:
-      - type: ntfy
-
   - name: Freshandeco
     group: business
     url: https://freshandeco.pl
@@ -57,28 +46,6 @@ endpoints:
     alerts:
       - type: ntfy
 
-  - name: Kosiarki do Trawy
-    group: business
-    url: https://kosiarkidotrawy.pl
-    interval: 1m
-    client:
-      dns-resolver: tcp://1.1.1.1:53
-    conditions:
-      - "[STATUS] == 200"
-    alerts:
-      - type: ntfy
-
-  - name: Lorenz Estate
-    group: business
-    url: https://lorenzestate.com
-    interval: 1m
-    client:
-      dns-resolver: tcp://1.1.1.1:53
-    conditions:
-      - "[STATUS] == 200"
-    alerts:
-      - type: ntfy
-
   - name: Luba Polska
     group: business
     url: https://luba-polska.pl
@@ -90,9 +57,20 @@ endpoints:
     alerts:
       - type: ntfy
 
-  - name: Luba Mini
+  - name: Lymow Polska
     group: business
-    url: https://lubamini.pl
+    url: https://lymow-polska.pl
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: ntfy
+
+  - name: Kosiarki Lymow
+    group: business
+    url: https://kosiarkilymow.pl
     interval: 1m
     client:
       dns-resolver: tcp://1.1.1.1:53
@@ -134,31 +112,9 @@ endpoints:
     alerts:
       - type: ntfy
 
-  - name: Roboty Koszace
+  - name: Roboty Koszace EU
     group: business
     url: https://robotykoszace.eu
-    interval: 1m
-    client:
-      dns-resolver: tcp://1.1.1.1:53
-    conditions:
-      - "[STATUS] == 200"
-    alerts:
-      - type: ntfy
-
-  - name: Yuka Polska
-    group: business
-    url: https://yuka-polska.pl
-    interval: 1m
-    client:
-      dns-resolver: tcp://1.1.1.1:53
-    conditions:
-      - "[STATUS] == 200"
-    alerts:
-      - type: ntfy
-
-  - name: Neo Mow Polska
-    group: business
-    url: https://neomow.pl
     interval: 1m
     client:
       dns-resolver: tcp://1.1.1.1:53
