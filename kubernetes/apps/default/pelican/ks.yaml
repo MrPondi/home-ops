@@ -18,8 +18,7 @@ spec:
   postBuild:
     substitute:
       APP: pelican
-      KOPIUR_PUID: "82"
-      KOPIUR_PGID: "82"
+      KOPIUR_PRIVILEGED_MODE: "true"
   prune: true
   sourceRef:
     kind: GitRepository
