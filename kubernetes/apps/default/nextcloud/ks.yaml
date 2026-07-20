@@ -19,6 +19,8 @@ spec:
     substitute:
       VOLSYNC_CAPACITY: 10Gi
       APP: nextcloud
+      KOPIUR_PUID: "33"
+      KOPIUR_PGID: "33"
   prune: true
   sourceRef:
     kind: GitRepository

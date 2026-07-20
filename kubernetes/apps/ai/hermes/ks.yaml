@@ -16,6 +16,8 @@ spec:
   postBuild:
     substitute:
       APP: hermes
+      KOPIUR_PUID: "10000"
+      KOPIUR_PGID: "10000"
   prune: true
   sourceRef:
     kind: GitRepository
