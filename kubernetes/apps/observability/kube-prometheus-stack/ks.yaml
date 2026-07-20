@@ -15,7 +15,7 @@ spec:
   postBuild:
     substitute:
       APP: kube-prometheus-stack
-      APP_HTTPROUTE: kube-prometheus-stack-prometheus
+      APP_HTTPROUTE: kube-prometheus-stack-alertmanager
   prune: true
   sourceRef:
     kind: GitRepository

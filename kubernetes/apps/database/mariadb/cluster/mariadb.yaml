@@ -37,7 +37,7 @@ spec:
         name: mariadb-secret
         key: MINIO_ACCESS_KEY
       bucket: backups
-      endpoint: minio.storage.svc.cluster.local:9000
+      endpoint: qnap.internal:9000
       prefix: mariadb
       secretAccessKeySecretKeyRef:
         name: mariadb-secret

@@ -5,7 +5,7 @@ terraform {
     region = "us-east-1"
 
     endpoints = {
-      s3 = "http://10.0.30.130:9000"
+      s3 = "http://10.0.25.25:9000"
     }
 
     use_path_style              = true
