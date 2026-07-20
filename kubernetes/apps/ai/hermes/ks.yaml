@@ -16,7 +16,6 @@ spec:
   postBuild:
     substitute:
       APP: hermes
-      KOPIUR_PRIVILEGED_MODE: "true"
   prune: true
   sourceRef:
     kind: GitRepository

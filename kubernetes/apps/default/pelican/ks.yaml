@@ -18,7 +18,6 @@ spec:
   postBuild:
     substitute:
       APP: pelican
-      KOPIUR_PRIVILEGED_MODE: "true"
   prune: true
   sourceRef:
     kind: GitRepository

@@ -19,7 +19,6 @@ spec:
     substitute:
       VOLSYNC_CAPACITY: 10Gi
       APP: nextcloud
-      KOPIUR_PRIVILEGED_MODE: "true"
   prune: true
   sourceRef:
     kind: GitRepository
