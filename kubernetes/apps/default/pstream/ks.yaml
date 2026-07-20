@@ -6,6 +6,7 @@ metadata:
   name: pstream-backend
 spec:
   components:
+    - ../../../../components/kopiur/backup
     - ../../../../components/volsync
   dependsOn:
     - name: longhorn

@@ -6,6 +6,7 @@ metadata:
   name: jellyfin
 spec:
   components:
+    - ../../../../components/kopiur/backup
     - ../../../../components/volsync
     - ../../../../components/zeroscaler
   dependsOn:

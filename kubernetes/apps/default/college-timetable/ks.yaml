@@ -6,6 +6,7 @@ metadata:
   name: college-timetable
 spec:
   components:
+    - ../../../../components/kopiur/backup
     - ../../../../components/volsync
   dependsOn:
     - name: longhorn

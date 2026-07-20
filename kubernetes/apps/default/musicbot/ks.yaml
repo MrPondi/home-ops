@@ -43,6 +43,7 @@ metadata:
   name: lavamusic
 spec:
   components:
+    - ../../../../components/kopiur/backup
     - ../../../../components/volsync
   dependsOn:
     - name: lavalink
