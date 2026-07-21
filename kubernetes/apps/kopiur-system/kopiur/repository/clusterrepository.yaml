@@ -25,3 +25,7 @@ spec:
       key: KOPIA_PASSWORD
   scheduleDefaults:
     timezone: Europe/Warsaw
+  server:
+    namespace: kopiur-system
+    auth:
+      insecure: { acknowledgeInsecure: true }
