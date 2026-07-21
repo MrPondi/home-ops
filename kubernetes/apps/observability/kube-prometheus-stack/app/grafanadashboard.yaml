@@ -177,4 +177,4 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  url: https://grafana.com/api/dashboards/13502/revisions/26/download
+  url: https://raw.githubusercontent.com/FedericoAntoniazzi/minio-grafana-dashboard-metrics-v3/main/dashboard.json

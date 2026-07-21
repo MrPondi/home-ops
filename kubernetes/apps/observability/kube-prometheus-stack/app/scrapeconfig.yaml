@@ -42,7 +42,7 @@ spec:
   staticConfigs:
     - targets:
         - s3.pondi.dev
-  metricsPath: /minio/v2/metrics/cluster
+  metricsPath: /minio/metrics/v3
   relabelings:
     - action: replace
       targetLabel: job
