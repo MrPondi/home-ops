@@ -14,4 +14,13 @@ resource "authentik_group" "admins" {
     authentik_group.pelican-wings-ssh.id,
     authentik_group.ai-access.id
   ]
+
+  attributes = jsonencode({
+    "KOPIUR_WEBUI_USERNAME": jsondecode(data.bitwarden-secrets_secret.kopiur.value)["WEBUI_USERNAME"],
+    "KOPIUR_WEBUI_PASSWORD": jsondecode(data.bitwarden-secrets_secret.kopiur.value)["WEBUI_PASSWORD"]
+  })
+}
+
+data "bitwarden-secrets_secret" "kopiur" {
+  id = "3c1222b8-e303-4f0b-9734-b48d00ba7def"
 }

@@ -8,6 +8,10 @@ resource "authentik_provider_proxy" "kopiur" {
   mode = "forward_single"
 
   access_token_validity = "hours=6"
+
+  basic_auth_enabled = true
+  basic_auth_username_attribute = "KOPIUR_WEBUI_USERNAME"
+  basic_auth_password_attribute = "KOPIUR_WEBUI_PASSWORD"
 }
 
 resource "authentik_outpost_provider_attachment" "kopiur" {

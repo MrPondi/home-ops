@@ -9,6 +9,9 @@ spec:
   from:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
+      namespace: "kopiur-system"
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
       namespace: "default"
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy

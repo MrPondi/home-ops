@@ -27,14 +27,14 @@ resource "authentik_provider_oauth2" "litellm" {
   signing_key = data.authentik_certificate_key_pair.self-signed.id
 }
 
-resource "authentik_application" "litellm" {
-  name              = "LiteLLM"
-  slug              = "litellm"
-  protocol_provider = authentik_provider_oauth2.litellm.id
-  meta_icon         = "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/litellm.svg"
-  meta_launch_url   = "https://litellm.pondi.dev"
-  open_in_new_tab   = true
-}
+# resource "authentik_application" "litellm" {
+#   name              = "LiteLLM"
+#   slug              = "litellm"
+#   protocol_provider = authentik_provider_oauth2.litellm.id
+#   meta_icon         = "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/litellm.svg"
+#   meta_launch_url   = "https://litellm.pondi.dev"
+#   open_in_new_tab   = true
+# }
 
 resource "authentik_group" "ai-access" {
   name         = "AI access"
