@@ -41,7 +41,7 @@ metadata:
 spec:
   staticConfigs:
     - targets:
-        - qnap.internal:9000
+        - s3.pondi.dev
   metricsPath: /minio/v2/metrics/cluster
   relabelings:
     - action: replace

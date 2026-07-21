@@ -56,7 +56,7 @@ data:
             key: {{HOMEPAGE_VAR_CLOUDFLARE_API_TOKEN}}
       - Minio:
           icon: minio.svg
-          href: http://qnap.internal:9001
+          href: https://minio.pondi.dev
           description: S3-compatible object storage
           weight: "5"
       - TrueNas:

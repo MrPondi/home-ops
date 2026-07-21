@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-backend
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9001
+      targetPort: http
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/discovery.k8s.io/endpointslice_v1.json
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: minio-backend-slice
+  labels:
+    kubernetes.io/service-name: minio-backend
+addressType: IPv4
+ports:
+  - name: http
+    port: 9001
+endpoints:
+  - addresses:
+      - 10.0.25.25
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: minio-route
+spec:
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+  hostnames:
+    - minio.pondi.dev
+  rules:
+    - backendRefs:
+        - name: minio-backend
+          port: 9001

@@ -14,7 +14,7 @@ spec:
           name: kopiur-repository-secret
           namespace: kopiur-system
       bucket: kopiur
-      endpoint: qnap.internal:9000
+      endpoint: s3.pondi.dev
       region: us-east-1
       tls:
         disableTls: true
