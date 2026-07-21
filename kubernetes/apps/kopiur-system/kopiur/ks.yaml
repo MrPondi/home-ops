@@ -26,15 +26,10 @@ kind: Kustomization
 metadata:
   name: kopiur-repository
 spec:
-  components:
-    - ../../../../components/auth-proxy
   dependsOn:
     - name: kopiur
   interval: 1h
   path: ./kubernetes/apps/kopiur-system/kopiur/repository
-  postBuild:
-    substitute:
-      APP_HTTPROUTE: kopiur-ui
   prune: true
   sourceRef:
     kind: GitRepository
