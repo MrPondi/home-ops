@@ -54,6 +54,11 @@ data:
             accountid: {{HOMEPAGE_VAR_CLOUDFLARE_ACCOUNT_ID}}
             tunnelid: {{HOMEPAGE_VAR_CLOUDFLARE_TUNNEL_ID}}
             key: {{HOMEPAGE_VAR_CLOUDFLARE_API_TOKEN}}
+      - Minio:
+          icon: minio.svg
+          href: http://qnap.internal:9001
+          description: S3-compatible object storage
+          weight: "5"
       - TrueNas:
           icon: truenas.svg
           href: https://truenas.pondi.dev

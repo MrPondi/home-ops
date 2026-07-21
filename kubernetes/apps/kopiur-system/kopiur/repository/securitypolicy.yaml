@@ -3,12 +3,12 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
-  name: kopiur-ui
+  name: kopiur-server
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      name: kopiur-ui
+      name: kopiur-server
   extAuth:
     failOpen: false
     headersToExtAuth:
