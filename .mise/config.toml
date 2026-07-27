@@ -1,12 +1,15 @@
 [env]
 _.file = ["{{config_root}}/.secrets.env"]
-HOMEBREW_NO_ENV_HINTS = 1
-FLATE_PATH = '{{config_root}}/kubernetes/flux/cluster'
+FLATE_PATH = "{{config_root}}/kubernetes/flux/cluster"
 KUBECONFIG = "{{config_root}}/kubeconfig"
-SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
 TALOSCONFIG = "{{config_root}}/talosconfig"
 MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
+SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
+JUST_UNSTABLE = "1"
+HOMEBREW_NO_ENV_HINTS = "1"
 
+[hooks]
+postinstall = "lefthook install"
 
 [tools]
 flux2 = "2.9.3"
@@ -19,9 +22,6 @@ kubectl = "1.36.3"
 kustomize = "5.8.1"
 lefthook = "2.1.10"
 shellcheck = "0.11.0"
-talosctl = "1.13.7"
+talos = "1.14.0-beta.0"
 terraform = "1.15.8"
 yq = "4.53.3"
-
-[hooks]
-postinstall = "lefthook install"
