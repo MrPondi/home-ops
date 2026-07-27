@@ -11,7 +11,6 @@ spec:
   values:
     controllers:
       mosquitto:
-        type: statefulset
         containers:
           app:
             image:
@@ -38,12 +37,6 @@ spec:
                 cpu: 10m
               limits:
                 memory: 100Mi
-        statefulset:
-          volumeClaimTemplates:
-            - name: config
-              storageClass: longhorn
-              accessMode: ReadWriteOnce
-              size: 5Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -75,6 +68,8 @@ spec:
             persistence true
             persistence_location /config
     persistence:
+      config:
+        existingClaim: "{{ .Release.Name }}"
       config-file:
         type: configMap
         identifier: config

@@ -14,6 +14,8 @@ brew "sops"
 brew "vals"
 # Secure and free password manager for all of your devices
 brew "bitwarden-cli"
+# Static checker for GitHub Actions workflow files
+brew "actionlint"
 # Language server for just
 brew "terror/tap/just-lsp"
 # Render and diff Flux GitOps repositories offline, without a cluster
