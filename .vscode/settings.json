@@ -65,10 +65,17 @@
     "kubeconfig": "kubernetes",
     "talosconfig": "kubernetes"
   },
+  "material-icon-theme.folders.customClones": [
+    {
+      "name": "mise",
+      "base": "gradle",
+      "color": "#866b6b",
+      "folderNames": [".mise"]
+    }
+  ],
   "material-icon-theme.folders.associations": {
     // top level
     ".github/workflows": "ci",
-    ".mise": "",
     ".private": "archive",
     "bootstrap": "seeders",
     "bootstrap/helmfile": "helm",
