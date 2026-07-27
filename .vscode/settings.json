@@ -68,6 +68,7 @@
   "material-icon-theme.folders.associations": {
     // top level
     ".github/workflows": "ci",
+    ".mise": "",
     ".private": "archive",
     "bootstrap": "seeders",
     "bootstrap/helmfile": "helm",
@@ -80,21 +81,17 @@
     "default": "home",
     "external-secrets": "secure",
     "flux-system": "pipe",
+    "kopiur-system": "aws",
     "kube-system": "kubernetes",
     "longhorn-system": "dump",
+    "miroir-system": "base",
     "network": "connection",
     "observability": "event",
-    "openebs-system": "base",
-    "system-upgrade": "update",
-    "storage": "aws"
+    "system-upgrade": "update"
   },
   "sops.defaults.ageKeyFile": "age.key",
   "terminal.integrated.fontSize": 14,
   "window.zoomLevel": 0,
-  "yaml.schemaStore.enable": true,
-  "yaml.schemas": {
-    "kubernetes": "./kubernetes/**/*.yaml"
-  },
   "[just]": {
     "editor.defaultFormatter": "nefrob.vscode-just-syntax"
   },
