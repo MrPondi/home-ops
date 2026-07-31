@@ -19,6 +19,7 @@ spec:
         gethomepage.dev/group: Home & Automation
         gethomepage.dev/icon: nextcloud.svg
         gethomepage.dev/description: Personal cloud storage
+        gethomepage.dev/href: https://nextcloud.pondi.dev
         gethomepage.dev/weight: "20"
         gethomepage.dev/widget.type: nextcloud
         gethomepage.dev/widget.url: https://nextcloud.pondi.dev
