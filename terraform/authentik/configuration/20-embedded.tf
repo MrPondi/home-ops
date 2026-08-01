@@ -12,7 +12,8 @@ resource "authentik_group" "admins" {
     authentik_group.flux-operator-admins.id,
     authentik_group.metrics-access.id,
     authentik_group.pelican-wings-ssh.id,
-    authentik_group.ai-access.id
+    authentik_group.ai-access.id,
+    authentik_group.teslamate-access.id
   ]
 
   attributes = jsonencode({

@@ -24,8 +24,12 @@ resource "authentik_application" "teslamate" {
   open_in_new_tab   = true
 }
 
+resource "authentik_group" "teslamate-access" {
+  name         = "Teslamate Access"
+}
+
 resource "authentik_policy_binding" "teslamate-access" {
   target = authentik_application.teslamate.uuid
-  group  = authentik_group.admins.id
+  group  = authentik_group.teslamate-access.id
   order  = 10
 }
