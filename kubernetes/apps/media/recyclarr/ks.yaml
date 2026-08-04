@@ -7,7 +7,6 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-    - ../../../../components/volsync
   dependsOn:
     - name: longhorn
       namespace: longhorn-system

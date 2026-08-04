@@ -7,7 +7,6 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-    - ../../../../components/volsync
     - ../../../../components/zeroscaler
   dependsOn:
     - name: longhorn
