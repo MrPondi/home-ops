@@ -193,10 +193,6 @@ spec:
         secretName: nextcloud-secret
         usernameKey: DB_USER
         passwordKey: DB_PASSWORD
-    externalRedis:
-      enabled: true
-      host: nextcloud-dragonfly.default.svc.cluster.local
-      port: 6379
     collabora:
       enabled: true
       collabora:
@@ -247,48 +243,21 @@ spec:
           runAsUser: 33
           runAsGroup: 33
           readOnlyRootFilesystem: true
-        affinity:
-          podAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                  matchExpressions:
-                    - key: app.kubernetes.io/instance
-                      operator: In
-                      values:
-                        - nextcloud
-                    - key: app.kubernetes.io/component
-                      operator: In
-                      values:
-                        - app
-                topologyKey: kubernetes.io/hostname
-        successfulJobsHistoryLimit: 1
     persistence:
       enabled: true
       existingClaim: nextcloud
       nextcloudData:
         enabled: true
         existingClaim: nextcloud-data
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 2Gi
+    startupProbe:
+      enabled: true
     metrics:
       enabled: true
       serviceMonitor:
         enabled: true
-    prometheus:
-      rules:
-        enabled: true
-        additionalLabels:
-          release: "kube-prometheus-stack"
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              kind: Deployment
-              name: nextcloud
-            patch: |-
-              apiVersion: apps/v1
-              kind: Deployment
-              metadata:
-                name: nextcloud
-              spec:
-                template:
-                  spec:
-                    hostUsers: false
