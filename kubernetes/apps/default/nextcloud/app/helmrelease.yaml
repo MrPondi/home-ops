@@ -243,21 +243,33 @@ spec:
           runAsUser: 33
           runAsGroup: 33
           readOnlyRootFilesystem: true
+        affinity:
+          podAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/instance
+                      operator: In
+                      values:
+                        - nextcloud
+                    - key: app.kubernetes.io/component
+                      operator: In
+                      values:
+                        - app
+                topologyKey: kubernetes.io/hostname
+        successfulJobsHistoryLimit: 1
     persistence:
       enabled: true
       existingClaim: nextcloud
       nextcloudData:
         enabled: true
         existingClaim: nextcloud-data
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        memory: 2Gi
-    startupProbe:
-      enabled: true
     metrics:
       enabled: true
       serviceMonitor:
         enabled: true
+    prometheus:
+      rules:
+        enabled: true
+        additionalLabels:
+          release: "kube-prometheus-stack"
