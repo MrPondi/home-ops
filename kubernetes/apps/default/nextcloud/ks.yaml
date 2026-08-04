@@ -6,7 +6,7 @@ metadata:
   name: nextcloud
 spec:
   components:
-    - ../../../../components/kopiur/backup
+    - ../../../../components/volsync
   dependsOn:
     - name: longhorn
       namespace: longhorn-system
@@ -17,6 +17,7 @@ spec:
   postBuild:
     substitute:
       KOPIUR_CAPACITY: 10Gi
+      VOLSYNC_CAPACITY: 10Gi
       APP: nextcloud
   prune: true
   sourceRef:

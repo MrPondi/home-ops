@@ -7,19 +7,5 @@ resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
   - ./pvc.yaml
-patches:
-  - patch: |-
-      apiVersion: kopiur.home-operations.com/v1alpha1
-      kind: SnapshotPolicy
-      metadata:
-        name: _
-      spec:
-        mover:
-          privilegedMode: true
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            privileged: true
-    target:
-      group: kopiur.home-operations.com
-      kind: SnapshotPolicy
+  - ./snapshotpolicy.yaml
+  - ./snapshotschedule.yaml
