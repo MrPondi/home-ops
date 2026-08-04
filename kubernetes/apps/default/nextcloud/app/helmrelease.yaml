@@ -34,6 +34,12 @@ spec:
             - path:
                 type: PathPrefix
                 value: "/"
+          filters:
+            - type: ResponseHeaderModifier
+              responseHeaderModifier:
+                add:
+                  - name: strict-transport-security
+                    value: max-age=31536000
     nextcloud:
       host: nextcloud.pondi.dev
       existingSecret:
@@ -80,6 +86,7 @@ spec:
             'overwrite.cli.url' => 'https://nextcloud.pondi.dev',
             'overwriteprotocol' => 'https',
             'allow_local_remote_servers' => true,
+            'serverid' => 0,
           ); ?>
         oidc.config.php: |-
           <?php
@@ -159,21 +166,6 @@ spec:
             secretKeyRef:
               name: nextcloud-secret
               key: NEXTCLOUD_OIDC_CLIENT_SECRET
-      extraVolumes:
-        - name: tmp
-          emptyDir: {}
-      extraVolumeMounts:
-        - name: tmp
-          mountPath: "/tmp"
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities: { drop: ["ALL"] }
-      podSecurityContext:
-        runAsNonRoot: true
-        runAsUser: 33
-        runAsGroup: 33
-        fsGroup: 33
-        fsGroupChangePolicy: OnRootMismatch
     internalDatabase:
       enabled: false
     externalDatabase:
@@ -186,6 +178,10 @@ spec:
         secretName: nextcloud-secret
         usernameKey: DB_USER
         passwordKey: DB_PASSWORD
+    externalRedis:
+      enabled: true
+      host: nextcloud-dragonfly.default.svc.cluster.local
+      port: 6379
     collabora:
       enabled: true
       collabora:
@@ -201,12 +197,8 @@ spec:
       prometheus:
         servicemonitor:
           enabled: true
-          labels:
-            release: "kube-prometheus-stack"
         rules:
           enabled: true
-          additionalLabels:
-            release: "kube-prometheus-stack"
       grafana:
         dashboards:
           enabled: true
@@ -231,26 +223,48 @@ spec:
       enabled: true
       type: cronjob
       cronjob:
-        securityContext:
-          runAsNonRoot: true
-          runAsUser: 33
-          runAsGroup: 33
-          readOnlyRootFilesystem: true
+        affinity:
+          podAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/instance
+                      operator: In
+                      values:
+                        - nextcloud
+                    - key: app.kubernetes.io/component
+                      operator: In
+                      values:
+                        - app
+                topologyKey: kubernetes.io/hostname
+        successfulJobsHistoryLimit: 1
     persistence:
       enabled: true
       existingClaim: nextcloud
       nextcloudData:
         enabled: true
         existingClaim: nextcloud-data
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        memory: 2Gi
-    startupProbe:
-      enabled: true
     metrics:
       enabled: true
       serviceMonitor:
         enabled: true
+    prometheus:
+      rules:
+        enabled: true
+        additionalLabels:
+          release: "kube-prometheus-stack"
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: nextcloud
+            patch: |-
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: nextcloud
+              spec:
+                template:
+                  spec:
+                    hostUsers: false
