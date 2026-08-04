@@ -17,6 +17,8 @@ spec:
   postBuild:
     substitute:
       APP: pelican
+      KOPIUR_PUID: "0"
+      KOPIUR_PGID: "33"
   prune: true
   sourceRef:
     kind: GitRepository
