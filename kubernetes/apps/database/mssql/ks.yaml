@@ -15,7 +15,7 @@ spec:
   postBuild:
     substitute:
       APP: mssql
-      VOLSYNC_CAPACITY: 8Gi
+      KOPIUR_CAPACITY: 8Gi
       KOPIUR_PUID: "10001"
       KOPIUR_PGID: "10001"
   prune: true

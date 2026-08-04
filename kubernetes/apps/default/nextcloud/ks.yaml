@@ -16,7 +16,7 @@ spec:
   path: ./kubernetes/apps/default/nextcloud/app
   postBuild:
     substitute:
-      VOLSYNC_CAPACITY: 10Gi
+      KOPIUR_CAPACITY: 10Gi
       APP: nextcloud
   prune: true
   sourceRef:
