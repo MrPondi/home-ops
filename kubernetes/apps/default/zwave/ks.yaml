@@ -8,7 +8,6 @@ spec:
   components:
     - ../../../../components/auth-proxy
     - ../../../../components/kopiur/backup
-    - ../../../../components/volsync
   dependsOn:
     - name: longhorn
       namespace: longhorn-system
