@@ -4,8 +4,8 @@ set default-list
 set default-script
 set lazy
 set quiet
-set shell := ['bash', '-euo', 'pipefail', '-c']
 set script-interpreter := ['bash', '-euo', 'pipefail']
+set shell := ['bash', '-euo', 'pipefail', '-c']
 
 # Bootstrap Recipes
 [group('Bootstrap')]
