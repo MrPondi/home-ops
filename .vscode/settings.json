@@ -58,6 +58,7 @@
     "helmrelease.yaml": "helm",
     "httproute.yaml": "routing",
     "grafanadashboard.yaml": "grafana-alloy",
+    "grafanadatasource.yaml": "grafana-alloy",
     "pvc.yaml": "sequelize",
     "resourceclaimtemplate.yaml": "parcel",
     "prometheusrule.yaml": "sentry",
