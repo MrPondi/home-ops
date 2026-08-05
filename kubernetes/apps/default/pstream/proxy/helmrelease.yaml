@@ -41,9 +41,9 @@ spec:
               - |
                 cd /workspace
 
-                npx --yes pnpm install
-                npx --yes pnpm build
-                npx --yes pnpm start
+                npx --yes pnpm@10 install
+                npx --yes pnpm@10 build
+                npx --yes pnpm@10 start
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
