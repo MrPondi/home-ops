@@ -47,9 +47,7 @@ spec:
   # spec:
   #   dependsOn:
   #     - name: pstream-backend
-  #       namespace: default
   #     - name: pstream-proxy
-  #       namespace: default
   #   interval: 1h
   #   path: ./kubernetes/apps/default/pstream/client
   #   prune: true

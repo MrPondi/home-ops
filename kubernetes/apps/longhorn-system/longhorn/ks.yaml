@@ -26,7 +26,6 @@ metadata:
 spec:
   dependsOn:
     - name: longhorn
-      namespace: longhorn-system
   healthChecks:
     - apiVersion: apps/v1
       kind: DaemonSet

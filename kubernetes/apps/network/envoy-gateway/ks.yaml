@@ -26,7 +26,6 @@ metadata:
 spec:
   dependsOn:
     - name: envoy-gateway
-      namespace: network
   interval: 1h
   path: ./kubernetes/apps/network/envoy-gateway/routes
   prune: true

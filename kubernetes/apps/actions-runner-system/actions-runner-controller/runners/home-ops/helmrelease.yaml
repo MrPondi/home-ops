@@ -19,7 +19,7 @@ spec:
       kubernetesModeWorkVolumeClaim:
         accessModes:
           - ReadWriteOnce
-        storageClassName: longhorn
+        storageClassName: miroir-slow-local
         resources:
           requests:
             storage: 10Gi

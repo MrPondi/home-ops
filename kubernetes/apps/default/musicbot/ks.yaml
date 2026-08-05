@@ -22,10 +22,9 @@ metadata:
   name: lavalink
 spec:
   dependsOn:
+    - name: yt-cipher
     - name: longhorn
       namespace: longhorn-system
-    - name: yt-cipher
-      namespace: default
   interval: 1h
   path: ./kubernetes/apps/default/musicbot/lavalink
   prune: true
@@ -46,7 +45,6 @@ spec:
     - ../../../../components/kopiur/backup
   dependsOn:
     - name: lavalink
-      namespace: default
   interval: 1h
   path: ./kubernetes/apps/default/musicbot/lavamusic
   postBuild:

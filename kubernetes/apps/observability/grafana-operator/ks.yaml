@@ -23,7 +23,6 @@ metadata:
 spec:
   dependsOn:
     - name: grafana-operator
-      namespace: observability
     - name: longhorn
       namespace: longhorn-system
   interval: 1h

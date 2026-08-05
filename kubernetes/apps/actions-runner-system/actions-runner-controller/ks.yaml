@@ -23,7 +23,6 @@ metadata:
 spec:
   dependsOn:
     - name: actions-runner-controller
-      namespace: actions-runner-system
     - name: longhorn
       namespace: longhorn-system
   interval: 1h

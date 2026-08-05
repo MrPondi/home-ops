@@ -9,10 +9,17 @@ spec:
     - ../../../../components/kopiur/backup
     # - ../../../../components/dragonfly
   dependsOn:
+    - name: dragonfly-operator
+      namespace: database
     - name: longhorn
       namespace: longhorn-system
     - name: mariadb-cluster
       namespace: database
+  healthCheckExprs:
+    - apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      failed: status.phase != 'ready'
+      current: status.phase == 'ready'
   interval: 1h
   path: ./kubernetes/apps/default/nextcloud/app
   postBuild:
