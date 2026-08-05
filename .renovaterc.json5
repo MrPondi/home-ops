@@ -15,15 +15,7 @@
       automerge: true,
       automergeType: "pr",
       matchUpdateTypes: ["digest"],
-      matchPackageNames: [
-        "/home-operations/",
-        "/seerr-team/",
-        "/autobrr/",
-        "alpine/git",
-        "python",
-        "nginx",
-        "node",
-      ],
+      matchPackageNames: ["/home-operations/", "alpine/git", "python", "nginx", "node"],
       ignoreTests: false,
     },
     {
