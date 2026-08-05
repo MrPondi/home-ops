@@ -39,7 +39,7 @@ If you’d like to build something similar, the [onedr0p/cluster-template](https
 - [external-dns](https://github.com/kubernetes-sigs/external-dns): Automated DNS record synchronization for ingress resources.
 - [external-secrets](https://github.com/external-secrets/external-secrets): Kubernetes secrets management integrated with [Bitwarden Secrets Manager](https://bitwarden.com/products/secrets-manager/).
 - [longhorn](https://github.com/longhorn/longhorn): Cloud-native distributed storage orchestrator for persistent storage.
-- [volsync](https://github.com/backube/volsync): Advanced backup and recovery solution for persistent volume claims.
+- [kopiur](https://github.com/home-operations/kopiur): Advanced backup and recovery solution for persistent volume claims.
 
 ### GitOps
 
