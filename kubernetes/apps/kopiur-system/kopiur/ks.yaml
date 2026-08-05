@@ -28,6 +28,8 @@ metadata:
 spec:
   dependsOn:
     - name: kopiur
+    - name: envoy-routes
+      namespace: network
   interval: 1h
   path: ./kubernetes/apps/kopiur-system/kopiur/repository
   prune: true
