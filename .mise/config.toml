@@ -12,7 +12,7 @@ HOMEBREW_NO_ENV_HINTS = "1"
 postinstall = "lefthook install"
 
 [tools]
-flux2 = "2.9.3"
+flux2 = "2.9.4"
 gh = "2.97.0"
 gum = "0.17.0"
 helm = "4.2.3"
