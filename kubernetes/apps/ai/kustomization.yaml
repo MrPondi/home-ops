@@ -12,4 +12,3 @@ resources:
   - ./namespace.yaml
   # - ./hermes/ks.yaml
   - ./litellm/ks.yaml
-  - ./litellm-operator/ks.yaml
