@@ -10,6 +10,8 @@ spec:
   dependsOn:
     - name: dragonfly-operator
       namespace: database
+    - name: external-secrets-store
+      namespace: external-secrets
     - name: litellm-operator
       namespace: ai
   healthCheckExprs:

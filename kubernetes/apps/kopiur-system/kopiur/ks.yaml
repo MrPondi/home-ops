@@ -30,6 +30,8 @@ spec:
     - name: kopiur
     - name: envoy-routes
       namespace: network
+    - name: external-secrets-store
+      namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/kopiur-system/kopiur/repository
   prune: true

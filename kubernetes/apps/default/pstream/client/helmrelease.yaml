@@ -1,16 +1,17 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: pstream
+  name: pstream-client
 spec:
   chartRef:
     kind: OCIRepository
-    name: pstream
+    name: pstream-client
   interval: 1h
   values:
     controllers:
-      pstream:
+      pstream-client:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -73,7 +74,7 @@ spec:
       app:
         annotations:
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: PStream
+          gethomepage.dev/name: P-Stream
           gethomepage.dev/group: Home & Automation
           gethomepage.dev/icon: libremdb.png
           gethomepage.dev/description: Movie provider agregator
