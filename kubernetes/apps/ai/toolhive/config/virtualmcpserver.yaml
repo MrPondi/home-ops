@@ -5,33 +5,33 @@ kind: VirtualMCPServer
 metadata:
   name: mcp-gateway
 spec:
-  authServerConfig:
-    issuer: https://mcp.pondi.dev
-    signingKeySecretRefs:
-      - name: toolhive-secret
-        key: AUTH_SIGNING_KEY
-    hmacSecretRefs:
-      - name: toolhive-secret
-        key: AUTH_HMAC_KEY
-    tokenLifespans:
-      accessTokenLifespan: 1h
-      refreshTokenLifespan: 168h
-      authCodeLifespan: 10m
-    upstreamProviders:
-      - name: authentik
-        type: oidc
-        oidcConfig:
-          issuerUrl: https://auth.pondi.dev/application/o/toolhive/
-          clientId: ${TOOLHIVE_OIDC_CLIENT_ID}
-          clientSecretRef:
-            name: toolhive-oidc-secret
-            key: TOOLHIVE_OIDC_CLIENT_SECRET
-          redirectUri: https://mcp.pondi.dev/oauth/callback
-          scopes:
-            - openid
-            - profile
-            - email
-            - offline_access
+  # authServerConfig:
+  #   issuer: https://mcp.pondi.dev
+  #   signingKeySecretRefs:
+  #     - name: toolhive-secret
+  #       key: AUTH_SIGNING_KEY
+  #   hmacSecretRefs:
+  #     - name: toolhive-secret
+  #       key: AUTH_HMAC_KEY
+  #   tokenLifespans:
+  #     accessTokenLifespan: 1h
+  #     refreshTokenLifespan: 168h
+  #     authCodeLifespan: 10m
+  #   upstreamProviders:
+  #     - name: authentik
+  #       type: oidc
+  #       oidcConfig:
+  #         issuerUrl: https://auth.pondi.dev/application/o/toolhive/
+  #         clientId: ${TOOLHIVE_OIDC_CLIENT_ID}
+  #         clientSecretRef:
+  #           name: toolhive-oidc-secret
+  #           key: TOOLHIVE_OIDC_CLIENT_SECRET
+  #         redirectUri: https://mcp.pondi.dev/oauth/callback
+  #         scopes:
+  #           - openid
+  #           - profile
+  #           - email
+  #           - offline_access
   config:
     aggregation:
       conflictResolution: prefix
@@ -42,16 +42,17 @@ spec:
   telemetryConfigRef:
     name: prometheus
   incomingAuth:
-    type: oidc
-    oidcConfigRef:
-      name: authentik
-      audience: https://mcp.pondi.dev/mcp
-      resourceUrl: https://mcp.pondi.dev/mcp
-      scopes:
-        - openid
-        - profile
-        - email
-        - offline_access
+    type: anonymous
+    # type: oidc
+    # oidcConfigRef:
+    #   name: authentik
+    #   audience: https://mcp.pondi.dev/mcp
+    #   resourceUrl: https://mcp.pondi.dev/mcp
+    #   scopes:
+    #     - openid
+    #     - profile
+    #     - email
+    #     - offline_access
   outgoingAuth:
     source: discovered
   sessionStorage:

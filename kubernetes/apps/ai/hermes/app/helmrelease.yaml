@@ -15,7 +15,7 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          init:
+          1-init:
             image:
               repository: ghcr.io/home-operations/busybox
               tag: 1.38.0@sha256:7e2c04dd50ede647bf4a7a4c8dbd629dd4971cd139b9b88fb22bfc3c7a6c13df
@@ -25,20 +25,56 @@ spec:
               - |
                 set -euo pipefail
 
-                chown 10000:10000 /run /opt/data
-                chmod 755 /run
-
                 cp /tmp/config.yaml /opt/data/config.yaml
-                chown 10000:10000 /opt/data/config.yaml
+
+                mkdir -p /opt/data/.local/bin
+
+                if [ ! -f /opt/data/.local/bin/ffmpeg ]; then
+                  wget -qO /tmp/ffmpeg.tar.xz https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+                  wget -qO /tmp/ffmpeg.tar.xz.md5 https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz.md5
+
+                  cd /tmp && md5sum -c ffmpeg.tar.xz.md5
+
+                  tar -xf /tmp/ffmpeg.tar.xz --strip-components=1 -C /opt/data/.local/bin --wildcards '*/ffmpeg'
+
+                  chmod +x /opt/data/.local/bin/ffmpeg
+                  rm /tmp/ffmpeg.tar.xz /tmp/ffmpeg.tar.xz.md5
+                fi
+
+                chown -R 10000:10000 /run /opt/data
+                chmod 755 /run
             securityContext:
               runAsUser: 0
               runAsGroup: 0
               runAsNonRoot: false
-        containers:
-          app:
-            image:
+          2-install-tools:
+            image: &hermes-image
               repository: docker.io/nousresearch/hermes-agent
               tag: v2026.8.3@sha256:16788311e2fa3035456bdc1bafb8ec2b1777db64ebf020af9bb7eb73c3712c9e
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -euo pipefail
+
+                PHOTON_SRC="/opt/hermes/plugins/platforms/photon/sidecar"
+                PHOTON_DEST="/opt/data/photon/sidecar"
+                mkdir -p "$PHOTON_DEST"
+
+                if [ -f "$PHOTON_SRC/package.json" ] && [ ! -f "$PHOTON_DEST/package.json" ]; then
+                  cp -a "$PHOTON_SRC/." "$PHOTON_DEST/"
+                fi
+
+                if [ -f "$PHOTON_DEST/package.json" ]; then
+                  cd "$PHOTON_DEST" && npm ci 2>/dev/null || npm install
+                fi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+        containers:
+          app:
+            image: *hermes-image
             args: ["gateway", "run"]
             env:
               HOME: /opt/data
@@ -101,7 +137,7 @@ spec:
           whatsapp:
             port: *whatsapp-port
     route:
-      app:
+      dashboard:
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Hermes Agent Dashboard
@@ -114,6 +150,22 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+      whatsapp-webhook:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            conditions: ["[STATUS] == 400"]
+        hostnames:
+          - whatsapp-webhook.pondi.dev
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+        rules:
+          - backendRefs:
+              - port: whatsapp
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /whatsapp/webhook
     persistence:
       data:
         existingClaim: "{{ .Release.Name }}"
@@ -125,7 +177,7 @@ spec:
         defaultMode: 0755
         advancedMounts:
           hermes:
-            init:
+            1-init:
               - path: /tmp/config.yaml
                 subPath: config.yaml
       run:
