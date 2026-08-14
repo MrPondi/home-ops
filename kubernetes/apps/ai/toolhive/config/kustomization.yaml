@@ -8,6 +8,6 @@ resources:
   - ./grafanadashboard.yaml
   - ./httproute.yaml
   - ./mcpgroup.yaml
-  # - ./mcpoidc.yaml
+  - ./mcpoidc.yaml
   - ./mcptelemetry.yaml
   - ./virtualmcpserver.yaml

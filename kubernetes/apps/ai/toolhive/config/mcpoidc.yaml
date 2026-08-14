@@ -9,4 +9,4 @@ spec:
   inline:
     issuer: https://mcp.pondi.dev
     jwksAllowPrivateIP: true
-    # protectedResourceAllowPrivateIP: true
+    protectedResourceAllowPrivateIP: true
