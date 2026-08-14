@@ -47,6 +47,11 @@ spec:
       name: authentik
       audience: https://mcp.pondi.dev/mcp
       resourceUrl: https://mcp.pondi.dev/mcp
+      scopes:
+        - openid
+        - profile
+        - email
+        - offline_access
   outgoingAuth:
     source: discovered
   sessionStorage:
