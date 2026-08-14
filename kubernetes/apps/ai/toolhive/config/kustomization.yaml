@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./servers/
   - ./externalsecret.yaml
+  - ./grafanadashboard.yaml
   - ./httproute.yaml
   - ./mcpgroup.yaml
   - ./mcpoidc.yaml
