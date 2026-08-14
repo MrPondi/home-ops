@@ -23,7 +23,7 @@ resource "authentik_application" "kopiur" {
   name              = "Kopiur"
   slug              = "kopiur"
   protocol_provider = authentik_provider_proxy.kopiur.id
-  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/kopiur.svg"
+  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/kopia.svg"
   meta_launch_url   = "https://kopiur.pondi.dev"
   open_in_new_tab   = true
 }
