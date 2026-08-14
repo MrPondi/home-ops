@@ -1,6 +1,6 @@
-data "bitwarden-secrets_secret" "litellm" {
-  id = "63923a43-e89c-4a97-a4a0-b489011d8b3f"
-}
+# data "bitwarden-secrets_secret" "litellm" {
+#   id = "63923a43-e89c-4a97-a4a0-b489011d8b3f"
+# }
 
 # resource "authentik_provider_oauth2" "litellm" {
 #   name          = "LiteLLM OAuth2 Provider"
@@ -16,6 +16,16 @@ data "bitwarden-secrets_secret" "litellm" {
 #       redirect_uri_type = "authorization",
 #       url           = "https://litellm.pondi.dev/sso/callback",
 #     }
+#   ]
+
+#   grant_types = [
+#     "authorization_code",
+#     "hybrid",
+#     "implicit",
+#     "client_credentials",
+#     "password",
+#     "urn:ietf:params:oauth:grant-type:device_code",
+#     "refresh_token"
 #   ]
 
 #   property_mappings = [

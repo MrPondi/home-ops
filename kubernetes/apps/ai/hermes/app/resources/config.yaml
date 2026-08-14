@@ -46,8 +46,8 @@ approvals:
 command_allowlist:
   - execute_code
   - "curl *pondi.dev*"
-  - "curl *.ai.svc.cluster.local*"
   - "wget *pondi.dev*"
+  - "curl *.ai.svc.cluster.local*"
 gateway:
   platforms:
     whatsapp_cloud:
