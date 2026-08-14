@@ -17,8 +17,8 @@ spec:
         initContainers:
           1-init:
             image:
-              repository: ghcr.io/home-operations/busybox
-              tag: 1.38.0@sha256:7e2c04dd50ede647bf4a7a4c8dbd629dd4971cd139b9b88fb22bfc3c7a6c13df
+              repository: docker.io/library/alpine
+              tag: "3.24"
             command:
               - /bin/sh
               - -c
@@ -30,15 +30,22 @@ spec:
                 mkdir -p /opt/data/.local/bin
 
                 if [ ! -f /opt/data/.local/bin/ffmpeg ]; then
-                  wget -qO /tmp/ffmpeg.tar.xz https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
-                  wget -qO /tmp/ffmpeg.tar.xz.md5 https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz.md5
+                  mkdir -p /tmp/ffmpeg
+                  cd /tmp/ffmpeg
 
-                  cd /tmp && md5sum -c ffmpeg.tar.xz.md5
+                  wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+                  wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz.md5
 
-                  tar -xf /tmp/ffmpeg.tar.xz --strip-components=1 -C /opt/data/.local/bin --wildcards '*/ffmpeg'
+                  md5sum -c ffmpeg-release-amd64-static.tar.xz.md5
 
-                  chmod +x /opt/data/.local/bin/ffmpeg
-                  rm /tmp/ffmpeg.tar.xz /tmp/ffmpeg.tar.xz.md5
+                  tar -xf ffmpeg-release-amd64-static.tar.xz --strip-components=1
+
+                  mv ffmpeg ffprobe /opt/data/.local/bin/
+
+                  chmod +x /opt/data/.local/bin/ffmpeg /opt/data/.local/bin/ffmprobe
+
+                  cd /
+                  rm -rf /tmp/ffmpeg
                 fi
 
                 chown -R 10000:10000 /run /opt/data

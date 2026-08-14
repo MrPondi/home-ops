@@ -67,7 +67,7 @@ group_sessions_per_user: false
 #     - memini
 mcp_servers:
   toolhive:
-    url: http://mcp.pondi.dev/mcp
+    url: http://vmcp-mcp-gateway.ai.svc.cluster.local:4483/mcp
 platform_toolsets:
   cli:
     - hermes-cli
