@@ -42,7 +42,6 @@ spec:
   telemetryConfigRef:
     name: prometheus
   incomingAuth:
-    # type: anonymous
     type: oidc
     oidcConfigRef:
       name: authentik
