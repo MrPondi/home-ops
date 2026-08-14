@@ -24,12 +24,11 @@ spec:
   components:
     - ../../../../components/dragonfly
   dependsOn:
+    - name: litellm-operator
     - name: dragonfly-operator
       namespace: database
     - name: external-secrets-store
       namespace: external-secrets
-    - name: litellm-operator
-      namespace: ai
   healthCheckExprs:
     - apiVersion: dragonflydb.io/v1alpha1
       kind: Dragonfly
@@ -46,4 +45,3 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: ai
-  wait: false

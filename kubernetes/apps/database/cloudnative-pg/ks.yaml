@@ -50,7 +50,6 @@ spec:
   interval: 1h
   path: ./kubernetes/apps/database/cloudnative-pg/cluster
   prune: true
-  retryInterval: 1m
   sourceRef:
     kind: GitRepository
     name: flux-system
