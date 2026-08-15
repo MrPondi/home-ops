@@ -55,7 +55,7 @@ spec:
               runAsGroup: 0
               runAsNonRoot: false
           2-install-tools:
-            image: &hermes-image
+            image: &image
               repository: docker.io/nousresearch/hermes-agent
               tag: v2026.8.13@sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
             command:
@@ -81,19 +81,38 @@ spec:
               capabilities: { drop: ["ALL"] }
         containers:
           app:
-            image: *hermes-image
+            image: *image
             args: ["gateway", "run"]
             env:
               HOME: /opt/data
               HERMES_HOME: /opt/data
-              HERMES_DASHBOARD: true
-              HERMES_DASHBOARD_HOST: 0.0.0.0
-              HERMES_DASHBOARD_PORT: &dashboard-port 9119
               WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+          dashboard:
+            image: *image
+            args:
+              - dashboard
+              - --host
+              - "0.0.0.0"
+            env:
+              GATEWAY_HEALTH_URL: http://localhost:8642
+              TZ: Europe/Warsaw
+            envFrom:
+              - secretRef:
+                  name: hermes-dashboard-secret
             probes:
               startup:
                 enabled: true
@@ -101,7 +120,7 @@ spec:
                 spec:
                   httpGet: &httpGet
                     path: /api/status
-                    port: *dashboard-port
+                    port: &dashboard-port 9119
                   initialDelaySeconds: 10
                   periodSeconds: 5
                   timeoutSeconds: 5
@@ -125,8 +144,8 @@ spec:
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
-                cpu: 50m
-                memory: 512Mi
+                cpu: 100m
+                memory: 256Mi
               limits:
                 memory: 1Gi
     defaultPodOptions:
@@ -140,9 +159,13 @@ spec:
       app:
         ports:
           http:
-            port: *dashboard-port
+            port: 8642
           whatsapp:
             port: *whatsapp-port
+      dashboard:
+        ports:
+          http:
+            port: *dashboard-port
     route:
       dashboard:
         annotations:
@@ -158,6 +181,10 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
+        rules:
+          - backendRefs:
+              - identifier: dashboard
+                port: http
       whatsapp-webhook:
         annotations:
           gatus.home-operations.com/endpoint: |-
@@ -169,7 +196,8 @@ spec:
             namespace: network
         rules:
           - backendRefs:
-              - port: whatsapp
+              - identifier: app
+                port: whatsapp
             matches:
               - path:
                   type: PathPrefix
