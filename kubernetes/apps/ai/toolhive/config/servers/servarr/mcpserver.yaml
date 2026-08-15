@@ -20,11 +20,11 @@ spec:
     - name: PROWLARR_URL
       value: http://prowlarr.media.svc.cluster.local
   secrets:
-    - name: toolhive-servarr-secret
+    - name: toolhive-radarr-secret
       key: RADARR_API_KEY
-    - name: toolhive-servarr-secret
+    - name: toolhive-sonarr-secret
       key: SONARR_API_KEY
-    - name: toolhive-servarr-secret
+    - name: toolhive-prowlarr-secret
       key: PROWLARR_API_KEY
   podTemplateSpec:
     spec:

@@ -36,11 +36,11 @@ spec:
     - name: UNIFI_TOOL_PERMISSION_MODE
       value: confirm
   secrets:
-    - name: toolhive-unifi-secret
+    - name: toolhive-unifi-username-secret
       key: UNIFI_USERNAME
-    - name: toolhive-unifi-secret
+    - name: toolhive-unifi-password-secret
       key: UNIFI_PASSWORD
-    - name: toolhive-unifi-secret
+    - name: toolhive-unifi-api-key-secret
       key: UNIFI_API_KEY
   groupRef:
     name: mcp-tools
