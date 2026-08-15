@@ -5,6 +5,4 @@ kind: Kustomization
 resources:
   - ./grafanadatasource.yaml
   - ./grafana.yaml
-  - ./mcpserver.yaml
-  - ./serviceaccount.yaml
   - ./servicemonitor.yaml
