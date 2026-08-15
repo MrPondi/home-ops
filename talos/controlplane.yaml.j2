@@ -10,9 +10,11 @@ machine:
       enabled: true
       allowedKubernetesNamespaces:
         - actions-runner-system
+        - ai
         - system-upgrade
       allowedRoles:
         - os:admin
+        - os:reader
 cluster:
   # ca merges as a unit; crt must be repeated alongside key
   ca:
