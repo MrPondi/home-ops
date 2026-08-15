@@ -21,7 +21,7 @@
       automerge: true,
       automergeType: "pr",
       matchUpdateTypes: ["digest"],
-      matchPackageNames: ["/home-operations/", "alpine/git", "python", "nginx", "node"],
+      matchPackageNames: ["/home-operations/", "/alpine/", "/python/", "/nginx/", "/node/"],
       ignoreTests: false,
     },
     {
@@ -126,6 +126,16 @@
       description: "Talos Group",
       groupName: "talos",
       matchPackageNames: ["siderolabs/talos"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 2,
+    },
+    {
+      description: "ToolHive Operator Group",
+      groupName: "toolhive-operator",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/toolhive-operator/", "/toolhive-operator-crds/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
