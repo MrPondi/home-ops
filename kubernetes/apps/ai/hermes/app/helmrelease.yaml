@@ -48,8 +48,8 @@ spec:
                   rm -rf /tmp/ffmpeg
                 fi
 
-                chown -R 10000:10000 /run /opt/data
-                chmod 755 /run
+                chown -R 10000:10000 /run-app /run-dashboard /opt/data
+                chmod 755 /run-app /run-dashboard
             securityContext:
               runAsUser: 0
               runAsGroup: 0
@@ -108,7 +108,8 @@ spec:
               - --host
               - "0.0.0.0"
             env:
-              GATEWAY_HEALTH_URL: http://localhost:8642
+              HOME: /opt/data
+              HERMES_HOME: /opt/data
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
@@ -216,9 +217,22 @@ spec:
             1-init:
               - path: /tmp/config.yaml
                 subPath: config.yaml
-      run:
+      run-app:
         type: emptyDir
-        globalMounts:
-          - path: /run
+        advancedMounts:
+          hermes:
+            1-init:
+              - path: /run-app
+            app:
+              - path: /run
+
+      run-dashboard:
+        type: emptyDir
+        advancedMounts:
+          hermes:
+            1-init:
+              - path: /run-dashboard
+            dashboard:
+              - path: /run
       tmp:
         type: emptyDir
