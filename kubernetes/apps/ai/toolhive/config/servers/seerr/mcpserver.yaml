@@ -3,27 +3,31 @@
 apiVersion: toolhive.stacklok.dev/v1beta1
 kind: MCPServer
 metadata:
-  name: hass
+  name: seerr
 spec:
-  image: ghcr.io/homeassistant-ai/ha-mcp:8.2.0@sha256:dbcfc0ee8ad02d2190ebde69e5cc6167175c79608bbf1d55cff9034e256face1
-  transport: streamable-http
-  mcpPort: 8080
+  image: docker.io/node:24-alpine
+  transport: stdio
+  proxyPort: 8080
   env:
-    - name: HOMEASSISTANT_URL
-      value: http://home-assistant.default.svc.cluster.local:8123
-    - name: HA_MCP_DISABLE_UPDATE_CHECK
-      value: "true"
-    - name: MCP_PORT
-      value: "8080"
+    - name: HOME
+      value: /tmp
+    - name: NPM_CONFIG_CACHE
+      value: /tmp/.npm
+    - name: SEERR_URL
+      value: http://seerr.media.svc.cluster.local
   secrets:
-    - name: home-assistant-secret
-      key: HASS_MCP_TOKEN
+    - name: toolhive-seerr-secret
+      key: SEERR_API_KEY
   podTemplateSpec:
     spec:
       containers:
         - name: mcp
+          image: docker.io/node:24-alpine
           command:
-            - ha-mcp-web
+            - npx
+          args:
+            - -y
+            - "@jhomen368/overseerr-mcp"
           volumeMounts:
             - name: tmp
               mountPath: /tmp
