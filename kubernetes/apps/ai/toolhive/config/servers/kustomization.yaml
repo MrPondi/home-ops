@@ -8,7 +8,8 @@ resources:
   - ./grafana/
   - ./hass/
   - ./kubectl/
+  - ./prometheus/
   - ./seerr/
   - ./servarr/
   # - ./talos/
-  # - ./unifi/
+  - ./unifi/
