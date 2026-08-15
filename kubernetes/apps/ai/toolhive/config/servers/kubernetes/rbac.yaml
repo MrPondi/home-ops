@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kubectl-mcp-readonly
+  name: kubernetes-mcp
 ---
-# Broad read-only access for kubectl MCP. Kubernetes Secrets (core v1) are excluded.
+# Broad read-only access for kubernetes MCP. Kubernetes Secrets (core v1) are excluded.
 #
 # - aggregationRule: same selector as built-in "view" — expands with operators that ship
 #   rbac.authorization.k8s.io/aggregate-to-view ClusterRoles (CRDs, etc.).
@@ -13,7 +13,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kubectl-mcp-readonly
+  name: kubernetes-mcp-readonly
 aggregationRule:
   clusterRoleSelectors:
     - matchLabels:
@@ -134,12 +134,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kubectl-mcp-readonly
+  name: kubernetes-mcp-readonly
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kubectl-mcp-readonly
+  name: kubernetes-mcp-readonly
 subjects:
   - kind: ServiceAccount
-    name: kubectl-mcp-readonly
-    namespace: ai
+    name: kubernetes-mcp
