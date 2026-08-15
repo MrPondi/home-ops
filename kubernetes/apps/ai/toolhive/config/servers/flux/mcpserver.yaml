@@ -20,8 +20,6 @@ spec:
           env:
             # In-cluster mode: no KUBECONFIG; uses the pod service account.
             - name: RUNTIME_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
+              value: flux-system
   groupRef:
     name: mcp-tools
