@@ -55,15 +55,17 @@
   "material-icon-theme.files.associations": {
     "*.gotmpl": "smarty",
     "*.sops.yaml": "lock",
-    "helmrelease.yaml": "helm",
-    "httproute.yaml": "routing",
+    "entrypoint.sh": "docker",
     "grafanadashboard.yaml": "grafana-alloy",
     "grafanadatasource.yaml": "grafana-alloy",
-    "pvc.yaml": "sequelize",
-    "resourceclaimtemplate.yaml": "parcel",
-    "prometheusrule.yaml": "sentry",
-    "entrypoint.sh": "docker",
+    "helmrelease.yaml": "helm",
+    "httproute.yaml": "routing",
     "kubeconfig": "kubernetes",
+    "mcpserver.yaml": "pipeline",
+    "pvc.yaml": "sequelize",
+    "rbac.yaml": "toc",
+    "prometheusrule.yaml": "sentry",
+    "resourceclaimtemplate.yaml": "parcel",
     "talosconfig": "kubernetes"
   },
   "material-icon-theme.folders.customClones": [

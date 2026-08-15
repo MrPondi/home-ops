@@ -6,4 +6,6 @@ resources:
   - ./clusterrolebinding.yaml
   - ./externalsecret.yaml
   - ./helmrelease.yaml
+  - ./mcpserver.yaml
   - ./ocirepository.yaml
+  - ./rbac.yaml
