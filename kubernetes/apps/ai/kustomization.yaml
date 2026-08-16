@@ -12,4 +12,5 @@ resources:
   - ./namespace.yaml
   - ./hermes/ks.yaml
   - ./litellm/ks.yaml
+  - ./searxng/ks.yaml
   - ./toolhive/ks.yaml
