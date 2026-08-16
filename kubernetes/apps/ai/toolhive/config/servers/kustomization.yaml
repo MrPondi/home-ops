@@ -12,6 +12,6 @@ resources:
   - ./prometheus/
   - ./seerr/
   - ./servarr/
-  # - ./talos/
+  - ./talos/
   - ./unifi/
   - ./victoria-logs/
