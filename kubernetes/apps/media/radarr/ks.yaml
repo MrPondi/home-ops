@@ -8,9 +8,10 @@ spec:
   components:
     - ../../../../components/auth-proxy
     - ../../../../components/kopiur/backup
-    - ../../../../components/volsync
     - ../../../../components/zeroscaler
   dependsOn:
+    - name: external-secrets-store
+      namespace: external-secrets
     - name: longhorn
       namespace: longhorn-system
   interval: 1h

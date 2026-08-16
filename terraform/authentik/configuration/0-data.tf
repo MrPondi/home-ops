@@ -48,6 +48,10 @@ data "authentik_property_mapping_provider_scope" "scope-profile" {
   name = "authentik default OAuth Mapping: OpenID 'profile'"
 }
 
+data "authentik_property_mapping_provider_scope" "scope-offline_access" {
+  name = "authentik default OAuth Mapping: OpenID 'offline_access'"
+}
+
 # SAML scopes
 
 data "authentik_property_mapping_provider_saml" "saml-email" {

@@ -1,6 +1,12 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["github>home-operations/renovate-presets#2.2.0", ":timezone(Europe/Warsaw)"],
+  extends: [
+    "github>home-operations/renovate-presets#7.0.0",
+    "github>home-operations/renovate-presets//apps/cnpg.json5#7.0.0",
+    "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#7.0.0",
+    "github>home-operations/renovate-presets//apps/talosFactory.json5#7.0.0",
+    ":timezone(Europe/Warsaw)",
+  ],
   lockFileMaintenance: {
     enabled: true,
     schedule: ["before 3am on the first day of the month"],
@@ -15,15 +21,7 @@
       automerge: true,
       automergeType: "pr",
       matchUpdateTypes: ["digest"],
-      matchPackageNames: [
-        "/home-operations/",
-        "/seerr-team/",
-        "/autobrr/",
-        "alpine/git",
-        "python",
-        "nginx",
-        "node",
-      ],
+      matchPackageNames: ["/home-operations/", "/alpine/", "/python/", "/nginx/", "/node/"],
       ignoreTests: false,
     },
     {
@@ -128,6 +126,16 @@
       description: "Talos Group",
       groupName: "talos",
       matchPackageNames: ["siderolabs/talos"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 2,
+    },
+    {
+      description: "ToolHive Operator Group",
+      groupName: "toolhive-operator",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/toolhive-operator/", "/toolhive-operator-crds/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },

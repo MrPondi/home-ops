@@ -15,42 +15,105 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          init:
+          1-init:
             image:
-              repository: ghcr.io/home-operations/busybox
-              tag: 1.38.0@sha256:7e2c04dd50ede647bf4a7a4c8dbd629dd4971cd139b9b88fb22bfc3c7a6c13df
+              repository: docker.io/library/alpine
+              tag: "3.24"
             command:
               - /bin/sh
               - -c
               - |
                 set -euo pipefail
 
-                chown 10000:10000 /run /opt/data
-                chmod 755 /run
-
                 cp /tmp/config.yaml /opt/data/config.yaml
-                chown 10000:10000 /opt/data/config.yaml
+
+                mkdir -p /opt/data/.local/bin
+
+                if [ ! -f /opt/data/.local/bin/ffmpeg ]; then
+                  mkdir -p /tmp/ffmpeg
+                  cd /tmp/ffmpeg
+
+                  wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+                  wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz.md5
+
+                  md5sum -c ffmpeg-release-amd64-static.tar.xz.md5
+
+                  tar -xf ffmpeg-release-amd64-static.tar.xz --strip-components=1
+
+                  mv ffmpeg ffprobe /opt/data/.local/bin/
+
+                  chmod +x /opt/data/.local/bin/ffmpeg /opt/data/.local/bin/ffmprobe
+
+                  cd /
+                  rm -rf /tmp/ffmpeg
+                fi
+
+                chown -R 10000:10000 /run-app /run-dashboard /opt/data
+                chmod 755 /run-app /run-dashboard
             securityContext:
               runAsUser: 0
               runAsGroup: 0
               runAsNonRoot: false
+          2-install-tools:
+            image: &image
+              repository: docker.io/nousresearch/hermes-agent
+              tag: v2026.8.13@sha256:68e15ae2a6d894d0ccbd9f8aacbbe13d4d28fa5dc9b6a303970b67bb2499b1a6
+            command:
+              - /bin/sh
+              - -c
+              - |
+                set -euo pipefail
+
+                PHOTON_SRC="/opt/hermes/plugins/platforms/photon/sidecar"
+                PHOTON_DEST="/opt/data/photon/sidecar"
+                mkdir -p "$PHOTON_DEST"
+
+                if [ -f "$PHOTON_SRC/package.json" ] && [ ! -f "$PHOTON_DEST/package.json" ]; then
+                  cp -a "$PHOTON_SRC/." "$PHOTON_DEST/"
+                fi
+
+                if [ -f "$PHOTON_DEST/package.json" ]; then
+                  cd "$PHOTON_DEST" && npm ci 2>/dev/null || npm install
+                fi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
         containers:
           app:
-            image:
-              repository: docker.io/nousresearch/hermes-agent
-              tag: v2026.7.20@sha256:f7b35053268f532f98955195c909f15a230470fbcbdacaa9fdecb95707dad04a
+            image: *image
             args: ["gateway", "run"]
             env:
               HOME: /opt/data
               HERMES_HOME: /opt/data
-              HERMES_DASHBOARD: true
-              HERMES_DASHBOARD_HOST: 0.0.0.0
-              HERMES_DASHBOARD_PORT: &dashboard-port 9119
               WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+          dashboard:
+            image: *image
+            args:
+              - dashboard
+              - --host
+              - "0.0.0.0"
+            env:
+              HOME: /opt/data
+              HERMES_HOME: /opt/data
+              TZ: Europe/Warsaw
+            envFrom:
+              - secretRef:
+                  name: hermes-dashboard-secret
             probes:
               startup:
                 enabled: true
@@ -58,7 +121,7 @@ spec:
                 spec:
                   httpGet: &httpGet
                     path: /api/status
-                    port: *dashboard-port
+                    port: &dashboard-port 9119
                   initialDelaySeconds: 10
                   periodSeconds: 5
                   timeoutSeconds: 5
@@ -82,8 +145,8 @@ spec:
               capabilities: { drop: ["ALL"] }
             resources:
               requests:
-                cpu: 50m
-                memory: 512Mi
+                cpu: 100m
+                memory: 256Mi
               limits:
                 memory: 1Gi
     defaultPodOptions:
@@ -97,11 +160,15 @@ spec:
       app:
         ports:
           http:
-            port: *dashboard-port
+            port: 8642
           whatsapp:
             port: *whatsapp-port
+      dashboard:
+        ports:
+          http:
+            port: *dashboard-port
     route:
-      app:
+      dashboard:
         annotations:
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Hermes Agent Dashboard
@@ -109,11 +176,33 @@ spec:
           gethomepage.dev/icon: mdi-robot-happy-outline
           gethomepage.dev/description: Nous Hermes agent
           gethomepage.dev/weight: "5"
+          gethomepage.dev/app: hermes
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:
           - name: envoy-internal
             namespace: network
+        rules:
+          - backendRefs:
+              - identifier: dashboard
+                port: http
+      whatsapp-webhook:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            conditions: ["[STATUS] == 400"]
+        hostnames:
+          - whatsapp-webhook.pondi.dev
+        parentRefs:
+          - name: envoy-external
+            namespace: network
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: whatsapp
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /whatsapp/webhook
     persistence:
       data:
         existingClaim: "{{ .Release.Name }}"
@@ -125,12 +214,25 @@ spec:
         defaultMode: 0755
         advancedMounts:
           hermes:
-            init:
+            1-init:
               - path: /tmp/config.yaml
                 subPath: config.yaml
-      run:
+      run-app:
         type: emptyDir
-        globalMounts:
-          - path: /run
+        advancedMounts:
+          hermes:
+            1-init:
+              - path: /run-app
+            app:
+              - path: /run
+
+      run-dashboard:
+        type: emptyDir
+        advancedMounts:
+          hermes:
+            1-init:
+              - path: /run-dashboard
+            dashboard:
+              - path: /run
       tmp:
         type: emptyDir

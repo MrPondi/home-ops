@@ -55,16 +55,27 @@
   "material-icon-theme.files.associations": {
     "*.gotmpl": "smarty",
     "*.sops.yaml": "lock",
+    "entrypoint.sh": "docker",
+    "grafanadashboard.yaml": "grafana-alloy",
+    "grafanadatasource.yaml": "grafana-alloy",
     "helmrelease.yaml": "helm",
     "httproute.yaml": "routing",
-    "grafanadashboard.yaml": "grafana-alloy",
-    "pvc.yaml": "sequelize",
-    "resourceclaimtemplate.yaml": "parcel",
-    "prometheusrule.yaml": "sentry",
-    "entrypoint.sh": "docker",
     "kubeconfig": "kubernetes",
+    "mcpserver.yaml": "pipeline",
+    "pvc.yaml": "sequelize",
+    "rbac.yaml": "toc",
+    "prometheusrule.yaml": "sentry",
+    "resourceclaimtemplate.yaml": "parcel",
     "talosconfig": "kubernetes"
   },
+  "material-icon-theme.folders.customClones": [
+    {
+      "name": "mise",
+      "base": "gradle",
+      "color": "#866b6b",
+      "folderNames": [".mise"]
+    }
+  ],
   "material-icon-theme.folders.associations": {
     // top level
     ".github/workflows": "ci",
@@ -80,21 +91,17 @@
     "default": "home",
     "external-secrets": "secure",
     "flux-system": "pipe",
+    "kopiur-system": "aws",
     "kube-system": "kubernetes",
     "longhorn-system": "dump",
+    "miroir-system": "base",
     "network": "connection",
     "observability": "event",
-    "openebs-system": "base",
-    "system-upgrade": "update",
-    "storage": "aws"
+    "system-upgrade": "update"
   },
   "sops.defaults.ageKeyFile": "age.key",
   "terminal.integrated.fontSize": 14,
   "window.zoomLevel": 0,
-  "yaml.schemaStore.enable": true,
-  "yaml.schemas": {
-    "kubernetes": "./kubernetes/**/*.yaml"
-  },
   "[just]": {
     "editor.defaultFormatter": "nefrob.vscode-just-syntax"
   },

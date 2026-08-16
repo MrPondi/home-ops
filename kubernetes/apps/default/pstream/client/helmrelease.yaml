@@ -1,23 +1,24 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: pstream
+  name: pstream-client
 spec:
   chartRef:
     kind: OCIRepository
-    name: pstream
+    name: pstream-client
   interval: 1h
   values:
     controllers:
-      pstream:
+      pstream-client:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
           1-clone:
             image:
               repository: alpine/git
-              tag: v2.54.0@sha256:b4d933c7185b5cc9da7704f2c6e19d477f935ea31a50d9a017ffce2bbd1109a3
+              tag: v2.54.0@sha256:3b44767883ac77bddae0160cc27b6b039345e23fa3504f4159efaa32264ab57f
             command:
               - "git"
               - "clone"
@@ -73,7 +74,7 @@ spec:
       app:
         annotations:
           gethomepage.dev/enabled: "true"
-          gethomepage.dev/name: PStream
+          gethomepage.dev/name: P-Stream
           gethomepage.dev/group: Home & Automation
           gethomepage.dev/icon: libremdb.png
           gethomepage.dev/description: Movie provider agregator

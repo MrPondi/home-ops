@@ -23,7 +23,8 @@ metadata:
 spec:
   dependsOn:
     - name: actions-runner-controller
-      namespace: actions-runner-system
+    - name: external-secrets-store
+      namespace: external-secrets
     - name: longhorn
       namespace: longhorn-system
   interval: 1h

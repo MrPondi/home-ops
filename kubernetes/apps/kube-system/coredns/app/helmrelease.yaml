@@ -3,23 +3,24 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app coredns
+  name: coredns
 spec:
   chartRef:
     kind: OCIRepository
     name: coredns
   interval: 1h
   values:
-    fullnameOverride: *app
+    fullnameOverride: coredns
     image:
       repository: mirror.gcr.io/coredns/coredns
+    replicaCount: 2
     k8sAppLabelOverride: kube-dns
+    priorityClassName: system-cluster-critical
     serviceAccount:
       create: true
     service:
       name: kube-dns
-      clusterIP: "10.43.0.10"
-    replicaCount: 2
+      clusterIP: 10.43.0.10
     servers:
       - zones:
           - zone: .
@@ -27,6 +28,10 @@ spec:
             use_tcp: true
         port: 53
         plugins:
+          - name: template
+            parameters: ANY AAAA
+            configBlock: |-
+              authority "{{ .Zone }} 60 IN SOA ns.dns.cluster.local. hostmaster.cluster.local. (1 60 60 60 60)"
           - name: errors
           - name: health
             configBlock: |-
@@ -45,6 +50,7 @@ spec:
             configBlock: |-
               prefetch 20
               serve_stale
+              servfail 0
           - name: loop
           - name: reload
           - name: loadbalance

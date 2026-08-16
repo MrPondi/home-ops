@@ -7,12 +7,11 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-    - ../../../../components/volsync
   dependsOn:
-    - name: longhorn
-      namespace: longhorn-system
     - name: external-secrets-store
       namespace: external-secrets
+    - name: longhorn
+      namespace: longhorn-system
   interval: 1h
   path: ./kubernetes/apps/security/authentik/app
   postBuild:

@@ -17,7 +17,7 @@ spec:
           clone:
             image:
               repository: alpine/git
-              tag: v2.54.0@sha256:b4d933c7185b5cc9da7704f2c6e19d477f935ea31a50d9a017ffce2bbd1109a3
+              tag: v2.54.0@sha256:3b44767883ac77bddae0160cc27b6b039345e23fa3504f4159efaa32264ab57f
             command:
               - "git"
               - "clone"
@@ -41,9 +41,9 @@ spec:
               - |
                 cd /workspace
 
-                npx --yes pnpm install
-                npx --yes pnpm build
-                npx --yes pnpm start
+                npx --yes pnpm@10 install
+                npx --yes pnpm@10 build
+                npx --yes pnpm@10 start
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

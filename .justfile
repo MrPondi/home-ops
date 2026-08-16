@@ -4,19 +4,19 @@ set default-list
 set default-script
 set lazy
 set quiet
-set shell := ['bash', '-euo', 'pipefail', '-c']
 set script-interpreter := ['bash', '-euo', 'pipefail']
+set shell := ['bash', '-euo', 'pipefail', '-c']
 
 # Bootstrap Recipes
-[group: 'Bootstrap']
+[group('Bootstrap')]
 mod bootstrap "bootstrap"
 
 # Kube Recipes
-[group: 'Kube']
+[group('Kube')]
 mod kube "kubernetes"
 
 # Talos Recipes
-[group: 'Talos']
+[group('Talos')]
 mod talos "talos"
 
 [private]
@@ -56,3 +56,5 @@ bitwarden-auth status:
     if [ "$(printf '%s' "$RESPONSE" | jq -r '.success')" != "true" ]; then
         just log fatal "Failed to unlock Bitwarden vault" "stage" "{{ recipe_name() }}"
     fi
+
+    just log info "Bitwarden vault unlocked successfully"

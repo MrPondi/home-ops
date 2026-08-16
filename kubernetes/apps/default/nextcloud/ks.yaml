@@ -7,18 +7,29 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-    - ../../../../components/volsync
+    # - ../../../../components/dragonfly
   dependsOn:
+    - name: dragonfly-operator
+      namespace: database
+    - name: external-secrets-store
+      namespace: external-secrets
     - name: longhorn
       namespace: longhorn-system
     - name: mariadb-cluster
       namespace: database
+  healthCheckExprs:
+    - apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      failed: status.phase != 'ready'
+      current: status.phase == 'ready'
   interval: 1h
   path: ./kubernetes/apps/default/nextcloud/app
   postBuild:
     substitute:
-      VOLSYNC_CAPACITY: 10Gi
       APP: nextcloud
+      KOPIUR_CAPACITY: 10Gi
+      KOPIUR_PUID: "0"
+      KOPIUR_PGID: "33"
   prune: true
   sourceRef:
     kind: GitRepository

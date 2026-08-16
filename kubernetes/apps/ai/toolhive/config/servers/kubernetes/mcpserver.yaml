@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: MCPServer
+metadata:
+  name: kubernetes
+spec:
+  image: ghcr.io/containers/kubernetes-mcp-server:v0.0.66@sha256:6d650f4bd6ac303ad82713c997e73a2d001602f9bf17392c9b9a0e30e29c6423
+  transport: streamable-http
+  mcpPort: 8080
+  serviceAccount: kubernetes-mcp
+  args:
+    - --port=8080
+    - --read-only
+    - --stateless
+  groupRef:
+    name: mcp-tools

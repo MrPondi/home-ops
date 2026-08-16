@@ -1,0 +1,80 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/virtualmcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: VirtualMCPServer
+metadata:
+  name: mcp-gateway
+spec:
+  # authServerConfig:
+  #   issuer: https://mcp.pondi.dev
+  #   signingKeySecretRefs:
+  #     - name: toolhive-secret
+  #       key: AUTH_SIGNING_KEY
+  #   hmacSecretRefs:
+  #     - name: toolhive-secret
+  #       key: AUTH_HMAC_KEY
+  #   tokenLifespans:
+  #     accessTokenLifespan: 1h
+  #     refreshTokenLifespan: 168h
+  #     authCodeLifespan: 10m
+  #   upstreamProviders:
+  #     - name: authentik
+  #       type: oidc
+  #       oidcConfig:
+  #         issuerUrl: https://auth.pondi.dev/application/o/toolhive/
+  #         clientId: ${TOOLHIVE_OIDC_CLIENT_ID}
+  #         clientSecretRef:
+  #           name: toolhive-oidc-secret
+  #           key: TOOLHIVE_OIDC_CLIENT_SECRET
+  #         redirectUri: https://mcp.pondi.dev/oauth/callback
+  #         scopes:
+  #           - openid
+  #           - profile
+  #           - email
+  #           - offline_access
+  config:
+    aggregation:
+      conflictResolution: prefix
+      conflictResolutionConfig:
+        prefixFormat: "{workload}."
+  groupRef:
+    name: mcp-tools
+  telemetryConfigRef:
+    name: prometheus
+  incomingAuth:
+    type: anonymous
+    # type: oidc
+    # oidcConfigRef:
+    #   name: authentik
+    #   audience: https://mcp.pondi.dev/mcp
+    #   resourceUrl: https://mcp.pondi.dev/mcp
+    #   scopes:
+    #     - openid
+    #     - profile
+    #     - email
+    #     - offline_access
+  outgoingAuth:
+    source: discovered
+  sessionStorage:
+    address: toolhive-dragonfly.ai.svc.cluster.local:6379
+    db: 0
+    provider: redis
+    keyPrefix: "vmcp-sessions:"
+  podTemplateSpec:
+    spec:
+      containers:
+        - name: vmcp
+          resources:
+            requests:
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          args:
+            - serve
+            - --config=/etc/vmcp-config/config.yaml
+            - --host=0.0.0.0
+            - --port=4483
+            - --debug
+          env:
+            - name: INSECURE_DISABLE_URL_VALIDATION
+              value: "true"

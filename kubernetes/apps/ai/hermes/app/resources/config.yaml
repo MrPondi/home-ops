@@ -3,28 +3,20 @@ providers:
     api: http://litellm.ai.svc.cluster.local:4000/v1
     api_key: "{{ .LITELLM_MASTER_KEY }}"
     models:
-      # qwen-local:
-      #   context_length: 148480
+      gemini-3.1-flash-lite:
+        context_length: 1000000
       deepseek-v4-flash-free:
         context_length: 1000000
       big-pickle-free:
         context_length: 200000
-      # minimax-m3:
-      #   context_length: 512000
-      # glm-5-2:
-      #   context_length: 1048560
 model:
-  default: deepseek-v4-flash-free
+  default: gemini-3.1-flash-lite
   provider: custom:litellm
 fallback_providers:
-  #   - provider: custom:litellm
-  #     model: qwen-local
+  - provider: custom:litellm
+    model: deepseek-v4-flash-free
   - provider: custom:litellm
     model: big-pickle-free
-#   - provider: custom:litellm
-#     model: minimax-m3
-#   - provider: custom:litellm
-#     model: glm-5-2
 agent:
   max_turns: 90
   gateway_timeout: 1800
@@ -46,11 +38,14 @@ approvals:
 command_allowlist:
   - execute_code
   - "curl *pondi.dev*"
-  - "curl *.ai.svc.cluster.local*"
   - "wget *pondi.dev*"
+  - "curl *.ai.svc.cluster.local*"
 gateway:
   platforms:
     whatsapp_cloud:
+      enabled: true
+      require_mention: true
+    photon:
       enabled: true
       require_mention: true
 group_sessions_per_user: false
@@ -63,10 +58,8 @@ group_sessions_per_user: false
 #   enabled:
 #     - memini
 mcp_servers:
-  homelab:
-    url: http://litellm.ai.svc.cluster.local:4000/mcp
-    headers:
-      Authorization: "Bearer {{ .LITELLM_MASTER_KEY }}"
+  toolhive:
+    url: http://vmcp-mcp-gateway.ai.svc.cluster.local:4483/mcp
 platform_toolsets:
   cli:
     - hermes-cli

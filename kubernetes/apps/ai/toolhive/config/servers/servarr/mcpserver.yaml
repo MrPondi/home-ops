@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: MCPServer
+metadata:
+  name: servarr
+spec:
+  image: ghcr.io/aplaceforallmystuff/mcp-arr:1.7.3@sha256:ace72c56448e8695e1d2d060e7437470e3f883fcc9316f1294e3a7f682e1efa1
+  transport: stdio
+  proxyPort: 8080
+  env:
+    - name: SONARR_URL
+      value: http://sonarr.media.svc.cluster.local
+    - name: RADARR_URL
+      value: http://radarr.media.svc.cluster.local
+    - name: PROWLARR_URL
+      value: http://prowlarr.media.svc.cluster.local
+  secrets:
+    - name: toolhive-radarr-secret
+      key: RADARR_API_KEY
+    - name: toolhive-sonarr-secret
+      key: SONARR_API_KEY
+    - name: toolhive-prowlarr-secret
+      key: PROWLARR_API_KEY
+  groupRef:
+    name: mcp-tools

@@ -2,19 +2,29 @@ resource "authentik_property_mapping_provider_scope" "nextcloud-profile" {
   name       = "Nextcloud Profile"
   scope_name = "nextcloud"
   expression = <<EOF
-# Extract all groups the user is a member of
-groups = [group.name.removeprefix("nextcloud-") for group in request.user.ak_groups.all() if group.name.startswith("nextcloud-")]
-quota = request.user.group_attributes().get("nextcloud_quota")
+user = request.user
 
-return {
-    "name": request.user.name,
-    "nc-groups": groups,
-    "quota": quota * 1024 * 1024 * 1024 if quota is not None else None, # Convert GB to Bytes
-    "avatar": request.user.avatar,
-    "is_admin": request.user.is_superuser or ak_is_group_member(request.user, name="Nextcloud Admins"),
-    # Since attribute 'birthdate' is supported from NC version 30 onwards, this attribute can be mapped too. Accepted format: YYYY-MM-DD
-    "birthdate": user.attributes.get("nextcloud_birthdate", None),
+# Extract Nextcloud groups
+nc_groups = [
+    group.name.removeprefix("nextcloud-")
+    for group in user.ak_groups.all()
+    if group.name.startswith("nextcloud-")
+]
+
+data = {
+    "name": user.name,
+    "nc-groups": nc_groups,
+    "avatar": user.avatar,
+    "is_admin": str(user.is_superuser or ak_is_group_member(user, name="Nextcloud Admins")),
 }
+
+# Convert quota to bytes (1024^3)
+if (quota := user.group_attributes().get("nextcloud_quota")) is not None:
+    data["quota"] = str(quota * 1024**3)
+if (birthdate := user.attributes.get("nextcloud_birthdate")) is not None:
+    data["birthdate"] = str(birthdate)
+
+return data
 EOF
 }
 
@@ -36,6 +46,16 @@ resource "authentik_provider_oauth2" "nextcloud" {
       redirect_uri_type = "authorization",
       url           = "https://nextcloud.pondi.dev/apps/oidc_login/oidc",
     }
+  ]
+
+  grant_types = [
+    "authorization_code",
+    "hybrid",
+    "implicit",
+    "client_credentials",
+    "password",
+    "urn:ietf:params:oauth:grant-type:device_code",
+    "refresh_token"
   ]
 
   property_mappings = [

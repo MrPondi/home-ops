@@ -7,8 +7,9 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-    - ../../../../components/volsync
   dependsOn:
+    - name: external-secrets-store
+      namespace: external-secrets
     - name: longhorn
       namespace: longhorn-system
   interval: 1h
@@ -16,7 +17,7 @@ spec:
   postBuild:
     substitute:
       APP: mssql
-      VOLSYNC_CAPACITY: 8Gi
+      KOPIUR_CAPACITY: 8Gi
       KOPIUR_PUID: "10001"
       KOPIUR_PGID: "10001"
   prune: true

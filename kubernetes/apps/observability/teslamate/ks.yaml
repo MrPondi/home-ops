@@ -7,6 +7,9 @@ metadata:
 spec:
   components:
     - ../../../../components/auth-proxy
+  dependsOn:
+    - name: external-secrets-store
+      namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/observability/teslamate/app
   postBuild:

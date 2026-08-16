@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: &name gemini-3.1-flash-lite
+spec:
+  modelName: *name
+  params:
+    model: gemini/gemini-3.1-flash-lite
+    apiKeyRef:
+      name: litellm-secret
+      key: GEMINI_API_KEY

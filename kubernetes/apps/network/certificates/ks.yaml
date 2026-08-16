@@ -26,7 +26,6 @@ metadata:
 spec:
   dependsOn:
     - name: certificates-import
-      namespace: network
   healthCheckExprs:
     - apiVersion: cert-manager.io/v1
       kind: Certificate

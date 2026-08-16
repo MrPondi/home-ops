@@ -24,6 +24,16 @@ resource "authentik_provider_oauth2" "flux-operator" {
     }
   ]
 
+  grant_types = [
+    "authorization_code",
+    "hybrid",
+    "implicit",
+    "client_credentials",
+    "password",
+    "urn:ietf:params:oauth:grant-type:device_code",
+    "refresh_token"
+  ]
+
   property_mappings = [
     authentik_property_mapping_provider_scope.flux-operator-admin.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,

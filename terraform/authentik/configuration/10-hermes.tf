@@ -6,6 +6,7 @@ resource "authentik_provider_oauth2" "hermes" {
   name          = "Hermes OAuth2 Provider"
   client_id     = jsondecode(data.bitwarden-secrets_secret.hermes.value)["HERMES_OIDC_CLIENT_ID"]
   client_secret = jsondecode(data.bitwarden-secrets_secret.hermes.value)["HERMES_OIDC_CLIENT_SECRET"]
+  client_type   = "public"
 
   authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
   invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
@@ -16,6 +17,16 @@ resource "authentik_provider_oauth2" "hermes" {
       redirect_uri_type = "authorization",
       url           = "https://hermes.pondi.dev/auth/callback",
     }
+  ]
+
+  grant_types = [
+    "authorization_code",
+    "hybrid",
+    "implicit",
+    "client_credentials",
+    "password",
+    "urn:ietf:params:oauth:grant-type:device_code",
+    "refresh_token"
   ]
 
   property_mappings = [

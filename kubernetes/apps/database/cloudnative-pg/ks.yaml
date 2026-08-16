@@ -3,23 +3,6 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: barman-cloud
-  namespace: database
-spec:
-  interval: 1h
-  path: ./kubernetes/apps/database/cloudnative-pg/barman-cloud
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  targetNamespace: database
-  wait: true
----
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
   name: cloudnative-pg
   namespace: database
 spec:
@@ -37,22 +20,36 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: barman-cloud
+  namespace: database
+spec:
+  interval: 1h
+  path: ./kubernetes/apps/database/cloudnative-pg/barman-cloud
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: database
+  wait: true
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: cloudnative-pg-cluster
   namespace: database
 spec:
   dependsOn:
     - name: cloudnative-pg
-      namespace: database
     - name: barman-cloud
-      namespace: database
     - name: external-secrets-store
       namespace: external-secrets
-    - name: openebs
-      namespace: openebs-system
+    - name: miroir-config
+      namespace: miroir-system
   interval: 1h
   path: ./kubernetes/apps/database/cloudnative-pg/cluster
   prune: true
-  retryInterval: 1m
   sourceRef:
     kind: GitRepository
     name: flux-system
