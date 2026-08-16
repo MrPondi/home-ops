@@ -5,16 +5,6 @@ machine:
   ca:
     crt: ref+bw://aed953fc-ef3c-4fd2-8bf6-b46600d71db3/notes#/machine_ca_crt
     key: ref+bw://aed953fc-ef3c-4fd2-8bf6-b46600d71db3/notes#/machine_ca_key
-  features:
-    kubernetesTalosAPIAccess:
-      enabled: true
-      allowedKubernetesNamespaces:
-        - actions-runner-system
-        - ai
-        - system-upgrade
-      allowedRoles:
-        - os:admin
-        - os:reader
 cluster:
   # ca merges as a unit; crt must be repeated alongside key
   ca:
@@ -89,6 +79,19 @@ kind: KubeCoreDNSConfig
 enabled: false
 ---
 apiVersion: v1alpha1
+kind: KubeEtcdEncryptionConfig
+config:
+  resources:
+    - providers:
+        - secretbox:
+            keys:
+              - name: key2
+                secret: ref+bw://aed953fc-ef3c-4fd2-8bf6-b46600d71db3/notes#/cluster_secretboxencryptionsecret
+        - identity: {}
+      resources:
+        - secrets
+---
+apiVersion: v1alpha1
 kind: KubeProxyConfig
 enabled: false
 image: registry.k8s.io/kube-proxy:v1.36.3
@@ -113,6 +116,16 @@ config:
 extraArgs:
   bind-address: 0.0.0.0
 image: registry.k8s.io/kube-scheduler:v1.36.3
+---
+apiVersion: v1alpha1
+kind: KubeTalosAPIAccessConfig
+allowedRoles:
+  - os:admin
+  - os:reader
+allowedKubernetesNamespaces:
+  - actions-runner-system
+  - ai
+  - system-upgrade
 ---
 apiVersion: v1alpha1
 kind: Layer2VIPConfig
