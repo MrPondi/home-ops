@@ -52,36 +52,36 @@ enabled_plugins:
   - Tracker URL remover
   - Unit converter plugin
 
-hostnames: high_priority:ni
-  - (.*)\/blog\/(.*)
-  - (.*\.)?wikipedia.org$
-  - (.*\.)?github.com$
-  - (.*\.)?reddit.com$
-  - (.*\.)?docker.com$
-  - (.*\.)?archlinux.org$
-  - (.*\.)?stackoverflow.com$
-  - (.*\.)?askubuntu.com$
-  - (.*\.)?superuser.com$
+hostnames:
+  high_priority:
+    - (.*)\/blog\/(.*)
+    - (.*\.)?wikipedia.org$
+    - (.*\.)?github.com$
+    - (.*\.)?reddit.com$
+    - (.*\.)?docker.com$
+    - (.*\.)?archlinux.org$
+    - (.*\.)?stackoverflow.com$
+    - (.*\.)?askubuntu.com$
+    - (.*\.)?superuser.com$
 
-# # Engines disabled because they were rate-limiting / captcha-ing this instance's
-# # single egress IP. Merged by `name` against use_default_settings. If an engine
-# # stops failing after traffic drops, it can be re-enabled here.
-# engines:
-#   # startpage is notoriously captcha-aggressive and was returning "Suspended: CAPTCHA".
-#   - name: startpage
-#     disabled: false
-#   # karmasearch was returning "Suspended: access denied". NOTE: karmasearch is
-#   # NOT a stock SearXNG engine in the default bundle (no matching name in
-#   # upstream settings.yml). If this entry doesn't take effect, confirm the
-#   # engine's exact `name:` field in the running instance (UI: Preferences ->
-#   # Engines, or `kubectl exec` into the pod and grep the bundled settings).
-#   - name: karmasearch
-#     disabled: false
-#   # brave (HTML scraper) gets IP-blocked like Google/DDG. The API-backed engine
-#   # `braveapi` is quota-based and reliable. It is inactive by default; enabling
-#   # it here and providing api_key routes Brave queries through the official API.
-#   # The key is injected at apply time: Flux postBuild.substituteFrom reads the
-#   # searxng Brave key from the searxng-brave ExternalSecret (1Password-backed).
-#   - name: braveapi
-#     disabled: false
-#     api_key: "{{ .BRAVE_API_KEY }}"
+# Engines disabled because they were rate-limiting / captcha-ing this instance's
+# single egress IP. Merged by `name` against use_default_settings. If an engine
+# stops failing after traffic drops, it can be re-enabled here.
+engines:
+  - name: ahmia
+    inactive: true
+  - name: torch
+    inactive: true
+  # startpage is notoriously captcha-aggressive and was returning "Suspended: CAPTCHA".
+  - name: startpage
+    disabled: true
+  # karmasearch was returning "Suspended: access denied".
+  - name: karmasearch
+    disabled: true
+  # brave was returning "Suspended: too many requests".
+  - name: brave
+    disabled: true
+  # Brave (HTML scraper) gets IP-blocked like Google/DDG. The API-backed engine `braveapi` is quota-based and reliable.
+  # - name: braveapi
+  #   disabled: true
+  #   api_key: "{{ .BRAVE_API_KEY }}"

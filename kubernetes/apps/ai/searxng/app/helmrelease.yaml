@@ -20,7 +20,7 @@ spec:
             env:
               SEARXNG_BASE_URL: https://search.pondi.dev
               SEARXNG_PORT: &port 8080
-              SEARXNG_REDIS_URL: "redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379"
+              SEARXNG_VALKEY_URL: "redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379"
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
@@ -66,12 +66,12 @@ spec:
     persistence:
       config:
         type: configMap
-        name: "{{ .Release.Name }}-configmap"
+        name: "{{ .Release.Name }}-config"
         globalMounts:
           - path: /etc/searxng/settings.yml
             subPath: settings.yml
-          # - path: /etc/searxng/limiter.toml
-          #   subPath: limiter.toml
+          - path: /etc/searxng/limiter.toml
+            subPath: limiter.toml
       tmp:
         type: emptyDir
         globalMounts:

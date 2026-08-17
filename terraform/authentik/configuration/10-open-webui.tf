@@ -30,7 +30,7 @@ resource "authentik_provider_oauth2" "open-webui" {
     {
       matching_mode = "strict",
       redirect_uri_type = "authorization",
-      url           = "https://chat.pondi.dev/auth/callback",
+      url           = "https://chat.pondi.dev/oauth/oidc/callback",
     }
   ]
 
