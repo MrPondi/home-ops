@@ -80,9 +80,9 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
         containers:
-          app:
+          gateway:
             image: *image
-            args: ["gateway", "run"]
+            args: ["gateway", "run", "--no-supervise"]
             env:
               HOME: /opt/data
               HERMES_HOME: /opt/data
@@ -158,7 +158,7 @@ spec:
         fsGroup: 10000
         fsGroupChangePolicy: OnRootMismatch
     service:
-      app:
+      gateway:
         ports:
           http:
             port: 8642
@@ -198,7 +198,7 @@ spec:
             namespace: network
         rules:
           - backendRefs:
-              - identifier: app
+              - identifier: gateway
                 port: whatsapp
             matches:
               - path:
@@ -224,7 +224,7 @@ spec:
           hermes:
             1-init:
               - path: /run-app
-            app:
+            gateway:
               - path: /run
 
       run-dashboard:
