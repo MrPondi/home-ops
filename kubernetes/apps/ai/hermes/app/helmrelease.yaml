@@ -176,7 +176,7 @@ spec:
           gethomepage.dev/group: Home & Automation
           gethomepage.dev/icon: mdi-robot-happy-outline
           gethomepage.dev/description: Nous Hermes agent
-          gethomepage.dev/weight: "5"
+          gethomepage.dev/weight: "2"
           gethomepage.dev/app: hermes
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"

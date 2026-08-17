@@ -81,6 +81,14 @@ spec:
           - port: http
     route:
       app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Open WebUI
+          gethomepage.dev/group: Home & Automation
+          gethomepage.dev/icon: open-webui-light
+          gethomepage.dev/description: Chat interface for local LLMs
+          gethomepage.dev/weight: "1"
+          gethomepage.dev/app: hermes
         hostnames:
           - "chat.pondi.dev"
         parentRefs:
