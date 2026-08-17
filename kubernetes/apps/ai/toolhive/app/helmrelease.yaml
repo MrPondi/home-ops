@@ -13,7 +13,7 @@ spec:
     operator:
       resources:
         requests:
-          memory: 256Mi
+          memory: 128Mi
         limits:
           memory: 512Mi
       gc:
