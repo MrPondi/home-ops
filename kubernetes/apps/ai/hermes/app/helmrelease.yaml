@@ -87,6 +87,7 @@ spec:
               HOME: /opt/data
               HERMES_HOME: /opt/data
               WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
+              SEARXNG_URL: http://searxng.ai.svc.cluster.local:8080
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:

@@ -49,6 +49,6 @@ resource "authentik_application" "toolhive" {
 
 resource "authentik_policy_binding" "toolhive-access" {
   target = authentik_application.toolhive.uuid
-  group  = authentik_group.ai-access.id
+  group  = authentik_group.ai-admins.id
   order  = 10
 }

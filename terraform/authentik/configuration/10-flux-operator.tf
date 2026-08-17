@@ -5,7 +5,14 @@ data "bitwarden-secrets_secret" "flux-operator" {
 resource "authentik_property_mapping_provider_scope" "flux-operator-admin" {
   name       = "Flux Operator Admin"
   scope_name = "admin"
-  expression = "return { 'admin': 'True' } if request.user.is_superuser or ak_is_group_member(request.user, name='Flux Operator Admins') else {}"
+  expression = <<EOF
+entitlement_names = {
+  entitlement.name
+  for entitlement in request.user.app_entitlements(provider.application)
+}
+
+return { "admin": "True" } if request.user.is_superuser or "Admins" in entitlement_names else {}
+EOF
 }
 
 resource "authentik_provider_oauth2" "flux-operator" {
@@ -61,6 +68,18 @@ resource "authentik_group" "flux-operator-admins" {
   name         = "Flux Operator Admins"
   parents      = [authentik_group.flux-operator-users.id]
 }
+
+resource "authentik_application_entitlement" "flux-operator-admins" {
+  name        = "Admins"
+  application = authentik_application.flux-operator.uuid
+}
+
+resource "authentik_policy_binding" "flux-operator-admins-access" {
+  target = authentik_application_entitlement.flux-operator-admins.id
+  group  = authentik_group.flux-operator-admins.id
+  order  = 10
+}
+
 
 resource "authentik_policy_binding" "flux-operator-access" {
   target = authentik_application.flux-operator.uuid

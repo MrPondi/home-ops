@@ -1,21 +1,20 @@
-resource "authentik_property_mapping_provider_scope" "nextcloud-profile" {
+resource "authentik_property_mapping_provider_scope" "nextcloud-scope" {
   name       = "Nextcloud Profile"
   scope_name = "nextcloud"
   expression = <<EOF
 user = request.user
 
-# Extract Nextcloud groups
-nc_groups = [
-    group.name.removeprefix("nextcloud-")
-    for group in user.ak_groups.all()
-    if group.name.startswith("nextcloud-")
-]
+entitlement_names = {
+  entitlement.name
+  for entitlement in request.user.app_entitlements(provider.application)
+}
+entitlement_names.add("Users")
 
 data = {
     "name": user.name,
-    "nc-groups": nc_groups,
-    "avatar": user.avatar,
-    "is_admin": str(user.is_superuser or ak_is_group_member(user, name="Nextcloud Admins")),
+    "nc-groups": entitlement_names,
+    "picture": user.avatar,
+    "is_admin": str(user.is_superuser or "Admins" in entitlement_names),
 }
 
 # Convert quota to bytes (1024^3)
@@ -59,7 +58,7 @@ resource "authentik_provider_oauth2" "nextcloud" {
   ]
 
   property_mappings = [
-    authentik_property_mapping_provider_scope.nextcloud-profile.id,
+    authentik_property_mapping_provider_scope.nextcloud-scope.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
@@ -85,6 +84,17 @@ resource "authentik_group" "nextcloud-users" {
 resource "authentik_group" "nextcloud-admins" {
   name         = "Nextcloud Admins"
   parents      = [authentik_group.nextcloud-users.id]
+}
+
+resource "authentik_application_entitlement" "nextcloud-admins" {
+  name        = "Admins"
+  application = authentik_application.nextcloud.uuid
+}
+
+resource "authentik_policy_binding" "nextcloud-admins-access" {
+  target = authentik_application_entitlement.nextcloud-admins.id
+  group  = authentik_group.nextcloud-admins.id
+  order  = 10
 }
 
 resource "authentik_policy_binding" "nextcloud-access" {

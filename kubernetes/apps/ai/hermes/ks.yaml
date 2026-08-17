@@ -12,6 +12,8 @@ spec:
       namespace: external-secrets
     - name: longhorn
       namespace: longhorn-system
+    - name: searxng
+      namespace: ai
   interval: 1h
   path: ./kubernetes/apps/ai/hermes/app
   postBuild:

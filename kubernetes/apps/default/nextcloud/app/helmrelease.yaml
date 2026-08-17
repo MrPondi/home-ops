@@ -112,7 +112,7 @@ spec:
                 'mail' => 'email',
                 'quota' => 'quota',
                 'groups' => 'nc-groups',
-                'photoURL' => 'avatar',
+                'photoURL' => 'picture',
                 'is_admin' => 'is_admin',
                 'birthdate' => 'birthdate',
             ),

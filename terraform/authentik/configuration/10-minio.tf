@@ -2,14 +2,19 @@ data "bitwarden-secrets_secret" "minio" {
   id = "bf6713b4-8ae0-4100-9208-b3dc00d6a8ae"
 }
 
-resource "authentik_property_mapping_provider_scope" "minio-policy" {
+resource "authentik_property_mapping_provider_scope" "minio-scope" {
   name       = "MinIO Policy"
   scope_name = "policy"
   expression = <<EOF
+entitlement_names = {
+  entitlement.name
+  for entitlement in request.user.app_entitlements(provider.application)
+}
+
 return {
   "policy": "consoleAdmin"
     if request.user.is_superuser
-    or ak_is_group_member(request.user, name="MinIO Admins")
+    or "Admins" in entitlement_names
     else "readonly"
 }
 EOF
@@ -42,7 +47,7 @@ resource "authentik_provider_oauth2" "minio" {
   ]
 
   property_mappings = [
-    authentik_property_mapping_provider_scope.minio-policy.id,
+    authentik_property_mapping_provider_scope.minio-scope.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
@@ -67,6 +72,17 @@ resource "authentik_group" "minio-users" {
 resource "authentik_group" "minio-admins" {
   name         = "MinIO Admins"
   parents      = [authentik_group.minio-users.id]
+}
+
+resource "authentik_application_entitlement" "minio-admins" {
+  name        = "Admins"
+  application = authentik_application.minio.uuid
+}
+
+resource "authentik_policy_binding" "minio-admins-access" {
+  target = authentik_application_entitlement.minio-admins.id
+  group  = authentik_group.minio-admins.id
+  order  = 10
 }
 
 resource "authentik_policy_binding" "minio-access" {

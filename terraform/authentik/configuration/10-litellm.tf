@@ -50,8 +50,13 @@ resource "authentik_group" "ai-access" {
   name         = "AI access"
 }
 
+resource "authentik_group" "ai-admins" {
+  name         = "AI Admins"
+  parents      = [authentik_group.ai-access.id]
+}
+
 # resource "authentik_policy_binding" "litellm-access" {
 #   target = authentik_application.litellm.uuid
-#   group  = authentik_group.ai-access.id
+#   group  = authentik_group.ai-admins.id
 #   order  = 10
 # }
