@@ -82,7 +82,7 @@ spec:
         containers:
           gateway:
             image: *image
-            args: ["gateway", "run", "--no-supervise"]
+            args: ["sleep", "inifinity"]
             env:
               HOME: /opt/data
               HERMES_HOME: /opt/data
