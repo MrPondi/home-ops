@@ -88,10 +88,38 @@ spec:
               HERMES_HOME: /opt/data
               WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
               SEARXNG_URL: http://searxng.ai.svc.cluster.local:8080
+              API_SERVER_ENABLED: true
+              API_SERVER_HOST: 0.0.0.0
+              API_SERVER_PORT: &api-port 8642
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: &httpGet
+                    path: /health
+                    port: *api-port
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *httpGet
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *httpGet
+                  timeoutSeconds: 5
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -111,10 +139,12 @@ spec:
             env:
               HOME: /opt/data
               HERMES_HOME: /opt/data
+              HERMES_DASHBOARD_PORT: &dashboard-port 9119
+              GATEWAY_HEALTH_URL: http://localhost:8642
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
-                  name: hermes-dashboard-secret
+                  name: "{{ .Release.Name }}-dashboard-secret"
             probes:
               startup:
                 enabled: true
@@ -122,7 +152,7 @@ spec:
                 spec:
                   httpGet: &httpGet
                     path: /api/status
-                    port: &dashboard-port 9119
+                    port: *dashboard-port
                   initialDelaySeconds: 10
                   periodSeconds: 5
                   timeoutSeconds: 5
@@ -160,8 +190,8 @@ spec:
     service:
       gateway:
         ports:
-          http:
-            port: 8642
+          api:
+            port: *api-port
           whatsapp:
             port: *whatsapp-port
       dashboard:
