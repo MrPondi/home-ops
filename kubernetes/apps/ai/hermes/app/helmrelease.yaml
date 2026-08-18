@@ -48,8 +48,8 @@ spec:
                   rm -rf /tmp/ffmpeg
                 fi
 
-                chown -R 10000:10000 /run-app /run-dashboard /opt/data
-                chmod 755 /run-app /run-dashboard
+                chown -R 10000:10000 /run /opt/data
+                chmod 755 /run
             securityContext:
               runAsUser: 0
               runAsGroup: 0
@@ -80,7 +80,7 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
         containers:
-          gateway:
+          app:
             image: *image
             args: ["sleep", "infinity"]
             env:
@@ -88,33 +88,16 @@ spec:
               HERMES_HOME: /opt/data
               WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
               SEARXNG_URL: http://searxng.ai.svc.cluster.local:8080
+              HERMES_DASHBOARD: true
+              HERMES_DASHBOARD_HOST: 0.0.0.0
+              HERMES_DASHBOARD_PORT: &dashboard-port 9119
+              API_SERVER_ENABLED: true
+              API_SERVER_HOST: 0.0.0.0
+              API_SERVER_PORT: &api-port 8642
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 100m
-                memory: 512Mi
-              limits:
-                memory: 2Gi
-          dashboard:
-            image: *image
-            args:
-              - dashboard
-              - --host
-              - "0.0.0.0"
-            env:
-              HOME: /opt/data
-              HERMES_HOME: /opt/data
-              TZ: Europe/Warsaw
-            envFrom:
-              - secretRef:
-                  name: hermes-dashboard-secret
             probes:
               startup:
                 enabled: true
@@ -122,7 +105,7 @@ spec:
                 spec:
                   httpGet: &httpGet
                     path: /api/status
-                    port: &dashboard-port 9119
+                    port: *dashboard-port
                   initialDelaySeconds: 10
                   periodSeconds: 5
                   timeoutSeconds: 5
@@ -147,9 +130,9 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                memory: 256Mi
+                memory: 512Mi
               limits:
-                memory: 1Gi
+                memory: 2Gi
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -158,16 +141,14 @@ spec:
         fsGroup: 10000
         fsGroupChangePolicy: OnRootMismatch
     service:
-      gateway:
-        ports:
-          http:
-            port: 8642
-          whatsapp:
-            port: *whatsapp-port
-      dashboard:
+      app:
         ports:
           http:
             port: *dashboard-port
+          api:
+            port: *api-port
+          whatsapp:
+            port: *whatsapp-port
     route:
       dashboard:
         annotations:
@@ -185,8 +166,7 @@ spec:
             namespace: network
         rules:
           - backendRefs:
-              - identifier: dashboard
-                port: http
+              - port: http
       whatsapp-webhook:
         annotations:
           gatus.home-operations.com/endpoint: |-
@@ -198,8 +178,7 @@ spec:
             namespace: network
         rules:
           - backendRefs:
-              - identifier: gateway
-                port: whatsapp
+              - port: whatsapp
             matches:
               - path:
                   type: PathPrefix
@@ -218,22 +197,13 @@ spec:
             1-init:
               - path: /tmp/config.yaml
                 subPath: config.yaml
-      run-app:
+      run:
         type: emptyDir
         advancedMounts:
           hermes:
             1-init:
-              - path: /run-app
-            gateway:
               - path: /run
-
-      run-dashboard:
-        type: emptyDir
-        advancedMounts:
-          hermes:
-            1-init:
-              - path: /run-dashboard
-            dashboard:
+            app:
               - path: /run
       tmp:
         type: emptyDir
