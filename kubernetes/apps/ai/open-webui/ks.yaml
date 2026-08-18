@@ -27,6 +27,9 @@ spec:
   postBuild:
     substitute:
       APP: open-webui
+    substituteFrom:
+      - kind: Secret
+        name: open-webui-postbuild-secret
   prune: true
   sourceRef:
     kind: GitRepository
