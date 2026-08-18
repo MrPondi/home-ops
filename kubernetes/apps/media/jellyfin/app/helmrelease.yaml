@@ -22,23 +22,22 @@ spec:
             env:
               TZ: Europe/Warsaw
             probes:
-              liveness: &probes
+              liveness:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet:
+                  httpGet: &httpGet
                     path: /health
                     port: &port 8096
-                  initialDelaySeconds: 0
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 3
-              readiness: *probes
-              startup:
+                  periodSeconds: 30
+                  timeoutSeconds: 3
+              readiness:
                 enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 10
+                  httpGet: *httpGet
+                  periodSeconds: 15
+                  timeoutSeconds: 3
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

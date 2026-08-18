@@ -10,6 +10,7 @@ spec:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   dependsOn:
+    - name: app-postbuild
     - name: external-secrets-store
       namespace: external-secrets
     - name: longhorn
@@ -19,6 +20,9 @@ spec:
   postBuild:
     substitute:
       APP: radarr
+    substituteFrom:
+      - kind: Secret
+        name: radarr-postbuild-secret
   prune: true
   sourceRef:
     kind: GitRepository

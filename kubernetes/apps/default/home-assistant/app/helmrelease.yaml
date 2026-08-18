@@ -27,25 +27,20 @@ spec:
             probes:
               liveness:
                 enabled: true
+                custom: true
                 spec:
+                  httpGet: &httpGet
+                    path: /healthz
+                    port: &port 8123
                   periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
+                  timeoutSeconds: 3
               readiness:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet:
-                    path: /healthz
-                    port: &port 8123
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              startup:
-                enabled: true
-                spec:
-                  failureThreshold: 30
-                  periodSeconds: 10
+                  httpGet: *httpGet
+                  periodSeconds: 15
+                  timeoutSeconds: 3
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

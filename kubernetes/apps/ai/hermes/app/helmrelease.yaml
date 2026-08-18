@@ -96,22 +96,14 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             probes:
-              startup:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet: &httpGet
-                    path: /health
-                    port: *api-port
-                  periodSeconds: 5
-                  timeoutSeconds: 3
-                  failureThreshold: 30
               liveness:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: *httpGet
-                  periodSeconds: 15
+                  httpGet:
+                    path: /health
+                    port: *api-port
+                  periodSeconds: 30
                   timeoutSeconds: 5
               readiness:
                 enabled: true
@@ -123,7 +115,7 @@ spec:
                     httpHeaders:
                       - name: Authorization
                         value: "Bearer ${PROBE_API_KEY}"
-                  periodSeconds: 10
+                  periodSeconds: 15
                   timeoutSeconds: 3
             securityContext:
               allowPrivilegeEscalation: false
@@ -151,21 +143,13 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-dashboard-secret"
             probes:
-              startup:
+              liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet: &httpGet
                     path: /api/status
                     port: *dashboard-port
-                  periodSeconds: 5
-                  timeoutSeconds: 3
-                  failureThreshold: 30
-              liveness:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet: *httpGet
                   periodSeconds: 15
                   timeoutSeconds: 3
               readiness:

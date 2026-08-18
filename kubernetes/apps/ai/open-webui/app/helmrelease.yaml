@@ -51,22 +51,14 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             probes:
-              startup:
-                enabled: true
-                custom: true
-                spec:
-                  httpGet: &httpGet
-                    path: /health
-                    port: &port 8080
-                  periodSeconds: 5
-                  timeoutSeconds: 3
-                  failureThreshold: 30
               liveness:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: *httpGet
-                  periodSeconds: 15
+                  httpGet:
+                    path: /health
+                    port: &port 8080
+                  periodSeconds: 30
                   timeoutSeconds: 3
               readiness:
                 enabled: true
@@ -78,7 +70,7 @@ spec:
                     httpHeaders:
                       - name: x-api-key
                         value: "${PROBE_API_KEY}"
-                  periodSeconds: 10
+                  periodSeconds: 15
                   timeoutSeconds: 3
             securityContext:
               allowPrivilegeEscalation: false

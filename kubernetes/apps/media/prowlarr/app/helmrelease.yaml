@@ -36,25 +36,25 @@ spec:
             probes:
               liveness:
                 enabled: true
-                spec:
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              readiness:
-                enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /ping
                     port: *port
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              startup:
+                  periodSeconds: 30
+                  timeoutSeconds: 3
+              readiness:
                 enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
-                  periodSeconds: 10
+                  httpGet:
+                    path: /api/v1/health
+                    port: *port
+                    httpHeaders:
+                      - name: X-Api-Key
+                        value: "${PROBE_API_KEY}"
+                  periodSeconds: 15
+                  timeoutSeconds: 3
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
