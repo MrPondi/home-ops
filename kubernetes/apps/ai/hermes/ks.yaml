@@ -8,6 +8,7 @@ spec:
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
+    - name: app-postbuild
     - name: external-secrets-store
       namespace: external-secrets
     - name: longhorn
@@ -21,6 +22,9 @@ spec:
       APP: hermes
       KOPIUR_PUID: "10000"
       KOPIUR_PGID: "10000"
+    substituteFrom:
+      - kind: Secret
+        name: hermes-postbuild-secret
   prune: true
   sourceRef:
     kind: GitRepository

@@ -103,23 +103,28 @@ spec:
                   httpGet: &httpGet
                     path: /health
                     port: *api-port
-                  initialDelaySeconds: 10
                   periodSeconds: 5
-                  timeoutSeconds: 5
+                  timeoutSeconds: 3
                   failureThreshold: 30
               liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet: *httpGet
-                  periodSeconds: 30
+                  periodSeconds: 15
                   timeoutSeconds: 5
               readiness:
                 enabled: true
                 custom: true
                 spec:
-                  httpGet: *httpGet
-                  timeoutSeconds: 5
+                  httpGet:
+                    path: /health/detailed
+                    port: *api-port
+                    httpHeaders:
+                      - name: Authorization
+                        value: "Bearer ${PROBE_API_KEY}"
+                  periodSeconds: 10
+                  timeoutSeconds: 3
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -153,23 +158,23 @@ spec:
                   httpGet: &httpGet
                     path: /api/status
                     port: *dashboard-port
-                  initialDelaySeconds: 10
                   periodSeconds: 5
-                  timeoutSeconds: 5
+                  timeoutSeconds: 3
                   failureThreshold: 30
               liveness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet: *httpGet
-                  periodSeconds: 30
-                  timeoutSeconds: 5
+                  periodSeconds: 15
+                  timeoutSeconds: 3
               readiness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet: *httpGet
-                  timeoutSeconds: 5
+                  periodSeconds: 10
+                  timeoutSeconds: 3
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

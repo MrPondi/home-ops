@@ -31,6 +31,7 @@ spec:
               WEBUI_URL: https://chat.pondi.dev
               CORS_ALLOW_ORIGIN: https://chat.pondi.dev
               ENABLE_VERSION_UPDATE_CHECK: "false"
+              ENABLE_API_KEYS: "true"
               DEFAULT_LOCALE: pl
               TOOL_SERVER_CONNECTIONS: '[{"type":"mcp","url":"http://vmcp-mcp-gateway-internal.ai.svc.cluster.local:4483/mcp","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"mcp-gateway","name":"MCP Gateway","description":""}}]'
               # SearXNG
@@ -49,18 +50,35 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             probes:
-              liveness: &probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: &httpGet
+                    path: /health
+                    port: &port 8080
+                  periodSeconds: 5
+                  timeoutSeconds: 3
+                  failureThreshold: 30
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *httpGet
+                  periodSeconds: 15
+                  timeoutSeconds: 3
+              readiness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
-                    path: /health
-                    port: &port 8080
-                  initialDelaySeconds: 0
+                    path: /api/models
+                    port: *port
+                    httpHeaders:
+                      - name: x-api-key
+                        value: "Bearer ${PROBE_API_KEY}"
                   periodSeconds: 10
-                  timeoutSeconds: 1
-                  failureThreshold: 3
-              readiness: *probes
+                  timeoutSeconds: 3
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -86,7 +104,6 @@ spec:
           gethomepage.dev/icon: open-webui-light
           gethomepage.dev/description: Chat interface for local LLMs
           gethomepage.dev/weight: "1"
-          gethomepage.dev/app: hermes
         hostnames:
           - "chat.pondi.dev"
         parentRefs:

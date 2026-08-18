@@ -44,6 +44,7 @@ spec:
     - ../../../../components/dragonfly
   dependsOn:
     - name: toolhive-operator
+    - name: app-postbuild
     - name: dragonfly-operator
       namespace: database
     - name: external-secrets-store
@@ -60,7 +61,7 @@ spec:
       APP: toolhive
     substituteFrom:
       - kind: Secret
-        name: toolhive-oidc-secret
+        name: toolhive-postbuild-secret
   prune: true
   sourceRef:
     kind: GitRepository
