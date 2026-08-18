@@ -12,6 +12,8 @@ spec:
   values:
     controllers:
       open-webui:
+        annotations:
+          reloader.stakater.com/auto: "true"
         initContainers:
           postgres-init:
             image:
