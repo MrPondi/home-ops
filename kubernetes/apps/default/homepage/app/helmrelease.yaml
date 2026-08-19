@@ -27,7 +27,7 @@ spec:
                   fieldRef:
                     fieldPath: status.podIP
               - name: HOMEPAGE_ALLOWED_HOSTS
-                value: "$(POD_IP):3000,{{ .Release.Name }}.pondi.dev"
+                value: "$(POD_IP):3000,{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local,{{ .Release.Name }}.pondi.dev"
               - name: TZ
                 value: Europe/Warsaw
             envFrom:
