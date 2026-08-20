@@ -8,9 +8,6 @@ spec:
   components:
     - ../../../../components/auth-proxy
     - ../../../../components/kopiur/backup
-  dependsOn:
-    - name: longhorn
-      namespace: longhorn-system
   interval: 1h
   path: ./kubernetes/apps/default/zwave/app
   postBuild:

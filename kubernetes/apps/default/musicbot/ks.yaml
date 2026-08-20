@@ -26,8 +26,6 @@ metadata:
 spec:
   dependsOn:
     - name: yt-cipher
-    - name: longhorn
-      namespace: longhorn-system
   interval: 1h
   path: ./kubernetes/apps/default/musicbot/lavalink
   prune: true

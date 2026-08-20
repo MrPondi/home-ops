@@ -7,9 +7,6 @@ metadata:
 spec:
   components:
     - ../../../../components/auth-proxy
-  dependsOn:
-    - name: longhorn
-      namespace: longhorn-system
   interval: 1h
   path: ./kubernetes/apps/observability/victoria-logs/app
   postBuild:

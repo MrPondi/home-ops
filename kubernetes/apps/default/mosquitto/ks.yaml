@@ -7,9 +7,6 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-  dependsOn:
-    - name: longhorn
-      namespace: longhorn-system
   interval: 1h
   path: ./kubernetes/apps/default/mosquitto/app
   postBuild:

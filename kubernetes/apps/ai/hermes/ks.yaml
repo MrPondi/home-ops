@@ -11,8 +11,6 @@ spec:
     - name: app-postbuild
     - name: external-secrets-store
       namespace: external-secrets
-    - name: longhorn
-      namespace: longhorn-system
     - name: searxng
       namespace: ai
   interval: 1h
