@@ -14,7 +14,7 @@ postinstall = "lefthook install"
 [tools]
 flux2 = "2.9.4"
 gh = "2.97.0"
-gum = "0.17.0"
+gum = "2.0.0"
 helm = "4.2.4"
 helmfile = "1.7.4"
 jq = "1.8.2"
