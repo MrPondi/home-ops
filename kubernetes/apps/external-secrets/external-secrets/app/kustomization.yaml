@@ -8,3 +8,4 @@ resources:
   - ./helmrelease.yaml
   - ./ocirepository.yaml
   # - ./pdb.yaml # Not for single node clusters
+  - ./pki.yaml

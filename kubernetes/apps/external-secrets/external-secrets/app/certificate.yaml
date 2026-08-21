@@ -6,7 +6,6 @@ metadata:
   name: &name bitwarden-tls-certs
 spec:
   secretName: *name
-  commonName: bitwarden-sdk-server.external-secrets.svc.cluster.local
   dnsNames:
     - bitwarden-sdk-server.external-secrets
     - bitwarden-sdk-server.external-secrets.svc
@@ -20,6 +19,6 @@ spec:
     encoding: PKCS8
     size: 2048
   issuerRef:
-    name: selfsigned-internal
-    kind: ClusterIssuer
+    name: bitwarden-certificate-issuer
+    kind: Issuer
     group: cert-manager.io
