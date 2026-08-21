@@ -24,7 +24,7 @@ spec:
           issuerUrl: https://auth.pondi.dev/application/o/toolhive/
           clientId: ${TOOLHIVE_OIDC_CLIENT_ID}
           clientSecretRef:
-            name: toolhive-oidc-secret
+            name: toolhive-secret
             key: TOOLHIVE_OIDC_CLIENT_SECRET
           redirectUri: https://mcp.pondi.dev/oauth/callback
           scopes:
