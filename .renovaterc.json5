@@ -8,7 +8,7 @@
     "github>home-operations/renovate-presets//apps/talosFactory.json5#8.1.0",
     ":timezone(Europe/Warsaw)",
   ],
-  assignAutomerge: "false",
+  reviewers: ["@MrPondi"],
   lockFileMaintenance: {
     enabled: true,
     schedule: ["before 3am on the first day of the month"],
