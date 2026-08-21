@@ -3,7 +3,7 @@
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
-  name: external-secrets-selfsign
+  name: selfsign-bootstrap
 spec:
   selfSigned: {}
 ---
@@ -11,22 +11,22 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: external-secrets-ca
+  name: internal-root-ca
 spec:
-  # this is discouraged but required by ios
-  commonName: external-secrets-ca
-  secretName: external-secrets-ca
-  duration: 43800h # 5y
   isCA: true
+  commonName: internal-root-ca
+  secretName: internal-root-ca-secret
+  duration: 43800h # 5y
+  renewBefore: 8760h # 1y
   issuerRef:
-    name: external-secrets-selfsign
+    name: selfsign-bootstrap
     kind: Issuer
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/issuer_v1.json
 apiVersion: cert-manager.io/v1
-kind: Issuer
+kind: ClusterIssuer
 metadata:
-  name: external-secrets-ca
+  name: selfsigned-internal
 spec:
   ca:
-    secretName: external-secrets-ca
+    secretName: internal-root-ca-secret

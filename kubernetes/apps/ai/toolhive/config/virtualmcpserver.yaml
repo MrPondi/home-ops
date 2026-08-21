@@ -8,8 +8,8 @@ spec:
   authServerConfig:
     issuer: https://mcp.pondi.dev
     signingKeySecretRefs:
-      - name: toolhive-secret
-        key: AUTH_SIGNING_KEY
+      - name: toolhive-signing-key-secret
+        key: tls.key
     hmacSecretRefs:
       - name: toolhive-secret
         key: AUTH_HMAC_KEY

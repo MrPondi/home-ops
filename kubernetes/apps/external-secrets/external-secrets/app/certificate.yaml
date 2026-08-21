@@ -20,6 +20,6 @@ spec:
     encoding: PKCS8
     size: 2048
   issuerRef:
-    name: external-secrets-ca
-    kind: Issuer
+    name: selfsigned-internal
+    kind: ClusterIssuer
     group: cert-manager.io

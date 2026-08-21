@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./cloudflare.yaml
   - ./externalsecret.yaml
+  - ./selfsigned.yaml
