@@ -48,7 +48,7 @@ spec:
       app:
         type: LoadBalancer
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: smtp-relay.pondi.dev
+          external-dns.kubernetes.io/hostname: smtp-relay.pondi.dev
           gatus.home-operations.com/endpoint: |-
             group: services
           lbipam.cilium.io/ips: 10.0.30.122

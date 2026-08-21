@@ -119,7 +119,7 @@ resource "authentik_outpost" "ldap" {
         },
         {
           "op"   : "add",
-          "path" : "/metadata/annotations/external-dns.alpha.kubernetes.io~1hostname",
+          "path" : "/metadata/annotations/external-dns.kubernetes.io~1hostname",
           "value": "ldap.pondi.dev"
         },
         {
