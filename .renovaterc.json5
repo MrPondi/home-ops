@@ -168,9 +168,9 @@
 
   customManagers: [
     {
-      customType: "regex",
       description: "Process Lavalink plugin dependencies",
-      managerFilePatterns: ["/lavalink/.*\\.yaml(?:\\.j2)?$/"],
+      customType: "regex",
+      managerFilePatterns: ["/lavalink/.+\\.ya?ml(?:\\.j2)?$/"],
       matchStrings: [
         '- dependency: "(?<depName>[^:]+:[^:]+):(?<currentValue>[^"]+)"[^\\n]*\\n\\s+repository:\\s*"(?<registryUrl>[^"]+)"',
       ],
