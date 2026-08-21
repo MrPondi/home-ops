@@ -11,7 +11,7 @@ spec:
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: external-secrets-ca
+  name: bitwarden-ca-certificate
 spec:
   isCA: true
   # this is discouraged but required by ios
@@ -27,7 +27,7 @@ spec:
     size: 2048
   issuerRef:
     name: bitwarden-bootstrap-issuer
-    kind: ClusterIssuer
+    kind: Issuer
     group: cert-manager.io
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cert-manager.io/issuer_v1.json
