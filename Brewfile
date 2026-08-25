@@ -25,4 +25,5 @@ cask "home-operations/tap/yayamlls"
 # Package manager for kubectl plugins
 brew "krew"
 krew "browse-pvc"
+krew "cnpg"
 krew "view-secret"

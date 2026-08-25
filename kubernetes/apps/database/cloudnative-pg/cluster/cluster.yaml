@@ -53,8 +53,6 @@ spec:
       disabledDefaultServices:
         - "r"
         - "ro"
-  monitoring:
-    enablePodMonitor: true
   bootstrap:
     recovery:
       source: source
@@ -80,3 +78,16 @@ spec:
   pluginConfiguration:
     name: barman-cloud.cloudnative-pg.io
   schedule: "@daily"
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/podmonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: cloudnative-pg
+spec:
+  podMetricsEndpoints:
+    - port: metrics
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: cloudnative-pg
+      app.kubernetes.io/name: cloudnative-pg
