@@ -11,6 +11,5 @@ configMapGenerator:
   - name: homepage-resources
     files:
       - popcorn.svg=./resources/popcorn.svg
-      - konflate.svg=./resources/konflate.svg
 generatorOptions:
   disableNameSuffixHash: true

@@ -27,7 +27,7 @@ spec:
         gethomepage.dev/enabled: "true"
         gethomepage.dev/name: Konflate
         gethomepage.dev/group: Monitoring & Operations
-        gethomepage.dev/icon: /icons/konflate.svg
+        gethomepage.dev/icon: konflate
         gethomepage.dev/description: Pull request review tool
         gethomepage.dev/weight: "40"
       parentRefs:
