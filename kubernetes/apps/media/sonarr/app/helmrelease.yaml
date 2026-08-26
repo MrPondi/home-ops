@@ -27,7 +27,9 @@ spec:
               SONARR__LOG__ANALYTICSENABLED: "False"
               SONARR__LOG__DBENABLED: "False"
               SONARR__LOG__LEVEL: info
+              SONARR__SERVER__ALLOWEDHOSTS: sonarr.pondi.dev,sonarr.media.svc.cluster.local
               SONARR__SERVER__PORT: &port 80
+              SONARR__SERVER__TRUSTEDNETWORKS: 10.42.0.0/16
               SONARR__UPDATE__BRANCH: develop
               TZ: Europe/Warsaw
             envFrom:
@@ -41,6 +43,9 @@ spec:
                   httpGet:
                     path: /ping
                     port: *port
+                    httpHeaders:
+                      - name: Host
+                        value: localhost
                   periodSeconds: 30
                   timeoutSeconds: 3
               readiness:
@@ -53,6 +58,8 @@ spec:
                     httpHeaders:
                       - name: X-Api-Key
                         value: "${PROBE_API_KEY}"
+                      - name: Host
+                        value: localhost
                   periodSeconds: 15
                   timeoutSeconds: 3
             securityContext:
