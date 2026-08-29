@@ -5,7 +5,7 @@ kind: MCPServer
 metadata:
   name: unifi-network
 spec:
-  image: ghcr.io/sirkirby/unifi-network-mcp:0.27.3@sha256:ceeb02d1e03fc6f18077cbf587a2747651992676631eba56f48d05d0bd3c03db
+  image: ghcr.io/sirkirby/unifi-network-mcp:0.29.0@sha256:564c8e0b339466b3ee0faa5f1361458c40df28ff6d21b4c6974994c121610d83
   transport: streamable-http
   mcpPort: 3000
   env:
