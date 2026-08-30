@@ -33,7 +33,8 @@ spec:
                     path: /healthz
                     port: *port
                   periodSeconds: 30
-                  timeoutSeconds: 3
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
@@ -41,8 +42,9 @@ spec:
                   httpGet:
                     path: /readyz
                     port: *port
-                  periodSeconds: 15
-                  timeoutSeconds: 3
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

@@ -30,14 +30,16 @@ spec:
                     path: /health
                     port: &port 8096
                   periodSeconds: 30
-                  timeoutSeconds: 3
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet: *httpGet
-                  periodSeconds: 15
-                  timeoutSeconds: 3
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true

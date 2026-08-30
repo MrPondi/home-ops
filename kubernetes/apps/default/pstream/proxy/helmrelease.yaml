@@ -43,8 +43,9 @@ spec:
                   httpGet:
                     path: /
                     port: &port 3000
-                  periodSeconds: 15
-                  timeoutSeconds: 3
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
               readiness:
                 enabled: true
                 custom: true
@@ -53,7 +54,8 @@ spec:
                     path: /?destination=https://postman-echo.com/get
                     port: &port 3000
                   periodSeconds: 10
-                  timeoutSeconds: 3
+                  timeoutSeconds: 5
+                  failureThreshold: 5
             command:
               - "sh"
               - "-c"
