@@ -38,6 +38,8 @@ mtu: 1500
 ---
 apiVersion: v1alpha1
 kind: ResolverConfig
+searchDomains:
+  domains: []
 hostDNS:
   enabled: true
   forwardKubeDNSToHost: true # Requires Cilium socketLB features
