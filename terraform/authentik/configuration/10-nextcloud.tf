@@ -12,12 +12,14 @@ entitlement_names.add("Users")
 
 data = {
     "name": user.name,
-    "nc-groups": entitlement_names,
+    "nc-groups": list(entitlement_names),
     "picture": user.avatar,
     "is_admin": user.is_superuser or "Admins" in entitlement_names,
-    "quota": int(user.group_attributes().get("nextcloud_quota") or 5) * 1024**3,
 }
 
+# Convert quota to bytes (1024^3)
+if (quota := user.group_attributes().get("nextcloud_quota")) is not None:
+    data["quota"] = quota * 1024**3
 if (birthdate := user.attributes.get("nextcloud_birthdate")) is not None:
     data["birthdate"] = str(birthdate)
 
