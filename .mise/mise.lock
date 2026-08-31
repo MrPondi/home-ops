@@ -7,17 +7,23 @@ backend = "aqua:fluxcd/flux2"
 [tools.flux2."platforms.linux-arm64"]
 checksum = "sha256:dcab945f8d8658662fa1db93e150a602ba1f91da367a82e099bd65595fc7c62c"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.4/flux_2.9.4_linux_arm64.tar.gz"
-provenance = "slsa"
+
+[tools.flux2."platforms.linux-arm64".provenance.slsa]
+url = "https://github.com/fluxcd/flux2/releases/download/v2.9.4/provenance.intoto.jsonl"
 
 [tools.flux2."platforms.linux-x64"]
 checksum = "sha256:c2c397a52930f52d2005c01d276116b059d062de379386d58e98115380a766a2"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.4/flux_2.9.4_linux_amd64.tar.gz"
-provenance = "slsa"
+
+[tools.flux2."platforms.linux-x64".provenance.slsa]
+url = "https://github.com/fluxcd/flux2/releases/download/v2.9.4/provenance.intoto.jsonl"
 
 [tools.flux2."platforms.macos-arm64"]
 checksum = "sha256:5350675411f1c8c20fb7fd827450933e939f7ab82a2cd92f8fa2abe497761911"
 url = "https://github.com/fluxcd/flux2/releases/download/v2.9.4/flux_2.9.4_darwin_arm64.tar.gz"
-provenance = "slsa"
+
+[tools.flux2."platforms.macos-arm64".provenance.slsa]
+url = "https://github.com/fluxcd/flux2/releases/download/v2.9.4/provenance.intoto.jsonl"
 
 [[tools.gh]]
 version = "2.98.0"
@@ -26,14 +32,39 @@ backend = "aqua:cli/cli"
 [tools.gh."platforms.linux-arm64"]
 checksum = "sha256:cf689084f3a3618f7eae4a2420d335d74626d65f5e594b9828d125d69f800d86"
 url = "https://github.com/cli/cli/releases/download/v2.98.0/gh_2.98.0_linux_arm64.tar.gz"
+provenance = "github-attestations"
 
 [tools.gh."platforms.linux-x64"]
 checksum = "sha256:3b8ac6b30336802fc1a858d7c084e11cdf24ac1a761ca90b68022d7d729208de"
 url = "https://github.com/cli/cli/releases/download/v2.98.0/gh_2.98.0_linux_amd64.tar.gz"
+provenance = "github-attestations"
 
 [tools.gh."platforms.macos-arm64"]
 checksum = "sha256:8cfb027cc5310675f2b830eac8f9865c1155a45ffcf9757f699fdd5a22046ca4"
 url = "https://github.com/cli/cli/releases/download/v2.98.0/gh_2.98.0_macOS_arm64.zip"
+provenance = "github-attestations"
+
+[[tools."github:home-operations/flate"]]
+version = "0.6.1"
+backend = "github:home-operations/flate"
+
+[tools."github:home-operations/flate"."platforms.linux-arm64"]
+checksum = "sha256:8ce58ae6f4ca3d609af658c688ea5d01049bfb6dae94a990339e2cb38b19db0f"
+url = "https://github.com/home-operations/flate/releases/download/v0.6.1/flate_0.6.1_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/home-operations/flate/releases/assets/531584321"
+github_attestations = "unavailable"
+
+[tools."github:home-operations/flate"."platforms.linux-x64"]
+checksum = "sha256:25de65dd4f4478575768b4c30d6bad4cbb7a75a7a38be5a3cd776ae065fd6631"
+url = "https://github.com/home-operations/flate/releases/download/v0.6.1/flate_0.6.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/home-operations/flate/releases/assets/531584324"
+github_attestations = "unavailable"
+
+[tools."github:home-operations/flate"."platforms.macos-arm64"]
+checksum = "sha256:fc41874e4ba03f65d2c78531d629f10b81942ef093bd7e9e224b5731dc043254"
+url = "https://github.com/home-operations/flate/releases/download/v0.6.1/flate_0.6.1_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/home-operations/flate/releases/assets/531584322"
+github_attestations = "unavailable"
 
 [[tools.gum]]
 version = "2.0.0"
@@ -90,14 +121,17 @@ backend = "aqua:jqlang/jq"
 [tools.jq."platforms.linux-arm64"]
 checksum = "sha256:8b85c817833814ddca00a144c33705546355afccf0cf39b188f3cdb48b852309"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-linux-arm64"
+provenance = "github-attestations"
 
 [tools.jq."platforms.linux-x64"]
 checksum = "sha256:b1c22172dd303f3be49e935aa56aa48a8b7a46e0bc838b4997d3bb451495870f"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-linux-amd64"
+provenance = "github-attestations"
 
 [tools.jq."platforms.macos-arm64"]
 checksum = "sha256:2d75340ba57a4b4b4c8708a21c2dc8e958a48aaa8bba13b27f77f6e4c0eca07e"
 url = "https://github.com/jqlang/jq/releases/download/jq-1.8.2/jq-macos-arm64"
+provenance = "github-attestations"
 
 [[tools.kubectl]]
 version = "1.37.0"
@@ -138,6 +172,7 @@ backend = "aqua:evilmartians/lefthook"
 [tools.lefthook."platforms.linux-arm64"]
 checksum = "sha256:d96ac16753f6d3d69b92098621c2a2427522a9c2c3e78cd7c9b4a9790b0b8f17"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.12/lefthook_2.1.12_Linux_aarch64.gz"
+provenance = "github-attestations"
 
 [tools.lefthook."platforms.linux-x64"]
 checksum = "sha256:dad908593c859d139b886c14913a44401d95288aa7642d9bdf6f3bd36bd788ff"
@@ -147,6 +182,7 @@ provenance = "github-attestations"
 [tools.lefthook."platforms.macos-arm64"]
 checksum = "sha256:f23eac328ca50c7b775dc24dc275cdeacb65e16cf8bd1745d18e3c563f704f94"
 url = "https://github.com/evilmartians/lefthook/releases/download/v2.1.12/lefthook_2.1.12_MacOS_arm64.gz"
+provenance = "github-attestations"
 
 [[tools.shellcheck]]
 version = "0.11.0"
