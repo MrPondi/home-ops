@@ -18,6 +18,14 @@
   packageRules: [
     // Auto-merge rules
     {
+      description: "Auto-merge Small changes",
+      matchDatasources: ["docker"],
+      automerge: true,
+      automergeType: "pr",
+      matchUpdateTypes: ["minor", "patch", "digest"],
+      ignoreTests: false,
+    },
+    {
       description: "Auto-merge trusted OCI digests",
       matchDatasources: ["docker"],
       automerge: true,
