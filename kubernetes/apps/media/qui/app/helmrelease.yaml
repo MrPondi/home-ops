@@ -24,7 +24,9 @@ spec:
               QUI__PORT: &port 80
               QUI__METRICS_ENABLED: true
               QUI__METRICS_HOST: 0.0.0.0
-              QUI__METRICS_PORT: &metricsPort 8080
+              QUI__METRICS_PORT: &metricsPort 9074
+              QUI__CHECK_FOR_UPDATES: false
+              QUI__LOG_LEVEL: INFO
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
