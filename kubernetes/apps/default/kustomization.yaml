@@ -22,4 +22,5 @@ resources:
   - ./pstream/ks.yaml
   - ./pelican/ks.yaml
   - ./smtp-relay/ks.yaml
+  - ./watermark-remover/ks.yaml
   - ./zwave/ks.yaml

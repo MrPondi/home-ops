@@ -1,0 +1,72 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: watermark-remover
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: watermark-remover
+  interval: 1h
+  values:
+    controllers:
+      watermark-remover:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/guillaumemeyer/watermarks-remover
+              tag: markllm-v0.6.0@sha256:d291d7c476bbee22348c09d5cacad3473d4d17f43c70dd30047d1fb8c0f8a31e
+            env:
+              TZ: Europe/Warsaw
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                spec:
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 100Mi
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        ports:
+          http:
+            port: 8765
+    route:
+      app:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            group: services
+        hostnames:
+          - "{{ .Release.Name }}.pondi.dev"
+        parentRefs:
+          - name: envoy-external
+            namespace: network
