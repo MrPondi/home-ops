@@ -14,7 +14,7 @@ postinstall = "lefthook install"
 [tools]
 "github:home-operations/flate" = "v0.6.5"
 flux2 = "2.9.5"
-gh = "2.99.0"
+gh = "2.100.0"
 gum = "2.0.0"
 helm = "4.2.4"
 helmfile = "1.7.4"
