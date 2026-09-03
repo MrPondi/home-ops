@@ -5,6 +5,9 @@ kind: Kustomization
 metadata:
   name: watermark-remover
 spec:
+  dependsOn:
+    - name: external-secrets-store
+      namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/default/watermark-remover/app
   prune: true

@@ -18,27 +18,12 @@ spec:
           app:
             image:
               repository: ghcr.io/guillaumemeyer/watermarks-remover
-              tag: markllm-v0.6.0@sha256:d291d7c476bbee22348c09d5cacad3473d4d17f43c70dd30047d1fb8c0f8a31e
+              tag: v0.6.0@sha256:eb613936083ddd4b83b5ed617e971f21f083544078ef418df11a6c7c0106c40c
             env:
               TZ: Europe/Warsaw
-            probes:
-              liveness:
-                enabled: true
-                spec:
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              readiness:
-                enabled: true
-                spec:
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              startup:
-                enabled: true
-                spec:
-                  failureThreshold: 30
-                  periodSeconds: 10
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -65,8 +50,14 @@ spec:
         annotations:
           gatus.home-operations.com/endpoint: |-
             group: services
+            conditions: ["[STATUS] == 401"]
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:
           - name: envoy-external
             namespace: network
+    persistence:
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
