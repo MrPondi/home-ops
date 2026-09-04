@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/guillaumemeyer/watermarks-remover
-              tag: v0.6.0@sha256:eb613936083ddd4b83b5ed617e971f21f083544078ef418df11a6c7c0106c40c
+              tag: v0.7.0@sha256:5850a577c15724b02e9b0e44d3e52a9064ca983270f228c893a26b73734d07fd
             env:
               TZ: Europe/Warsaw
             envFrom:
