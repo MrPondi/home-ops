@@ -50,6 +50,12 @@
       "base": "serverless",
       "color": "#3A72E9",
       "fileNames": ["ks.yaml"]
+    },
+    {
+      "name": "networkpolicy",
+      "base": "lib",
+      "color": "#FC6E4F",
+      "fileNames": ["networkpolicy.yaml"]
     }
   ],
   "material-icon-theme.files.associations": {
