@@ -48,12 +48,23 @@ spec:
                   rm -rf /tmp/ffmpeg
                 fi
 
+                cat > /opt/data/.env <<EOF
+                WHATSAPP_ENABLED=false
+                API_SERVER_KEY=$${API_SERVER_KEY}
+                EOF
+
                 chown -R 10000:10000 /run-app /run-dashboard /opt/data
                 chmod 755 /run-app /run-dashboard
             securityContext:
               runAsUser: 0
               runAsGroup: 0
               runAsNonRoot: false
+            env:
+              - name: API_SERVER_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}-secret"
+                    key: API_SERVER_KEY
           2-install-tools:
             image: &image
               repository: docker.io/nousresearch/hermes-agent
