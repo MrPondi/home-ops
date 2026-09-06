@@ -59,6 +59,8 @@ spec:
   postBuild:
     substitute:
       APP: toolhive
+      # Dragonfly consumers are the VirtualMCPServer gateways
+      DRAGONFLY_APP_NAME: virtualmcpserver
     substituteFrom:
       - kind: Secret
         name: toolhive-postbuild-secret

@@ -1,0 +1,72 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name grafana
+spec:
+  endpointSelector:
+    matchLabels:
+      toolhive: "true"
+      toolhive-name: *name
+  ingress:
+    # MCP gateways -> proxy sidecar / server port
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: virtualmcpserver
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
+    # Proxy <-> server (same workload)
+    - fromEndpoints:
+        - matchLabels:
+            toolhive: "true"
+            toolhive-name: *name
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+  egress:
+    # DNS
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # Proxy <-> server (same workload)
+    - toEndpoints:
+        - matchLabels:
+            toolhive: "true"
+            toolhive-name: *name
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+    # Grafana instance
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            k8s:app: grafana
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    # Kubernetes API (toolhive proxy control-plane calls)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP

@@ -12,6 +12,9 @@ spec:
       namespace: "kopiur-system"
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
+      namespace: "kube-system"
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
       namespace: "default"
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy

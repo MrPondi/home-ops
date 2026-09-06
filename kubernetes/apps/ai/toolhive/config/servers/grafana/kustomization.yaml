@@ -6,3 +6,4 @@ resources:
   - ./mcpserver.yaml
   - ./rbac.yaml
   - ./secret.yaml
+  - ./networkpolicy.yaml

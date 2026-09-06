@@ -11,4 +11,5 @@ resources:
   - ./mcpgroup.yaml
   - ./mcpoidc.yaml
   - ./mcptelemetry.yaml
+  - ./networkpolicy.yaml
   - ./virtualmcpserver.yaml
