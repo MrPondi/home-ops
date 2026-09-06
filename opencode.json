@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "ToolHive": {
+      "type": "remote",
+      "url": "https://mcp.pondi.dev/mcp",
+      "oauth": {}
+    }
+  }
+}
