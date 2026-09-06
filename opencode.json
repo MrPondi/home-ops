@@ -6,5 +6,12 @@
       "url": "https://mcp.pondi.dev/mcp",
       "oauth": {}
     }
+  },
+  "lsp": {
+    "yaml-ls": { "disabled": true },
+    "yayamlls": {
+      "command": ["yayamlls"],
+      "extensions": [".yaml", ".yml"]
+    }
   }
 }
