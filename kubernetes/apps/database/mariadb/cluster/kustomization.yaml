@@ -7,6 +7,7 @@ metadata:
 resources:
   - ./externalsecret.yaml
   - ./mariadb.yaml
+  - ./networkpolicy.yaml
   - ./physicalbackup.yaml
 
   # Pelican

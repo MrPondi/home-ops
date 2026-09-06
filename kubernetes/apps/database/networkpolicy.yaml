@@ -1,0 +1,102 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name database-jobs
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: batch.kubernetes.io/job-name
+        operator: Exists
+      - key: kopiur.home-operations.com/config
+        operator: DoesNotExist
+  ingress:
+    # MariaDB (backup/restore data stream)
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: mariadb
+      toPorts:
+        - ports:
+            - port: "3306"
+              protocol: TCP
+  egress:
+    # DNS
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # Kubernetes API (status)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # MariaDB (backup source / restore target)
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: mariadb
+      toPorts:
+        - ports:
+            - port: "3306"
+              protocol: TCP
+    # Backups to QNAP MinIO (S3)
+    - toCIDR:
+        - 10.0.25.25/32
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name database-kopiur
+spec:
+  endpointSelector:
+    matchExpressions:
+      - key: kopiur.home-operations.com/config
+        operator: Exists
+  ingress: []
+  egress:
+    # DNS
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # Kubernetes API (status)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # Repository backend (kopia S3 via envoy-internal VIP)
+    - toCIDR:
+        - 10.0.30.11/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

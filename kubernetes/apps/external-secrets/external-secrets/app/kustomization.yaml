@@ -6,6 +6,7 @@ resources:
   - ./grafanadashboard.yaml
   - ./certificate.yaml
   - ./helmrelease.yaml
+  - ./networkpolicy.yaml
   - ./ocirepository.yaml
   # - ./pdb.yaml # Not for single node clusters
   - ./pki.yaml

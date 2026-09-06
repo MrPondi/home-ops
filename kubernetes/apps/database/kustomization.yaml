@@ -9,6 +9,7 @@ components:
   - ../../components/kopiur/secret
 
 resources:
+  - ./networkpolicy.yaml
   - ./namespace.yaml
   - ./cloudnative-pg/ks.yaml
   - ./dragonfly-operator/ks.yaml
