@@ -12,7 +12,7 @@ Repository-wide conventions live in `AGENTS.md` — read it first.
 
 - App manifests live in `kubernetes/apps/<namespace>/<app>/`; `ks.yaml` sits at the app root, manifests for each Kustomization go in a subdir (default `app/`)
 - The Namespace object comes from `kubernetes/apps/<namespace>/namespace.yaml` (placeholder `name: _`, renamed by the overlay kustomization's `namespace:` field). The `alerts` component (Flux notifications) is injected by the namespace overlay — never include it in the app itself
-- The namespace overlay wires the `replacements` list (`kubernetes/components/replacements/ks.yaml`, via the overlay's top-level `replacements:` field) which stamps `spec.targetNamespace` onto every Kustomization from the overlay's Namespace object. An explicit `targetNamespace` in `ks.yaml` is redundant but must match the namespace
+- The namespace overlay wires the `replacements` list (`kubernetes/components/replacements/ks.yaml`, via the overlay's top-level `replacements:` field) which stamps `spec.targetNamespace` onto every Kustomization from the overlay's Namespace object. The replacement is the default and the only mechanism — never set an explicit `targetNamespace` in `ks.yaml`
 - Every app declares its own per-app `OCIRepository` in `ocirepository.yaml`; `app-template` apps point `spec.chartRef.name` at that per-app repo (named after the app). There is no shared/injected chart source
 - Secrets use `external-secrets` with the `bitwarden-secretsmanager` `ClusterSecretStore`
 - Fail-closed namespaces (baseline `default-deny` NetworkPolicy folded into `namespace.yaml`): `ai`, `database`, `external-secrets`, `cert-manager`, `actions-runner-system`. **Apps in these namespaces must ship a `networkpolicy.yaml`**. In open namespaces (`default`, `media`, `observability`, `security`, `network`, ...) do **not** scaffold a CNP unless it is complete (a CNP isolates its pods immediately)
@@ -257,11 +257,10 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-    targetNamespace: <namespace>
     wait: false
 ```
 
-Drop `dependsOn` when the app has no secrets or external deps. Add `components` (pointing at `../../../../components/...`) and `healthCheckExprs` only when the app needs them. Follow nearby `ks.yaml` files in the same namespace for exact patterns. The overlay's `replacements` component stamps `spec.targetNamespace` from the Namespace object — the explicit value above must equal `<namespace>` (or be omitted in overlays already wired to the replacement).
+Drop `dependsOn` when the app has no secrets or external deps. Add `components` (pointing at `../../../../components/...`) and `healthCheckExprs` only when the app needs them. Follow nearby `ks.yaml` files in the same namespace for exact patterns. `spec.targetNamespace` is stamped by the overlay's `replacements` list from the Namespace object — never set it in `ks.yaml`.
 
 ### Step 6: Update the namespace overlay
 
@@ -284,7 +283,7 @@ Verify that:
 
 1. `kubernetes/apps/<namespace>/<app>/` contains `ks.yaml` and the `app/` subdir with `helmrelease.yaml`, `kustomization.yaml`, `ocirepository.yaml` (plus `networkpolicy.yaml`/`externalsecret.yaml` when applicable).
 2. The overlay kustomization lists `./<app>/ks.yaml` and the app's kustomization lists every created file.
-3. `ks.yaml` sets `targetNamespace` and `postBuild.substitute.APP` and its `path` points at the right subdir.
+3. `ks.yaml` omits `targetNamespace` (stamped by the overlay replacement), sets `postBuild.substitute.APP`, and its `path` points at the right subdir.
 4. The app has its own `ocirepository.yaml` (named after the app), and the HelmRelease's `spec.chartRef.name` matches it.
 5. In a fail-closed namespace the CNP covers ingress + full egress; no CNP was added in an open namespace.
 6. Render cleanly: `just kube render-local-ks <ns> <app>` (or `kubectl kustomize <dir>` before the overlay entry is added).
