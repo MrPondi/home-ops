@@ -42,14 +42,16 @@ spec:
     name: cloudnative-pg-secret
   managed:
     services:
-      additional:
-        - selectorType: rw
-          serviceTemplate:
-            metadata:
-              name: *pgname
-            spec:
-              type: LoadBalancer
-          updateStrategy: patch
+      # LoadBalancer service for the primary node
+      #
+      # additional:
+      #   - selectorType: rw
+      #     serviceTemplate:
+      #       metadata:
+      #         name: *pgname
+      #       spec:
+      #         type: LoadBalancer
+      #     updateStrategy: patch
       disabledDefaultServices:
         - "r"
         - "ro"

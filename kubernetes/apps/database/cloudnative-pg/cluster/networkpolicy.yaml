@@ -1,0 +1,170 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name postgres
+spec:
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: *name
+  ingress:
+    # Same-cluster replication
+    - fromEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: *name
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # cloudnative-pg operator (psql, instance manager API)
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: cloudnative-pg
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
+    # open-webui (ai)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            k8s:app.kubernetes.io/name: open-webui
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # pstream (default)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: pstream-backend
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # teslamate (observability)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            k8s:app.kubernetes.io/name: teslamate
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # authentik (security)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: security
+            k8s:app.kubernetes.io/name: authentik
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # Prometheus metrics (PodMonitor)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            k8s:app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "9187"
+              protocol: TCP
+  egress:
+    # DNS
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # Kubernetes API (instance status reporting)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # Barman cloud plugin API (gRPC)
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: plugin-barman-cloud
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    # Same-cluster replication
+    - toEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: *name
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # Backups / WAL archiving (sidecar -> QNAP MinIO)
+    - toCIDR:
+        - 10.0.25.25/32
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name cnpg-barman-cloud
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: plugin-barman-cloud
+      app.kubernetes.io/instance: cnpg-barman-cloud
+  ingress:
+    # cloudnative-pg operator + postgres instance sidecars (gRPC)
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: cloudnative-pg
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: postgres
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+  egress:
+    # DNS
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # Kubernetes API
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP

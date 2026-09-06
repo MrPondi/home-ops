@@ -6,3 +6,4 @@ resources:
   - ./externalsecret.yaml
   - ./objectstore.yaml
   - ./cluster.yaml
+  - ./networkpolicy.yaml
