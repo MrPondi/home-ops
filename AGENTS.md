@@ -175,10 +175,17 @@ Cilium 1.20 (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.
 ### CiliumNetworkPolicy conventions
 
 - One file per app dir: `networkpolicy.yaml` (schema header per Conventions). Multi-doc files (several CNPs separated by `---`) are an accepted convention for multi-component apps.
-- Selectors:
-    - `endpointSelector`: plain k8s label keys (`app.kubernetes.io/name: ...`).
-    - `fromEndpoints`/`toEndpoints`: `k8s:`-prefixed keys (`k8s:io.kubernetes.pod.namespace: ...`).
+- Selectors (the `k8s:` prefix is **label-source qualification**, not namespace scoping — a CNP bound to a namespace can still cross namespaces by explicitly matching `k8s:io.kubernetes.pod.namespace`, and a prefix changes what object the label is read from):
+    - `endpointSelector`: plain k8s label keys (`app.kubernetes.io/name: ...`) — un-prefixed pod labels select within the CNP's own namespace.
+    - `fromEndpoints`/`toEndpoints` label meanings:
+        - Plain key → `any:` (pod labels + namespace labels union; correct default for same-namespace selects, can't false-negative).
+        - `k8s:<key>` → **pod-object** labels only (e.g. `k8s:app.kubernetes.io/name: envoy`); use when the same key may also exist on the namespace object or in mixed selectors.
+        - `k8s:io.kubernetes.pod.namespace: <ns>` → canonical cross-namespace selector; matches the namespace **object**, pods do not carry it as a label. Negative targets require an explicitly named namespace or a namespace-label matcher.
+        - `io.cilium.k8s.namespace.labels.<key>` → matches pods whose **namespace object** itself carries `<key>`; for grouping across all namespaces at once.
+    - **Scope trap**: a CNP selector with only plain/prefixed pod labels — _no_ explicit namespace key — is implicitly clamped to the CNP's own namespace (confirmed via realized-policy selectors, dragonfly-operator 2026-09). "Pods with label X in any namespace" is not expressible in a CNP → use a `CiliumClusterwideNetworkPolicy` with prefixed pod-label selectors (see `dragonfly-operator/app/networkpolicy.yaml`).
     - **Never guess chart labels** — render with flate and copy the real ones, then cross-check live endpoints (`cilium-dbg endpoint list -o json` → `status.labels["security-relevant"]`).
+- Every selector endpoint (`endpointSelector`, `fromEndpoints`, `toEndpoints` entries) carries a short comment stating what it matches — e.g. `# Dragonfly operator pods (database/ns-wide)` or `# kube-dns pods (kube-system)`. A selector that compiles but matches nothing is silent; the comment makes the intent reviewable against rendered/live labels.
+- Scope sweep (periodic): verify selectors actually match live endpoints — `cilium-dbg endpoint list -o json` → `status.labels["security-relevant"]` vs. the rendered selector, and `just kube hubble-drops` must be clean in touched namespaces. First sweep over existing CNPs pending (tracked as known-audit item, 2026-09 — dragonfly-operator was the proof-of-concept failure mode).
 - Standard building blocks (copy from existing policies):
     - DNS: toEndpoints kube-system + `k8s-app: kube-dns`, ports 53 UDP/TCP, `rules.dns.matchPattern: "*"`
     - Route ingress: fromEndpoints `network` ns + `k8s:app.kubernetes.io/name: envoy` + `k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal` (copy from `open-webui`)
