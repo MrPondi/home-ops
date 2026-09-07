@@ -59,3 +59,97 @@ view-secret ns secret="":
 [private]
 render-local-ks ns ks:
     flate build ks --namespace "{{ ns }}" --path "{{ justfile_directory() }}/kubernetes" --output yaml  --allow-missing-secrets "{{ ks }}"
+
+[private]
+hubble-ensure:
+    if hubble status >/dev/null 2>&1; then
+        exit 0
+    fi
+    nohup cilium hubble port-forward >/dev/null 2>&1 &
+    for _ in $(seq 1 30); do
+        if hubble status >/dev/null 2>&1; then
+            exit 0
+        fi
+        sleep 1
+    done
+    echo "hubble relay unreachable - 'cilium hubble port-forward' failed to become ready" >&2
+    exit 1
+
+# Compact flow formatter: time | verdict | drop reason | source | destination | :port | dns query.
+# Replies are hidden; drops mode keeps only POLICY_* drops. Pitfalls baked in: .flow? guard,
+# --unbuffered, paren-wrapped select conditions.
+
+[doc('Hubble relay status (starts the port-forward when needed)')]
+hubble-status: hubble-ensure
+    hubble status
+
+[doc('Follow live flows')]
+hubble-flows ns="" *args: hubble-ensure
+    trap 'exit 0' INT TERM
+    ns_args=""
+    if [[ -n "{{ ns }}" ]]; then
+        ns_args="--namespace {{ ns }}"
+    fi
+    hubble observe --follow -o json $ns_args {{ args }} 2>/dev/null \
+        | jq --unbuffered -r '
+            .flow? // empty
+            | select(.is_reply != true)
+            | [
+                (.time | sub("^\\d{4}-\\d{2}-\\d{2}T"; "") | sub("\\..*"; "")),
+                .verdict,
+                (if .verdict == "DROPPED" then (.drop_reason_desc // "-") else "-" end),
+                (if .source.pod_name then "\(.source.namespace)/\(.source.pod_name)" elif .source.IP then .source.IP else "reserved:\(.source.identity // "?")" end),
+                (if .destination.pod_name then "\(.destination.namespace)/\(.destination.pod_name)" elif .destination.IP then .destination.IP else "reserved:\(.destination.identity // "?")" end),
+                ((.l4.TCP.destination_port // .l4.UDP.destination_port // null) | if . == null then "-" else ":\(.)" end),
+                (.l7.dns.query // "-")
+              ]
+            | @tsv'
+
+[doc('Follow policy drops only (POLICY_DENIED)')]
+hubble-drops ns="" *args: hubble-ensure
+    trap 'exit 0' INT TERM
+    ns_args=""
+    if [[ -n "{{ ns }}" ]]; then
+        ns_args="--namespace {{ ns }}"
+    fi
+    hubble observe --follow -o json $ns_args {{ args }} 2>/dev/null \
+        | jq --unbuffered -r '
+            .flow? // empty
+            | select(.is_reply != true)
+            | select(.verdict == "DROPPED" and ((.drop_reason_desc // "") | test("POLICY")))
+            | [
+                (.time | sub("^\\d{4}-\\d{2}-\\d{2}T"; "") | sub("\\..*"; "")),
+                (.source.pod_name // .source.IP // "reserved:\(.source.identity // "?")"),
+                (.destination.pod_name // .destination.IP // "reserved:\(.destination.identity // "?")"),
+                ((.l4.TCP.destination_port // .l4.UDP.destination_port // null) | if . == null then "-" else ":\(.)" end),
+                (.l7.dns.query // "-")
+              ]
+            | @tsv'
+
+[doc('Bounded flow capture to an auto-named file (NS optional, SECONDS = duration, FILE = optional path override)')]
+hubble-capture ns="" seconds="60" file="": hubble-ensure
+    ns_args=""
+    if [[ -n "{{ ns }}" ]]; then
+        ns_args="--namespace {{ ns }}"
+    fi
+    file="{{ file }}"
+    if [[ -z "$file" ]]; then
+        scope="{{ ns }}"
+        [[ -z "$scope" ]] && scope="all"
+        file="/tmp/hubble-${scope}-$(date +%Y%m%d-%H%M%S).tsv"
+    fi
+    timeout "{{ seconds }}" hubble observe --follow -o json $ns_args 2>/dev/null \
+        | jq --unbuffered -r '
+            .flow? // empty
+            | select(.is_reply != true)
+            | [
+                (.time | sub("^\\d{4}-\\d{2}-\\d{2}T"; "") | sub("\\..*"; "")),
+                .verdict,
+                (if .verdict == "DROPPED" then (.drop_reason_desc // "-") else "-" end),
+                (if .source.pod_name then "\(.source.namespace)/\(.source.pod_name)" elif .source.IP then .source.IP else "reserved:\(.source.identity // "?")" end),
+                (if .destination.pod_name then "\(.destination.namespace)/\(.destination.pod_name)" elif .destination.IP then .destination.IP else "reserved:\(.destination.identity // "?")" end),
+                ((.l4.TCP.destination_port // .l4.UDP.destination_port // null) | if . == null then "-" else ":\(.)" end),
+                (.l7.dns.query // "-")
+              ]
+            | @tsv' > "$file" || true
+    gum log -t rfc3339 -s -l info "captured $(wc -l < "$file") flows -> $file"
