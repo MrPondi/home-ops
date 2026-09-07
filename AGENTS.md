@@ -136,7 +136,7 @@ git worktree remove /tmp/baseline --force
 
 ### Rollout: git-first, fix forward (default path)
 
-main = cluster state; merge the PR **before** deep verification, not after:
+main = cluster state; merge the PR **before** deep verification, not after. **Direct pushes to `main` are forbidden** (see **Commit & push hygiene**):
 
 1. Edit manifests → commit → PR → merge to `main`.
 2. Force the deploy (root and child KS intervals are 1h — never wait for it): `flux reconcile kustomization <ks> -n <ns> --with-source`, or `just kube sync ks` to force-sync cluster-wide.
@@ -165,6 +165,8 @@ When a change needs repeated apply→observe→fix cycles (e.g. CNP selector tun
 
 - **Always commit changes when an assignment is complete** — never leave a dirty working tree; partial work belongs in a WIP commit, not in `git status`.
 - **Do not push unless the change needs to land.** Push is only load-bearing for changes that drive the rollout pipeline (`kubernetes/`, `talos/`, `terraform/`, CI workflows). Docs-only edits (this file, READMEs, ROADMAP) have no cluster effect: committing alone is enough — only push when a PR/main-merge workflow requires it.
+- **AI assistants never push directly to `main`.** Rollout changes land via PR only: push a working branch (`agent/<topic>`), `gh pr create`, wait for the required checks, `gh pr merge`, then reconcile. Bypass-privileged credentials are not permission — the account's branch-protection bypass right must never be exercised by automation.
+- **`remote: Bypassed rule violations for refs/heads/main:` on a push is a hard stop.** It means branch protection was circumvented: stop immediately, report it to the user, and take no further rollout actions (no retry, no rebase-and-repush, no reconcile) without explicit approval.
 
 ## YAML Validation (yayamlls)
 
