@@ -301,8 +301,11 @@ Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/
 
 ## Python tooling
 
-- Python scripts for this repo run through the **uv-managed `.venv`** at the repo root (`.venv/bin/python`) — never install packages globally (no `pip install --user` / system pip). Add venv-scoped deps with `uv pip install --python .venv/bin/python <pkg>` and invoke scripts as `.venv/bin/python <script>`.
+- Python scripts run through the **uv project at the repo root** (`pyproject.toml` + `uv.lock` + `.python-version`) — never install packages globally (no `pip install --user` / system pip). Add dependencies with `uv add <pkg>` (updates `pyproject.toml` and `uv.lock`, commit both), sync the venv with `uv sync`, and invoke scripts as `uv run scripts/<script>.py`.
 
 ## scripts/
 
-Standalone maintenance/audit helpers (not cluster-deployed; see Repository Structure)
+Standalone maintenance/audit helpers (not cluster-deployed; see Repository Structure). Invoke via `uv run scripts/<script>.py` — each script documents its usage and configuration in its module docstring and `--help`.
+
+- `cnp_prefix_audit.py` — audits Cilium CNP/CCNP label selectors against the prefix guidelines ("Networking & Policy (Cilium)" → Selectors); exit 1 on violations or unparseable YAML.
+- `jellyfin_actor_images.py` — triggers Jellyfin's metadata refresh for persons missing a primary image (needs `JELLYFIN_API_KEY` + `JELLYFIN_USER_ID`). Should be done after a cluster bootstrap due to metadata living on non-restorable pvc.
