@@ -15,6 +15,7 @@ home-ops/
 │   └── flux/            # Flux system configuration (root cluster-apps Kustomization)
 ├── talos/               # Talos Linux machine config templates (minijinja) + mod.just
 ├── terraform/           # Terraform IaC (proxmox VMs, authentik configuration)
+├── scripts/             # Standalone maintenance/audit helper scripts (not cluster-deployed)
 └── ROADMAP.md           # Planned work
 ```
 
@@ -301,3 +302,7 @@ Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/
 ## Python tooling
 
 - Python scripts for this repo run through the **uv-managed `.venv`** at the repo root (`.venv/bin/python`) — never install packages globally (no `pip install --user` / system pip). Add venv-scoped deps with `uv pip install --python .venv/bin/python <pkg>` and invoke scripts as `.venv/bin/python <script>`.
+
+## scripts/
+
+Standalone maintenance/audit helpers (not cluster-deployed; see Repository Structure)
