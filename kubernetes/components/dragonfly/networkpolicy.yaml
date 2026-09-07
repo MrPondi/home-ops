@@ -19,6 +19,15 @@ spec:
         - ports:
             - port: "6379"
               protocol: TCP
+    # Dragonfly operator
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            app.kubernetes.io/name: dragonfly-operator
+      toPorts:
+        - ports:
+            - port: "9999"
+              protocol: TCP
     # Prometheus metrics (ServiceMonitor/PodMonitor)
     - fromEndpoints:
         - matchLabels:
