@@ -32,3 +32,12 @@ spec:
         - ports:
             - port: "6443"
               protocol: TCP
+    # Dragonfly Cluster pods
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: dragonfly
+            app.kubernetes.io/part-of: dragonfly
+      toPorts:
+        - ports:
+            - port: "9999"
+              protocol: TCP
