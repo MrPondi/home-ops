@@ -35,8 +35,8 @@ spec:
     # Dragonfly Cluster pods
     - toEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: dragonfly
-            app.kubernetes.io/part-of: dragonfly
+            k8s:app.kubernetes.io/name: dragonfly
+            k8s:app.kubernetes.io/part-of: dragonfly
       toPorts:
         - ports:
             - port: "9999"
