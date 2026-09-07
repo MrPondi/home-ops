@@ -297,3 +297,7 @@ Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/
 - `talos/README.md` — Talos machine config notes
 - `.agents/skills/add-app/SKILL.md` — app scaffolding workflow
 - Component-specific docs live with the component (`kubernetes/apps/**/README.md` when present)
+
+## Python tooling
+
+- Python scripts for this repo run through the **uv-managed `.venv`** at the repo root (`.venv/bin/python`) — never install packages globally (no `pip install --user` / system pip). Add venv-scoped deps with `uv pip install --python .venv/bin/python <pkg>` and invoke scripts as `.venv/bin/python <script>`.
