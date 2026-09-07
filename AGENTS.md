@@ -160,6 +160,11 @@ When a change needs repeated apply→observe→fix cycles (e.g. CNP selector tun
 - Newly _created_ objects (not yet in git) are invisible to flux prune and persist until the PR merges.
 - `kubectl apply` cannot remove fields from flux-managed objects (no last-applied history) — use `kubectl patch --type=merge -p '{...: null}'`.
 
+## Commit & push hygiene
+
+- **Always commit changes when an assignment is complete** — never leave a dirty working tree; partial work belongs in a WIP commit, not in `git status`.
+- **Do not push unless the change needs to land.** Push is only load-bearing for changes that drive the rollout pipeline (`kubernetes/`, `talos/`, `terraform/`, CI workflows). Docs-only edits (this file, READMEs, ROADMAP) have no cluster effect: committing alone is enough — only push when a PR/main-merge workflow requires it.
+
 ## YAML Validation (yayamlls)
 
 `yayamlls` (workspace config `.yayamlls.yaml`, wired in `opencode.json`) is the YAML language server for this repo:
@@ -185,7 +190,6 @@ Cilium 1.20 (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.
     - **Scope trap**: a CNP selector with only plain/prefixed pod labels — _no_ explicit namespace key — is implicitly clamped to the CNP's own namespace (confirmed via realized-policy selectors, dragonfly-operator 2026-09). "Pods with label X in any namespace" is not expressible in a CNP → use a `CiliumClusterwideNetworkPolicy` with prefixed pod-label selectors (see `dragonfly-operator/app/networkpolicy.yaml`).
     - **Never guess chart labels** — render with flate and copy the real ones, then cross-check live endpoints (`cilium-dbg endpoint list -o json` → `status.labels["security-relevant"]`).
 - Every selector endpoint (`endpointSelector`, `fromEndpoints`, `toEndpoints` entries) carries a short comment stating what it matches — e.g. `# Dragonfly operator pods (database/ns-wide)` or `# kube-dns pods (kube-system)`. A selector that compiles but matches nothing is silent; the comment makes the intent reviewable against rendered/live labels.
-- Scope sweep (periodic): verify selectors actually match live endpoints — `cilium-dbg endpoint list -o json` → `status.labels["security-relevant"]` vs. the rendered selector, and `just kube hubble-drops` must be clean in touched namespaces. First sweep over existing CNPs pending (tracked as known-audit item, 2026-09 — dragonfly-operator was the proof-of-concept failure mode).
 - Standard building blocks (copy from existing policies):
     - DNS: toEndpoints kube-system + `k8s-app: kube-dns`, ports 53 UDP/TCP, `rules.dns.matchPattern: "*"`
     - Route ingress: fromEndpoints `network` ns + `k8s:app.kubernetes.io/name: envoy` + `k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal` (copy from `open-webui`)
