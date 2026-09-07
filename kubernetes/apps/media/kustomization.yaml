@@ -9,7 +9,7 @@ replacements:
 
 components:
   - ../../components/alerts
-  - ../../components/kopiur/secret
+  - ../../components/kopiur/base
 
 resources:
   - ./namespace.yaml

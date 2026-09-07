@@ -16,6 +16,7 @@ Repository-wide conventions live in `AGENTS.md` — read it first.
 - Every app declares its own per-app `OCIRepository` in `ocirepository.yaml`; `app-template` apps point `spec.chartRef.name` at that per-app repo (named after the app). There is no shared/injected chart source
 - Secrets use `external-secrets` with the `bitwarden-secretsmanager` `ClusterSecretStore`
 - Fail-closed namespaces (baseline `default-deny` NetworkPolicy folded into `namespace.yaml`): `ai`, `database`, `external-secrets`, `cert-manager`, `actions-runner-system`. **Apps in these namespaces must ship a `networkpolicy.yaml`**. In open namespaces (`default`, `media`, `observability`, `security`, `network`, ...) do **not** scaffold a CNP unless it is complete (a CNP isolates its pods immediately)
+- Kopiur backups: apps with a PVC to back up attach `../../../../components/kopiur/backup` via the Kustomization's `spec.components` (SnapshotPolicy + hourly SnapshotSchedule + Restore + PVC, all keyed on `${APP}`). Mover-job egress is handled namespace-wide by the overlay's `kopiur/base` component (the `kopiur-mover` CNP) — never hand-write mover rules; just confirm the overlay attaches `kopiur/base` and verify with `kubectl kopiur snapshot now -n <ns> --policy <app>` (hubble must show zero `POLICY_DENIED` from the mover pod)
 - The root `cluster-apps` Kustomization already patches HelmRelease defaults (crds `CreateReplace`, rollback/upgrade remediation) — do not add them to the app
 
 ## Workflow
@@ -33,6 +34,7 @@ Use the `question` tool to gather:
 7. Whether the app needs persistence
 8. Whether the app needs an ingress route (envoy-internal / envoy-external) — if yes, plan for gatus/homepage route annotations
 9. Flux `dependsOn` entries for the Kustomization (usually `external-secrets-store` in namespace `external-secrets`)
+10. Whether the app needs kopiur PVC backups (attach `components/kopiur/backup`; also confirm the namespace overlay attaches `kopiur/base`)
 
 If the requested namespace does not exist under `kubernetes/apps/`, stop and ask the user how to proceed (new namespace = new overlay + `namespace.yaml`, possibly fail-closed).
 Always ask for confirmation before writing files.
@@ -288,6 +290,7 @@ Verify that:
 5. In a fail-closed namespace the CNP covers ingress + full egress; no CNP was added in an open namespace.
 6. Render cleanly: `just kube render-local-ks <ns> <app>` (or `kubectl kustomize <dir>` before the overlay entry is added).
 7. No plain-text secrets were introduced.
+8. If the app attaches `components/kopiur/backup`: the namespace overlay attaches `kopiur/base`, and a verification snapshot run (`kubectl kopiur snapshot now -n <ns> --policy <app>`) completed with zero `POLICY_DENIED` flows from the mover pod in hubble.
 
 ## Notes
 

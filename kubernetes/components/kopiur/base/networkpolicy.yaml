@@ -1,0 +1,55 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kopiur-mover
+spec:
+  # Selects kopiur snapshot/restore mover jobs only — service pods and kopiur's
+  # own maintenance/discovery jobs (which deliberately omit the label) never match
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/managed-by: kopiur
+  egress:
+    # DNS
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # S3 repository (s3.pondi.dev) — Cilium enforces egress on the DNAT-ed backend,
+    # so the rule targets the envoy-internal pods (s3.pondi.dev listener is 10080)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10080"
+              protocol: TCP
+    # S3 repository fallback — direct VIP match (pre-NAT); toCIDR alone is NOT
+    # sufficient (verified: mover dial to 10.0.30.11:80 times out without the
+    # backend rule above)
+    - toCIDR:
+        - 10.0.30.11/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Kubernetes API (progress/status)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
