@@ -1,20 +1,21 @@
 ---
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
 apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
+kind: CiliumClusterwideNetworkPolicy
 metadata:
   name: &name dragonfly-operator
 spec:
+  description: Operator egress (DNS, kube API, Dragonfly pods via 9999)
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/name: *name
+      k8s:app.kubernetes.io/name: *name
   ingress: []
   egress:
     # DNS
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: kube-system
-            k8s-app: kube-dns
+            k8s:k8s-app: kube-dns
       toPorts:
         - ports:
             - port: "53"
@@ -32,7 +33,7 @@ spec:
         - ports:
             - port: "6443"
               protocol: TCP
-    # Dragonfly Cluster pods
+    # Dragonfly Cluster pods (cluster-wide: any namespace, no maintenance needed)
     - toEndpoints:
         - matchLabels:
             k8s:app.kubernetes.io/name: dragonfly
