@@ -45,6 +45,15 @@ spec:
         - ports:
             - port: "5432"
               protocol: TCP
+    # grafana (observability) — teslamate dashboards read the postgres datasource
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            k8s:app: grafana
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
     # teslamate (observability)
     - fromEndpoints:
         - matchLabels:
