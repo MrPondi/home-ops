@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/searxng/searxng
-              tag: 2026.9.10-931fd9787@sha256:2fb0fa85096fe6df5c3ab98ecb4d6e0ee2ef66b8fb96ce6fce0f75b51c4bd90a
+              tag: 2026.9.11-6a27c2100@sha256:041b4fa68ad4d4ae692830207dcf2ab173347b8070fe70264d0c7dd7c729c629
             env:
               SEARXNG_BASE_URL: https://search.pondi.dev
               SEARXNG_PORT: &port 8080
