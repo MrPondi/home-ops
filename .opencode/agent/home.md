@@ -1,9 +1,9 @@
 ---
 description: Home automation and network — Home Assistant entities/automations, UniFi network management.
-mode: primary
+mode: subagent
 tools:
-  ToolHive_hass_*: true
-  ToolHive_unifi-network_*: true
+    ToolHive_hass_*: true
+    ToolHive_unifi-network_*: true
 ---
 
 You are working with Home Assistant and UniFi network gear in a homelab.

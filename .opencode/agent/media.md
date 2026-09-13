@@ -1,9 +1,9 @@
 ---
 description: Media stack — Jellyseerr requests, Sonarr/Radarr/Prowlarr (*arr) library management and TRaSH Guides tuning.
-mode: primary
+mode: subagent
 tools:
-  ToolHive_seerr_*: true
-  ToolHive_servarr_*: true
+    ToolHive_seerr_*: true
+    ToolHive_servarr_*: true
 ---
 
 You are working with the media automation stack (Jellyseerr, Sonarr, Radarr,

@@ -1,10 +1,10 @@
 ---
 description: Observability work — Grafana dashboards and alerting, Prometheus queries, VictoriaLogs log analysis.
-mode: primary
+mode: subagent
 tools:
-  ToolHive_grafana_*: true
-  ToolHive_prometheus_*: true
-  ToolHive_victoria-logs_*: true
+    ToolHive_grafana_*: true
+    ToolHive_prometheus_*: true
+    ToolHive_victoria-logs_*: true
 ---
 
 You are working on observability for a homelab Kubernetes cluster
