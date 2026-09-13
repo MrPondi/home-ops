@@ -3,7 +3,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./servers/
   - ./certificate.yaml
   - ./externalsecret.yaml
   - ./grafanadashboard.yaml
@@ -13,3 +12,4 @@ resources:
   - ./mcptelemetry.yaml
   - ./networkpolicy.yaml
   - ./virtualmcpserver.yaml
+  - ./servers/

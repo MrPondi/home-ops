@@ -83,7 +83,7 @@ resources:
     - ./ocirepository.yaml
 ```
 
-Add `./networkpolicy.yaml` (fail-closed namespaces), `./externalsecret.yaml`, and other resource files only when required. Keep the resource list alphabetized.
+Add `./networkpolicy.yaml` (fail-closed namespaces), `./externalsecret.yaml`, and other resource files only when required. Follow the list ordering rules in AGENTS.md ("List ordering rules"): files in the kustomization's own directory come first (section 1, self-sorted), directory references last (section 4, self-sorted).
 
 #### `kubernetes/apps/<namespace>/<app>/app/helmrelease.yaml`
 
@@ -277,7 +277,7 @@ resources:
     - ./<app>/ks.yaml
 ```
 
-Keep the resource list alphabetized.
+Follow the list ordering rules in AGENTS.md ("List ordering rules"): `./namespace.yaml` (section 1) first, then the `./<app>/ks.yaml` Kustomization entries (section 3, self-sorted).
 
 ### Step 7: Verify
 
