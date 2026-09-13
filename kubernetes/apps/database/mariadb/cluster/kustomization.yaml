@@ -20,8 +20,3 @@ resources:
   - ./databases/nextcloud.yaml
   - ./grants/nextcloud.yaml
   - ./users/nextcloud.yaml
-
-  # Wordpress
-  - ./databases/wordpress.yaml
-  - ./grants/wordpress.yaml
-  - ./users/robotybezprzewodowe.yaml
