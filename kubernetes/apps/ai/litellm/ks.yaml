@@ -26,6 +26,12 @@ spec:
     - name: litellm-operator
     - name: external-secrets-store
       namespace: external-secrets
+    - name: dragonfly-operator
+      namespace: database
+  healthCheckExprs:
+    - apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      current: has(status.phase) && status.phase == 'Ready'
   interval: 1h
   path: ./kubernetes/apps/ai/litellm/config
   postBuild:

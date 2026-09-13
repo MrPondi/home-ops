@@ -11,8 +11,14 @@ spec:
   dependsOn:
     - name: external-secrets-store
       namespace: external-secrets
+    - name: dragonfly-operator
+      namespace: database
     - name: searxng
       namespace: ai
+  healthCheckExprs:
+    - apiVersion: dragonflydb.io/v1alpha1
+      kind: Dragonfly
+      current: has(status.phase) && status.phase == 'Ready'
   interval: 1h
   path: ./kubernetes/apps/ai/open-webui/app
   postBuild:
