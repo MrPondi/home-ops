@@ -43,15 +43,8 @@ spec:
   dependsOn:
     - name: toolhive-operator
     - name: app-postbuild
-    - name: dragonfly-operator
-      namespace: database
     - name: external-secrets-store
       namespace: external-secrets
-  healthCheckExprs:
-    - apiVersion: dragonflydb.io/v1alpha1
-      kind: Dragonfly
-      failed: status.phase != 'ready'
-      current: status.phase == 'ready'
   interval: 1h
   path: ./kubernetes/apps/ai/toolhive/config
   postBuild:

@@ -5,8 +5,23 @@ kind: Dragonfly
 metadata:
   name: ${APP}-dragonfly
 spec:
-  image: ghcr.io/dragonflydb/dragonfly:v1.40.2
-  replicas: ${DRAGONFLY_REPLICAS:=1}
+  # replicas: 2
+  # topologySpreadConstraints:
+  #   - maxSkew: 1
+  #     topologyKey: kubernetes.io/hostname
+  #     whenUnsatisfiable: DoNotSchedule
+  #     labelSelector:
+  #       matchLabels:
+  #         app: ${APP}-dragonfly
+  snapshot:
+    cron: "*/5 * * * *"
+    persistentVolumeClaimSpec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: miroir-slow-local
   env:
     - name: MAX_MEMORY
       valueFrom:
@@ -14,11 +29,13 @@ spec:
           resource: limits.memory
           divisor: 1Mi
   args:
+    - --dbfilename=dump
     - --maxmemory=$(MAX_MEMORY)Mi
     - --proactor_threads=2
     - --cluster_mode=emulated
+    - --default_lua_flags=allow-undeclared-keys
   resources:
     requests:
       cpu: 25m
     limits:
-      memory: 768Mi
+      memory: 512Mi

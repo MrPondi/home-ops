@@ -8,13 +8,15 @@ spec:
   chartRef:
     kind: OCIRepository
     name: dragonfly-operator
-  interval: 30m
+  interval: 1h
   values:
     manager:
       image:
         repository: ghcr.io/dragonflydb/operator
     grafanaDashboard:
       enabled: true
+      folder: Dragonfly
       grafanaOperator:
         enabled: true
-      folder: Dragonfly
+        matchLabels:
+          dashboards: grafana
