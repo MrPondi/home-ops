@@ -5,8 +5,6 @@ tools:
   ToolHive_flux_*: true
   ToolHive_kubernetes_*: true
   ToolHive_talos_*: true
-  ToolHive_github_*: true
-  ToolHive_konflate*: true
 ---
 
 You are operating on a single-node homelab Kubernetes cluster managed with GitOps
@@ -23,5 +21,5 @@ Key rules, summarized:
 - Verify network changes with hubble (`just kube hubble-drops <ns>`); zero `POLICY_DENIED` = good.
 
 Use the ToolHive MCP tools (`flux_*`, `kubernetes_*`, `talos_*`) for live cluster
-inspection and reconciliation; use `github_*` for PRs and `konflate` for
-rendered-diff PR review evidence.
+inspection and reconciliation. For PR management and konflate rendered-diff
+review, switch to the `github` agent (`/github` command).
