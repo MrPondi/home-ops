@@ -53,8 +53,9 @@ spec:
     # Valkey (dragonfly)
     - toEndpoints:
         - matchLabels:
-            app: searxng-dragonfly
+            app: ${APP}-dragonfly
             app.kubernetes.io/name: dragonfly
+            app.kubernetes.io/part-of: dragonfly
       toPorts:
         - ports:
             - port: "6379"

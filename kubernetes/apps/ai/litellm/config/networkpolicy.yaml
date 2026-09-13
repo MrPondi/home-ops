@@ -62,8 +62,9 @@ spec:
     # Redis cache (dragonfly)
     - toEndpoints:
         - matchLabels:
-            app: litellm-dragonfly
+            app: ${APP}-dragonfly
             app.kubernetes.io/name: dragonfly
+            app.kubernetes.io/part-of: dragonfly
       toPorts:
         - ports:
             - port: "6379"

@@ -47,8 +47,9 @@ spec:
     # Session storage (dragonfly)
     - toEndpoints:
         - matchLabels:
-            app: toolhive-dragonfly
+            app: ${APP}-dragonfly
             app.kubernetes.io/name: dragonfly
+            app.kubernetes.io/part-of: dragonfly
       toPorts:
         - ports:
             - port: "6379"
@@ -155,8 +156,9 @@ spec:
     # Session storage (dragonfly)
     - toEndpoints:
         - matchLabels:
-            app: toolhive-dragonfly
+            app: ${APP}-dragonfly
             app.kubernetes.io/name: dragonfly
+            app.kubernetes.io/part-of: dragonfly
       toPorts:
         - ports:
             - port: "6379"
