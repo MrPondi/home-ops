@@ -1,5 +1,21 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "default_agent": "homelab-k8s",
+  "tools": {
+    "ToolHive_flux_*": false,
+    "ToolHive_github_*": false,
+    "ToolHive_grafana_*": false,
+    "ToolHive_hass_*": false,
+    "ToolHive_kubernetes_*": false,
+    "ToolHive_prometheus_*": false,
+    "ToolHive_seerr_*": false,
+    "ToolHive_servarr_*": false,
+    "ToolHive_talos_*": false,
+    "ToolHive_unifi-network_*": false,
+    "ToolHive_victoria-logs_*": false,
+    "ToolHive_webfetch": false,
+    "ToolHive_websearch": false
+  },
   "mcp": {
     "ToolHive": {
       "type": "remote",
