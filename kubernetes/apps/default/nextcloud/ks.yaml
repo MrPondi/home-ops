@@ -6,20 +6,19 @@ metadata:
   name: nextcloud
 spec:
   components:
+    - ../../../../components/dragonfly
     - ../../../../components/kopiur/backup
-    # - ../../../../components/dragonfly
   dependsOn:
-    - name: dragonfly-operator
-      namespace: database
     - name: external-secrets-store
       namespace: external-secrets
+    - name: dragonfly-operator
+      namespace: database
     - name: mariadb-cluster
       namespace: database
   healthCheckExprs:
     - apiVersion: dragonflydb.io/v1alpha1
       kind: Dragonfly
-      failed: status.phase != 'ready'
-      current: status.phase == 'ready'
+      current: has(status.phase) && status.phase == 'Ready'
   interval: 1h
   path: ./kubernetes/apps/default/nextcloud/app
   postBuild:

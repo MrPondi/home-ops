@@ -8,10 +8,10 @@ spec:
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
-    - name: cloudflare-tunnel
-      namespace: network
     - name: external-secrets-store
       namespace: external-secrets
+    - name: cloudflare-tunnel
+      namespace: network
   interval: 1h
   path: ./kubernetes/apps/default/home-assistant/app
   postBuild:

@@ -78,7 +78,12 @@ Flux recursively walks `kubernetes/apps/` from the root Kustomization `cluster-a
 
 - **Namespace injection** — `metadata.namespace` is never set inline on `HelmRelease`/`Kustomization` resources. The namespace is injected by the overlay kustomization's `namespace:` field (`kubernetes/apps/<ns>/kustomization.yaml`), which also renames the Namespace placeholder (`kubernetes/apps/<ns>/namespace.yaml`, `name: _`). `spec.targetNamespace` on child Kustomizations is stamped at render time by the replacements list (`kubernetes/components/replacements/ks.yaml`, wired via each overlay's top-level `replacements:` field). The replacement **must** stay top-level: replacements carried by a kustomize component run before the Namespace rename and would read the placeholder name. **Never** set `targetNamespace` explicitly in an app `ks.yaml` — do not flag its absence as a violation.
 - **Per-app chart sources** — every app declares its own `OCIRepository` in `<subdir>/ocirepository.yaml`, named after the app; the HelmRelease's `spec.chartRef.name` matches it. There is no shared/injected app-template repo.
-- **Alphabetical lists** — kustomize resource lists are alphabetized; add new files (e.g. `networkpolicy.yaml`) to the dir's `kustomization.yaml`.
+- **List ordering rules** — entries in `resources:` lists are grouped into _sections_; each section is sorted within itself (case-insensitive byte order, `./` prefix ignored). Sections appear in this fixed order at the top of the list:
+    1. **Files in the kustomization's own directory** — `./<name>.yaml` (e.g. `namespace.yaml`, `helmrelease.yaml`, `externalsecret.yaml`, `networkpolicy.yaml`).
+    2. **Files in subdirectories** — `./<subdir>/<name>.yaml` (e.g. mariadb cluster's `databases/`/`grants/`/`users/` per-app groups). Comment-delimited groups (e.g. `# Pelican`) are sub-sections, with the groups themselves sorted.
+    3. **Flux Kustomizations** — `./<app>/ks.yaml`. Only occur in namespace overlays, alongside root files (section 1).
+    4. **Directory references** — `./<folder>/` (e.g. `./servers/`, `./models/`). Always last in a resource list.
+- **Flux Kustomizations (`ks.yaml`)** — top-level keys alphabetized (`apiVersion`, `kind`, `metadata`, `spec`); `spec.*` keys alphabetized (e.g. `healthCheckExprs` sorts before `healthChecks`) except `patches` which are **last**. `spec.dependsOn` is **not** alphabetical — it follows dependency-chain order: same-namespace deps first (operator/crds before the app), then `external-secrets-store` (ns `external-secrets`), then remaining cross-namespace deps. `spec.components` is sorted plain path-alphabetical.
 - **Schema headers** — every YAML document starts with a `---` separator followed by a schema header pointing at the schema server: `# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/<group>/<kind>_v<n>.json` (e.g. `cilium.io/ciliumnetworkpolicy_v2.json`, `kustomize.toolkit.fluxcd.io/kustomization_v1.json`). Multi-doc files repeat `---` + header per document. Kustomization files themselves use `https://json.schemastore.org/kustomization`.
 - **Formatting** — YAML is 2-space indented (`.editorconfig`); JSON/YAML/Markdown formatting is delegated to the oxc formatter (`.vscode/settings.json`); Git hooks run via lefthook (remote config from `home-operations/.github`).
 - **Components** (`kubernetes/components/`):
@@ -111,7 +116,7 @@ The repo is driven by `just` (`just --list`; modules in `.justfile`, `kubernetes
 
 - `just kube sync ks` — force-sync every Kustomization (annotates force-sync/reconcile/forceAt)
 - `just kube apply-ks <ns> <ks>` / `delete-ks <ns> <ks>` — SSA-apply / delete a locally rendered Kustomization
-- `just kube render-local-ks <ns> <ks>` — render with flate (`--allow-missing-secrets`)
+- `just kube render-local-ks <ns> <ks>` — render kustomization with flate (`--allow-missing-secrets`). **`<ks>` is the Kustomization's `metadata.name`** from the app's `ks.yaml` (e.g. `just kube render-local-ks ai toolhive-config`), not the directory name.
 - `just kube node-shell <node>`, `browse-pvc <ns> <claim>`, `view-secret <ns> <secret>`, `prune-pods`
 - `just talos apply-node <node>`, `upgrade-k8s <version>`, `upgrade-node <node>`, `render-config <node>`, `reset/reboot/shutdown-node`
 - `just template <file>` — minijinja-cli + vals (auto-unlocks Bitwarden via `bw serve` on `:8087`)

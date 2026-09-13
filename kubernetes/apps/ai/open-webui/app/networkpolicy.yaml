@@ -46,8 +46,9 @@ spec:
     # Redis (dragonfly)
     - toEndpoints:
         - matchLabels:
-            app: open-webui-dragonfly
+            app: ${APP}-dragonfly
             app.kubernetes.io/name: dragonfly
+            app.kubernetes.io/part-of: dragonfly
       toPorts:
         - ports:
             - port: "6379"

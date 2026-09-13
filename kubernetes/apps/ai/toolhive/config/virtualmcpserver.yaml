@@ -59,6 +59,9 @@ spec:
     db: 0
     provider: redis
     keyPrefix: "vmcp-sessions:"
+    passwordRef:
+      key: password
+      name: ${APP}-dragonfly-secret
   podTemplateSpec:
     spec:
       containers:
@@ -101,6 +104,9 @@ spec:
     db: 1
     provider: redis
     keyPrefix: "vmcp-sessions:"
+    passwordRef:
+      key: password
+      name: ${APP}-dragonfly-secret
   podTemplateSpec:
     spec:
       containers:
