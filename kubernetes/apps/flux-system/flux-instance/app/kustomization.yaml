@@ -6,8 +6,8 @@ resources:
   - ./externalsecret.yaml
   - ./grafanadashboard.yaml
   - ./helmrelease.yaml
-  - ./ocirepository.yaml
   - ./httproute.yaml
+  - ./ocirepository.yaml
   - ./podmonitor.yaml
   - ./prometheusrule.yaml
   - ./receiver.yaml

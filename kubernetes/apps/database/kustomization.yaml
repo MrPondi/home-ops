@@ -12,8 +12,8 @@ components:
   - ../../components/kopiur/base
 
 resources:
-  - ./networkpolicy.yaml
   - ./namespace.yaml
+  - ./networkpolicy.yaml
   - ./cloudnative-pg/ks.yaml
   - ./dragonfly-operator/ks.yaml
   - ./mariadb/ks.yaml

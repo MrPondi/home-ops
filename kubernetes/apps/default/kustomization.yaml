@@ -22,8 +22,8 @@ resources:
   - ./mosquitto/ks.yaml
   # - ./musicbot/ks.yaml
   - ./nextcloud/ks.yaml
-  - ./pstream/ks.yaml
   - ./pelican/ks.yaml
+  - ./pstream/ks.yaml
   - ./smtp-relay/ks.yaml
   - ./watermark-remover/ks.yaml
   - ./zwave/ks.yaml
