@@ -10,6 +10,10 @@ spec:
     name: drm-exporter-intel
   interval: 1h
   values:
+    config:
+      # Node also has an AMD GPU (0000:03:00.0); scope to the Intel slot
+      # (0000:01:00.0) so the Intel-only DRA claim is sufficient.
+      devices: ["0000:01:00.0"]
     dra:
       enabled: true
       deviceClassName: gpu.intel.com

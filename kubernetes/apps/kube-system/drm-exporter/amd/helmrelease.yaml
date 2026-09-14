@@ -10,13 +10,15 @@ spec:
     name: drm-exporter-amd
   interval: 1h
   values:
+    config:
+      # Node has two GPUs (Intel 0000:01:00.0 + AMD 0000:03:00.0); qmlib
+      # enumerates every DRM card and the exporter exits ENOENT on the Intel
+      # device node, which is not injected by the AMD-only DRA claim. Scope to
+      # the AMD slot so only its device nodes are opened.
+      devices: ["0000:03:00.0"]
     dra:
       enabled: true
       deviceClassName: gpu.amd.com
-    securityContext:
-      capabilities:
-        add:
-          - PERFMON
     monitoring:
       serviceMonitor:
         enabled: true
