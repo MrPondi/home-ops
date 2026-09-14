@@ -175,16 +175,4 @@
       versioning: "semver",
     },
   ],
-
-  customManagers: [
-    {
-      description: "Process Lavalink plugin dependencies",
-      customType: "regex",
-      managerFilePatterns: ["/lavalink/.+\\.ya?ml(?:\\.j2)?$/"],
-      matchStrings: [
-        '- dependency: "(?<depName>[^:]+:[^:]+):(?<currentValue>[^"]+)"[^\\n]*\\n\\s+repository:\\s*"(?<registryUrl>[^"]+)"',
-      ],
-      datasourceTemplate: "maven",
-    },
-  ],
 }

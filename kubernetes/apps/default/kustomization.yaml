@@ -20,7 +20,6 @@ resources:
   - ./home-assistant/ks.yaml
   - ./homepage/ks.yaml
   - ./mosquitto/ks.yaml
-  # - ./musicbot/ks.yaml
   - ./nextcloud/ks.yaml
   - ./pelican/ks.yaml
   - ./pstream/ks.yaml
