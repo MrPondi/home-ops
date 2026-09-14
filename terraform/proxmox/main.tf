@@ -34,7 +34,8 @@ data "bitwarden-secrets_secret" "proxmox" {
 
 provider "proxmox" {
   endpoint  = "https://pve.internal:8006"
-  api_token = jsondecode(data.bitwarden-secrets_secret.proxmox.value)["PROXMOX_TERRAFORM_TOKEN"]
+  username  = "root@pam"
+  password  = jsondecode(data.bitwarden-secrets_secret.proxmox.value)["PROXMOX_ROOT_PASSWORD"]
   insecure  = true
   ssh {
     agent       = true

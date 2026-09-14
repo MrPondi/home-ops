@@ -80,21 +80,28 @@ resource "proxmox_virtual_environment_vm" "k8s-0" {
 
   hostpci {
     device   = "hostpci0"
-    id       = "0000:0a:00"
+    id       = "0000:0a:00.0" # Intel DG2 Arc A310 [8086:56a6]
     pcie     = true
     rombar   = true
   }
 
   hostpci {
     device   = "hostpci1"
-    id       = "0000:09:00"
+    id       = "0000:09:00.0" # Intel DG2 Audio Controller [8086:4f92]
     pcie     = true
     rombar   = true
   }
 
   hostpci {
     device   = "hostpci2"
-    id       = "0000:01:00" # Granite Ridge Radeon 610M (1002:13c0) - vfio-pci on the host
+    id       = "0000:01:00.0" # AMD Granite Ridge Radeon 610M [1002:13c0]
+    pcie     = true
+    rombar   = true
+  }
+
+  hostpci {
+    device   = "hostpci3"
+    id       = "0000:01:00.1" # AMD Radeon High Definition Audio Controller [1002:1640]
     pcie     = true
     rombar   = true
   }
