@@ -42,6 +42,21 @@ spec:
       enabled: true
       dashboards:
         enabled: true
+      # Per-flow export of dropped flows to /var/run/cilium/hubble/ (hostPath),
+      # collected by victoria-logs-collector on the node. JSON lines, hot-reloadable.
+      export:
+        dynamic:
+          enabled: true
+          config:
+            createConfigMap: true
+            content:
+              - name: policy-drops
+                filePath: /var/run/cilium/hubble/policy-drops.log
+                fileMaxSizeMb: 10
+                fileMaxBackups: 3
+                includeFilters:
+                  - verdict:
+                      - DROPPED
       metrics:
         enabled:
           - dns
