@@ -37,8 +37,8 @@ provider "proxmox" {
   api_token = jsondecode(data.bitwarden-secrets_secret.proxmox.value)["PROXMOX_TERRAFORM_TOKEN"]
   insecure  = true
   ssh {
-    agent = true
-    username = "root"
+    agent       = true
+    username    = "root"
     private_key = data.sops_file.secret.data["PROXMOX_SSH_KEY"]
   }
 }

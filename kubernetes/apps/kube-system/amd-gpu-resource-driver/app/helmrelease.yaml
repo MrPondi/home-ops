@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: amd-gpu-resource-driver
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: amd-gpu-resource-driver
+  interval: 1h
+  values:
+    image:
+      repository: docker.io/rocm/k8s-gpu-dra-driver
+      tag: v1.0.1@sha256:f173c8e78bc819e2b8adc15192afefaf69a11307d49fca5382bda82885975830
+    kubeletPlugin:
+      containers:
+        init:
+          image: docker.io/library/busybox:1.37@sha256:9db7b59979c38555a39def84a31fb98b5296952f9e3afd4f6f11f05b07adfab0
+    cdi:
+      dynamicPath: /run/cdi

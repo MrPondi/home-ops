@@ -12,6 +12,7 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./amd-gpu-resource-driver/ks.yaml
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
   - ./drm-exporter/ks.yaml

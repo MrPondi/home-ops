@@ -92,6 +92,13 @@ resource "proxmox_virtual_environment_vm" "k8s-0" {
     rombar   = true
   }
 
+  hostpci {
+    device   = "hostpci2"
+    id       = "0000:01:00" # Granite Ridge Radeon 610M (1002:13c0) - vfio-pci on the host
+    pcie     = true
+    rombar   = true
+  }
+
   usb {
     host = "10c4:ea60"
     usb3 = true
