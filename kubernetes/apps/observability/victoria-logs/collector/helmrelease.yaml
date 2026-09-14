@@ -27,3 +27,15 @@ spec:
         - kubernetes.pod_labels.app.kubernetes.io/name
     extraArgs:
       "kubernetesCollector.decolorizeFields": _msg
+      # Cilium hubble exported flows on the node (rotated by the exporter)
+      "fileCollector.glob": /var/run/cilium/hubble/policy-drops*.log
+      "fileCollector.extraFields": '{"log_source":"cilium-hubble"}'
+    extraVolumes:
+      - name: hubble-flows
+        hostPath:
+          path: /var/run/cilium/hubble
+          type: Directory
+    extraVolumeMounts:
+      - name: hubble-flows
+        mountPath: /var/run/cilium/hubble
+        readOnly: true
