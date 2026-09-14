@@ -7,6 +7,10 @@
     "nefrob.vscode-just-syntax",
     "PKief.material-icon-theme",
     "redhat.vscode-yaml",
-    "signageos.signageos-vscode-sops"
+    "signageos.signageos-vscode-sops",
+    "tamasfe.even-better-toml",
+    "hashicorp.terraform",
+    "home-operations.yayamlls",
+    "wholroyd.jinja"
   ]
 }
