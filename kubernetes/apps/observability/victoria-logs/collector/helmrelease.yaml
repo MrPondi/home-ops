@@ -30,6 +30,10 @@ spec:
       # Cilium hubble exported flows on the node (rotated by the exporter)
       "fileCollector.glob": /var/run/cilium/hubble/policy-drops*.log
       "fileCollector.extraFields": '{"log_source":"cilium-hubble"}'
+      # single stream per node instead of default hostname+file → stream-filterable & compress better
+      "fileCollector.streamFields": hostname,log_source
+      # use the flow event time, not tailing time
+      "fileCollector.timeField": time
     extraVolumes:
       - name: hubble-flows
         hostPath:
