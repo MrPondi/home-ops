@@ -13,6 +13,10 @@ spec:
     dra:
       enabled: true
       deviceClassName: gpu.amd.com
+    securityContext:
+      capabilities:
+        add:
+          - PERFMON
     monitoring:
       serviceMonitor:
         enabled: true
