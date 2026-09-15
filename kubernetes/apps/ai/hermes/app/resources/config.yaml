@@ -71,6 +71,15 @@ security:
   redact_secrets: true
   tirith_enabled: true
   tirith_fail_open: true
+# No Nous Portal account in use: disable the auth keepalive thread,
+# the passive update checks, and the external model-catalog fetch
+# (portal.nousresearch.com / hermes-agent.nousresearch.com / openrouter.ai)
+nous:
+  keepalive_interval_seconds: 0
+updates:
+  check: false
+model_catalog:
+  enabled: false
 streaming:
   enabled: false
 terminal:
