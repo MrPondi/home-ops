@@ -73,20 +73,6 @@ spec:
             - port: "9187"
               protocol: TCP
   egress:
-    # DNS
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: kube-system
-            k8s:k8s-app: kube-dns
-      toPorts:
-        - ports:
-            - port: "53"
-              protocol: UDP
-            - port: "53"
-              protocol: TCP
-          rules:
-            dns:
-              - matchPattern: "*"
     # Kubernetes API (instance status reporting)
     - toEntities:
         - host
@@ -146,20 +132,6 @@ spec:
             - port: "9090"
               protocol: TCP
   egress:
-    # DNS
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: kube-system
-            k8s:k8s-app: kube-dns
-      toPorts:
-        - ports:
-            - port: "53"
-              protocol: UDP
-            - port: "53"
-              protocol: TCP
-          rules:
-            dns:
-              - matchPattern: "*"
     # Kubernetes API
     - toEntities:
         - host
