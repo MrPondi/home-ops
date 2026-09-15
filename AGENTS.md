@@ -43,7 +43,7 @@ CIDR map:
 
 Namespaces mirror `kubernetes/apps/` (network, observability, database, media, ai, default, security, external-secrets, cert-manager, kube-system, flux-system, kopiur-system, miroir-system, longhorn-system, system-upgrade, actions-runner-system). Live extras `cilium-secrets` and `openebs-system` are empty and not Flux-managed — leave them alone.
 
-**Fail-closed namespaces** (baseline `default-deny` NetworkPolicy folded into `<ns>/namespace.yaml`): `ai`, `database`, `external-secrets`, `cert-manager`, `actions-runner-system`. All other namespaces are open (no baseline deny).
+**Fail-closed namespaces** (baseline `default-deny` CiliumNetworkPolicy folded into `<ns>/namespace.yaml`): `ai`, `database`, `external-secrets`, `cert-manager`, `actions-runner-system`. The baseline is deny-all ingress + deny-all egress with one namespace-wide egress allow: DNS to kube-dns (kube-system) with `rules.dns` L7 inspection — apps in fail-closed namespaces must **not** re-declare a per-app DNS egress rule (it is inherited from `default-deny`). Per-app CNPs only add app-specific egress (kube API, services, internet, FQDN). All other namespaces are open (no baseline deny).
 
 ## Key Technologies
 
@@ -199,7 +199,7 @@ Cilium 1.20 (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.
     - **Never guess chart labels** — render with flate and copy the real ones, then cross-check live endpoints (`cilium-dbg endpoint list -o json` → `status.labels["security-relevant"]`).
 - Every selector endpoint (`endpointSelector`, `fromEndpoints`, `toEndpoints` entries) carries a short comment stating what it matches — e.g. `# Dragonfly operator pods (database/ns-wide)` or `# kube-dns pods (kube-system)`. A selector that compiles but matches nothing is silent; the comment makes the intent reviewable against rendered/live labels.
 - Standard building blocks (copy from existing policies):
-    - DNS: toEndpoints kube-system + `k8s-app: kube-dns`, ports 53 UDP/TCP, `rules.dns.matchPattern: "*"`
+    - DNS: shipped cluster-wide **per fail-closed namespace** by the `default-deny` CNP in `<ns>/namespace.yaml` (toEndpoints kube-system + `k8s:k8s-app: kube-dns`, ports 53 UDP/TCP, `rules.dns.matchPattern: "*"`); allow rules are additive across policies. Do **not** duplicate it in per-app CNPs in fail-closed namespaces — only in shared components (`kopiur/base`, `dragonfly`) or policies in open namespaces. `toFQDNs` rules in any CNP of a fail-closed ns work thanks to the proxied DNS; FQDN policies without any proxied `:53` DNS won't resolve (2026-09).
     - Route ingress: fromEndpoints `network` ns + `k8s:app.kubernetes.io/name: envoy` + `k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal` (copy from `open-webui`)
     - Metrics ingress: fromEndpoints `observability` ns + `k8s:app.kubernetes.io/name: prometheus`
     - kube API: `toEntities: [host, remote-node]` port 6443
