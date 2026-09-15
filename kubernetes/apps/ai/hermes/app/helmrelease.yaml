@@ -97,7 +97,8 @@ spec:
             env:
               HOME: /opt/data
               HERMES_HOME: /opt/data
-              WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
+              # WhatsApp cloud webhook (unused — platform disabled in config.yaml)
+              # WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
               SEARXNG_URL: http://searxng.ai.svc.cluster.local:8080
               API_SERVER_ENABLED: true
               API_SERVER_HOST: 0.0.0.0
@@ -185,6 +186,13 @@ spec:
               limits:
                 memory: 1Gi
     defaultPodOptions:
+      # ndots:1 → external names are resolved absolutely first (no search-suffix
+      # lookups), so Cilium's FQDN rules see the plain names they match
+      # (see cilium issue #20191)
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       securityContext:
         runAsNonRoot: true
         runAsUser: 10000
@@ -196,8 +204,8 @@ spec:
         ports:
           api:
             port: *api-port
-          whatsapp:
-            port: *whatsapp-port
+          # whatsapp:
+          #   port: *whatsapp-port
       dashboard:
         ports:
           http:
@@ -221,23 +229,23 @@ spec:
           - backendRefs:
               - identifier: dashboard
                 port: http
-      whatsapp-webhook:
-        annotations:
-          gatus.home-operations.com/endpoint: |-
-            conditions: ["[STATUS] == 400"]
-        hostnames:
-          - whatsapp-webhook.pondi.dev
-        parentRefs:
-          - name: envoy-external
-            namespace: network
-        rules:
-          - backendRefs:
-              - identifier: gateway
-                port: whatsapp
-            matches:
-              - path:
-                  type: PathPrefix
-                  value: /whatsapp/webhook
+      # whatsapp-webhook:
+      #   annotations:
+      #     gatus.home-operations.com/endpoint: |-
+      #       conditions: ["[STATUS] == 400"]
+      #   hostnames:
+      #     - whatsapp-webhook.pondi.dev
+      #   parentRefs:
+      #     - name: envoy-external
+      #       namespace: network
+      #   rules:
+      #     - backendRefs:
+      #         - identifier: gateway
+      #           port: whatsapp
+      #       matches:
+      #         - path:
+      #             type: PathPrefix
+      #             value: /whatsapp/webhook
     persistence:
       data:
         existingClaim: "{{ .Release.Name }}"

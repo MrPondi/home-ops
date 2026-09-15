@@ -19,16 +19,16 @@ spec:
         - ports:
             - port: "9119"
               protocol: TCP
-    # HTTPRoute whatsapp-webhook.pondi.dev (envoy-external)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: network
-            k8s:app.kubernetes.io/name: envoy
-            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-external
-      toPorts:
-        - ports:
-            - port: "8090"
-              protocol: TCP
+    # WhatsApp webhook (unused — platform disabled in config.yaml)
+    # - fromEndpoints:
+    #     - matchLabels:
+    #         k8s:io.kubernetes.pod.namespace: network
+    #         k8s:app.kubernetes.io/name: envoy
+    #         k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-external
+    #   toPorts:
+    #     - ports:
+    #         - port: "8090"
+    #           protocol: TCP
     # open-webui (OpenAI-compatible backend)
     - fromEndpoints:
         - matchLabels:
@@ -86,14 +86,24 @@ spec:
         - ports:
             - port: "10443"
               protocol: TCP
-    # WhatsApp cloud API, ffmpeg download, npm registry (init containers)
-    - toCIDRSet:
-        - cidr: 0.0.0.0/0
-          except:
-            - 10.0.0.0/8
-            - 169.254.0.0/16
-            - 172.16.0.0/12
-            - 192.168.0.0/16
+    # Photon iMessage gRPC stream (spectrum sidecar)
+    - toFQDNs:
+        - matchPattern: "*.spectrum.photon.codes"
+        - matchName: spectrum.photon.codes
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # ffmpeg static build download (1-init)
+    - toFQDNs:
+        - matchName: johnvansickle.com
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Photon sidecar deps, npm install (2-install-tools)
+    - toFQDNs:
+        - matchName: registry.npmjs.org
       toPorts:
         - ports:
             - port: "443"

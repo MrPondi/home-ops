@@ -43,7 +43,7 @@ command_allowlist:
 gateway:
   platforms:
     whatsapp_cloud:
-      enabled: true
+      enabled: false
       require_mention: true
     photon:
       enabled: true
