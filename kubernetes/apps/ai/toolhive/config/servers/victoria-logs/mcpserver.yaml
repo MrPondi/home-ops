@@ -22,5 +22,7 @@ spec:
       value: info
     - name: VL_INSTANCE_ENTRYPOINT
       value: http://victoria-logs.observability.svc.cluster.local:9428
+    - name: TOOLHIVE_SKIP_UPDATE_CHECK
+      value: "true"
   groupRef:
     name: mcp-tools
