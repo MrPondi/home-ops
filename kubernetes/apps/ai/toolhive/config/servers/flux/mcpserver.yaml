@@ -9,6 +9,10 @@ spec:
   transport: streamable-http
   mcpPort: 8000
   serviceAccount: flux-mcp
+  env:
+    # In-cluster mode: no KUBECONFIG; uses the pod service account.
+    - name: RUNTIME_NAMESPACE
+      value: flux-system
   podTemplateSpec:
     spec:
       containers:
@@ -17,12 +21,5 @@ spec:
             - serve
             - --transport=http
             - --port=8000
-          env:
-            # In-cluster mode: no KUBECONFIG; uses the pod service account.
-            - name: RUNTIME_NAMESPACE
-              value: flux-system
-            # Disable the proxyrunner's update checks / usage metrics
-            - name: TOOLHIVE_SKIP_UPDATE_CHECK
-              value: "true"
   groupRef:
     name: mcp-tools

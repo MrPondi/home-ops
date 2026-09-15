@@ -44,6 +44,14 @@ spec:
           rules:
             dns:
               - matchPattern: "*"
+    # Kubernetes API
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
     # Proxy <-> server (same workload)
     - toEndpoints:
         - matchLabels:
@@ -61,24 +69,4 @@ spec:
       toPorts:
         - ports:
             - port: "3000"
-              protocol: TCP
-    # Kubernetes API (toolhive proxy control-plane calls)
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
-    # Internet (registry checks, remote MCP endpoints)
-    - toCIDRSet:
-        - cidr: 0.0.0.0/0
-          except:
-            - 10.0.0.0/8
-            - 169.254.0.0/16
-            - 172.16.0.0/12
-            - 192.168.0.0/16
-      toPorts:
-        - ports:
-            - port: "443"
               protocol: TCP

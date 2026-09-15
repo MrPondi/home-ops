@@ -35,8 +35,6 @@ spec:
       value: "false"
     - name: UNIFI_TOOL_PERMISSION_MODE
       value: confirm
-    - name: TOOLHIVE_SKIP_UPDATE_CHECK
-      value: "true"
   secrets:
     - name: toolhive-unifi-username-secret
       key: UNIFI_USERNAME
