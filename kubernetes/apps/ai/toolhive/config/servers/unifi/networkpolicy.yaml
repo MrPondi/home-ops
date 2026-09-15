@@ -9,48 +9,44 @@ spec:
     matchLabels:
       toolhive: "true"
       toolhive-name: *name
+      app: *name
   ingress:
-    # MCP gateways -> proxy sidecar / server port
+    # Proxy runner -> server
     - fromEndpoints:
         - matchLabels:
-            app.kubernetes.io/name: virtualmcpserver
-      toPorts:
-        - ports:
-            - port: "8080"
-              protocol: TCP
-            - port: "3000"
-              protocol: TCP
-    # Proxy <-> server (same workload)
-    - fromEndpoints:
-        - matchLabels:
-            toolhive: "true"
-            toolhive-name: *name
+            toolhive-name: unifi-network
+            app.kubernetes.io/name: mcpserver
       toPorts:
         - ports:
             - port: "3000"
               protocol: TCP
   egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
-    # Proxy <-> server (same workload)
-    - toEndpoints:
-        - matchLabels:
-            toolhive: "true"
-            toolhive-name: *name
-      toPorts:
-        - ports:
-            - port: "3000"
-              protocol: TCP
     # UniFi controller
     - toCIDR:
         - 192.168.1.1/32
       toPorts:
         - ports:
             - port: "443"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: unifi-network-proxy-runner
+spec:
+  endpointSelector:
+    matchLabels:
+      toolhive: "true"
+      toolhive-name: &name unifi-network
+      app.kubernetes.io/name: mcpserver
+  egress:
+    # Proxy runner -> MCP server
+    - toEndpoints:
+        - matchLabels:
+            toolhive-name: *name
+            app: *name
+      toPorts:
+        - ports:
+            - port: "3000"
               protocol: TCP
