@@ -13,8 +13,6 @@ spec:
       value: http://grafana-service.observability.svc.cluster.local:3000
     - name: GRAFANA_ORG_ID
       value: "1"
-    - name: TOOLHIVE_SKIP_UPDATE_CHECK
-      value: "true"
   secrets:
     - name: grafana-mcp-token
       key: token

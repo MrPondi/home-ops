@@ -13,8 +13,6 @@ spec:
       value: https://api.github.com
     - name: LOG_LEVEL
       value: info
-    - name: TOOLHIVE_SKIP_UPDATE_CHECK
-      value: "true"
   secrets:
     - name: toolhive-github-secret
       key: GITHUB_PERSONAL_ACCESS_TOKEN

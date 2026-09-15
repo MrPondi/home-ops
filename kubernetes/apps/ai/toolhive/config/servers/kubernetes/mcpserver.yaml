@@ -5,9 +5,7 @@ kind: MCPServer
 metadata:
   name: kubernetes
 spec:
-  env:
-    - name: TOOLHIVE_SKIP_UPDATE_CHECK
-      value: "true"
+  env: []
   image: ghcr.io/containers/kubernetes-mcp-server:v0.0.66@sha256:6d650f4bd6ac303ad82713c997e73a2d001602f9bf17392c9b9a0e30e29c6423
   transport: streamable-http
   mcpPort: 8080
