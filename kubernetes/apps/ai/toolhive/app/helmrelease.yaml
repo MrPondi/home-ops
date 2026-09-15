@@ -11,6 +11,10 @@ spec:
   interval: 1h
   values:
     operator:
+      # Disable periodic update checks (updates.stacklok.com) and usage metrics
+      env:
+        - name: TOOLHIVE_SKIP_UPDATE_CHECK
+          value: "true"
       resources:
         requests:
           memory: 128Mi
