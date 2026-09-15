@@ -16,6 +16,8 @@ spec:
       value: http
     - name: TALOS_MCP_HTTP_ADDR
       value: ":8080"
+    - name: TOOLHIVE_SKIP_UPDATE_CHECK
+      value: "true"
   podTemplateSpec:
     spec:
       containers:
