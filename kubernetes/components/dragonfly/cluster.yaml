@@ -36,6 +36,7 @@ spec:
     - --proactor_threads=2
     - --cluster_mode=emulated
     - --default_lua_flags=allow-undeclared-keys
+    - --version_check=false
   resources:
     requests:
       cpu: 25m
