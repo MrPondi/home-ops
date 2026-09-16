@@ -8,28 +8,37 @@ metadata:
 spec:
   modelRef: embed
   runtime: llamacpp
-  image: docker.io/kyuz0/amd-strix-halo-toolboxes:rocm-6.4.4@sha256:1c655ca0443655f2e7603d054770b07cd8c79267145728b3261295f005053947
+  image: ghcr.io/ggml-org/llama.cpp:server@sha256:79903855d3de1689e9856219283591be12ba6f40a8e65fc7223824109446ad88
   rolloutPolicy:
-    waitForIdle: false
+    waitForIdle: true
     idleTimeoutSeconds: 86400
   replicas: 1
   priority: normal
   podLabels:
-    gpu-inference: "true"
+    cpu-inference: "true"
     embed-pool: "true"
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                embed-pool: "true"
+            topologyKey: kubernetes.io/hostname
   contextSize: 32768
   parallelSlots: 32
   flashAttention: true
   batchSize: 2048
   uBatchSize: 2048
   env:
-    - name: HSA_OVERRIDE_GFX_VERSION
-      value: "11.5.1" # Radeon 8060S iGPU (gfx1151)
-    - name: GGML_HIP_ENABLE_UNIFIED_MEMORY
-      value: "1"
+    - name: GOMP_CPU_AFFINITY
+      value: "0-11"
+    - name: KMP_AFFINITY
+      value: "granularity=fine,proc_list=[0-11],explicit"
   resources:
     cpu: "2"
-    memory: 16Gi
+    memory: 8Gi
   mode: embedding
   extraArgs:
     - --alias
@@ -38,6 +47,10 @@ spec:
     - --cache-ram
     - "0"
     - --kv-unified
+    - --threads
+    - "6"
+    - --threads-batch
+    - "12"
     - --load-mode
     - mmap
   endpoint:
