@@ -44,6 +44,11 @@ spec:
             env:
               XDG_DATA_HOME: /pelican-data
               FILAMENT_UPLOADABLE_AVATARS: "true"
+              REDIS_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Release.Name }}-secret"
+                    key: password
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
