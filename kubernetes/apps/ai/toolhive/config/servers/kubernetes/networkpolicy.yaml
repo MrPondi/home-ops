@@ -20,15 +20,6 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
-  egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
 apiVersion: cilium.io/v2

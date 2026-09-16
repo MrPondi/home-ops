@@ -8,25 +8,7 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: *name
-  ingress:
-    # Prometheus metrics (ServiceMonitor)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "9402"
-              protocol: TCP
   egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
     # ACME (Let's Encrypt), Cloudflare API
     - toCIDRSet:
         - cidr: 0.0.0.0/0
@@ -58,36 +40,6 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name cert-manager-cainjector
-spec:
-  endpointSelector:
-    matchLabels:
-      app.kubernetes.io/name: cainjector
-      app.kubernetes.io/instance: cert-manager
-  ingress:
-    # Prometheus metrics (ServiceMonitor)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "9402"
-              protocol: TCP
-  egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
----
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
-apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
   name: &name cert-manager-webhook
 spec:
   endpointSelector:
@@ -101,22 +53,4 @@ spec:
       toPorts:
         - ports:
             - port: "9443"
-              protocol: TCP
-    # Prometheus metrics (ServiceMonitor)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "9402"
-              protocol: TCP
-  egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
               protocol: TCP

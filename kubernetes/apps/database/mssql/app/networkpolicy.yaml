@@ -9,6 +9,13 @@ spec:
     matchLabels:
       app.kubernetes.io/name: *name
   ingress:
+    # Cluster-wide clients on the service port (gatus health checks, in-cluster clients)
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "1433"
+              protocol: TCP
     # LAN clients (LoadBalancer 10.0.30.131)
     - fromCIDR:
         - 192.168.1.0/24
@@ -16,13 +23,3 @@ spec:
         - ports:
             - port: "1433"
               protocol: TCP
-    # gatus health checks
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: gatus-sidecar
-      toPorts:
-        - ports:
-            - port: "1433"
-              protocol: TCP
-  egress: []
