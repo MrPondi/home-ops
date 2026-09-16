@@ -8,7 +8,6 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: *name
-  # ingress: metrics from prometheus comes from the namespace-wide default-deny
   egress:
     # MariaDB (user/database/grant reconciliation)
     - toEndpoints:
@@ -18,18 +17,6 @@ spec:
         - ports:
             - port: "3306"
               protocol: TCP
----
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
-apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
-  name: &name mariadb-operator-cert-controller
-spec:
-  endpointSelector:
-    matchLabels:
-      app.kubernetes.io/name: *name
-  # ingress: metrics from prometheus comes from the namespace-wide default-deny
-  egress: []
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
 apiVersion: cilium.io/v2
@@ -48,4 +35,3 @@ spec:
         - ports:
             - port: "9443"
               protocol: TCP
-  egress: []

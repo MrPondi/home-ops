@@ -9,37 +9,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: *name
   ingress:
-    # HTTPRoute litellm.pondi.dev (envoy-internal)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: network
-            k8s:app.kubernetes.io/name: envoy
-            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
-      toPorts:
-        - ports:
-            - port: "4000"
-              protocol: TCP
-    # Prometheus ServiceMonitor
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "4000"
-              protocol: TCP
-    # open-webui (OpenAI-compatible backend)
-    - fromEndpoints:
-        - matchLabels:
-            app.kubernetes.io/name: open-webui
-      toPorts:
-        - ports:
-            - port: "4000"
-              protocol: TCP
-    # hermes (LLM provider)
-    - fromEndpoints:
-        - matchLabels:
-            app.kubernetes.io/name: hermes
+    # Cluster-wide clients on the service port (envoy HTTPRoute, open-webui, hermes, prometheus; API keys gate access)
+    - fromEntities:
+        - cluster
       toPorts:
         - ports:
             - port: "4000"

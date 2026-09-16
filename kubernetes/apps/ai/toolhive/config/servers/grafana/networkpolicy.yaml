@@ -21,14 +21,6 @@ spec:
             - port: "8000"
               protocol: TCP
   egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
     # Grafana instance
     - toEndpoints:
         - matchLabels:

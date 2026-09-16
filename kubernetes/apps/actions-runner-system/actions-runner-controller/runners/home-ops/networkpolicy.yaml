@@ -8,7 +8,6 @@ spec:
   endpointSelector:
     matchLabels:
       runner: *name
-  ingress: []
   egress:
     # Kubernetes + Talos API (host-networked backends; service VIPs DNAT to the node)
     - toEntities:
@@ -61,8 +60,6 @@ spec:
     matchLabels:
       app.kubernetes.io/component: runner-scale-set-listener
       app.kubernetes.io/instance: home-ops-runner
-  ingress: []
-  # egress: kube-API comes from the namespace-wide default-deny
   egress:
     # GitHub (runner scale set API, blob storage)
     - toCIDRSet:

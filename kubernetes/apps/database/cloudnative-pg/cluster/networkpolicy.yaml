@@ -75,5 +75,3 @@ spec:
         - ports:
             - port: "9090"
               protocol: TCP
-  # egress: kube-API comes from the namespace-wide default-deny
-  egress: []

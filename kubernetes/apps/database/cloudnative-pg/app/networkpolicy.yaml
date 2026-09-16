@@ -16,8 +16,6 @@ spec:
         - ports:
             - port: "9443"
               protocol: TCP
-  # ingress: metrics from prometheus comes from the namespace-wide default-deny
-  # egress: kube-API comes from the namespace-wide default-deny
   egress:
     # Barman cloud plugin API (gRPC)
     - toEndpoints:

@@ -9,7 +9,6 @@ spec:
   endpointSelector:
     matchLabels:
       k8s:app.kubernetes.io/name: *name
-  ingress: []
   egress:
     # Kubernetes API
     - toEntities:

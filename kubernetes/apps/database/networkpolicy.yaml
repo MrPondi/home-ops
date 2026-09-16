@@ -47,8 +47,6 @@ spec:
     matchExpressions:
       - key: kopiur.home-operations.com/config
         operator: Exists
-  ingress: []
-  # egress: kube-API comes from the namespace-wide default-deny
   egress:
     # Repository backend (kopia S3 via envoy-internal VIP)
     - toCIDR:

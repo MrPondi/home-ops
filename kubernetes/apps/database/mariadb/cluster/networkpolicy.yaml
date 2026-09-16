@@ -16,7 +16,6 @@ spec:
         - ports:
             - port: "3306"
               protocol: TCP
-  egress: []
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
 apiVersion: cilium.io/v2
@@ -28,7 +27,6 @@ spec:
     matchLabels:
       app.kubernetes.io/name: exporter
       app.kubernetes.io/instance: mariadb-metrics
-  # ingress: metrics from prometheus comes from the namespace-wide default-deny
   egress:
     # MariaDB (exporter)
     - toEndpoints:

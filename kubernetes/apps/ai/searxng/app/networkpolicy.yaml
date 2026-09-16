@@ -9,28 +9,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: *name
   ingress:
-    # HTTPRoute search.pondi.dev (envoy-internal)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: network
-            k8s:app.kubernetes.io/name: envoy
-            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
-      toPorts:
-        - ports:
-            - port: "8080"
-              protocol: TCP
-    # open-webui (web search backend)
-    - fromEndpoints:
-        - matchLabels:
-            app.kubernetes.io/name: open-webui
-      toPorts:
-        - ports:
-            - port: "8080"
-              protocol: TCP
-    # hermes (web backend)
-    - fromEndpoints:
-        - matchLabels:
-            app.kubernetes.io/name: hermes
+    # Cluster-wide clients on the service port (envoy HTTPRoute, open-webui, hermes)
+    - fromEntities:
+        - cluster
       toPorts:
         - ports:
             - port: "8080"
