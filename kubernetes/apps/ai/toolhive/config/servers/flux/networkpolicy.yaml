@@ -20,7 +20,6 @@ spec:
         - ports:
             - port: "8000"
               protocol: TCP
-  egress:
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
 apiVersion: cilium.io/v2
