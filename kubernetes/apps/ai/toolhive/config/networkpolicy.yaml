@@ -40,6 +40,22 @@ spec:
         - ports:
             - port: "6379"
               protocol: TCP
+    # Kubernetes API (MCP backend discovery)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # Local MCPServer proxies
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: mcpserver
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
     # OIDC upstream authentik via auth.pondi.dev (envoy-internal; backend port 10443)
     - toEndpoints:
         - matchLabels:
@@ -97,4 +113,20 @@ spec:
       toPorts:
         - ports:
             - port: "6379"
+              protocol: TCP
+    # Kubernetes API (MCP backend discovery)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # Local MCPServer proxies
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: mcpserver
+      toPorts:
+        - ports:
+            - port: "8080"
               protocol: TCP
