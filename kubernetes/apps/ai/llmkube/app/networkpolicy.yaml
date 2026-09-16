@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name llmkube-operator
+spec:
+  endpointSelector:
+    matchLabels:
+      control-plane: controller-manager # llmkube controller pods (ai), chart selectorLabels
+  ingress:
+    # Admission webhook from kube-apiserver (host-networked)
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9443"
+              protocol: TCP

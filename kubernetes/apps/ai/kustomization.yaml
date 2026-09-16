@@ -17,6 +17,7 @@ resources:
   - ./app-postbuild/ks.yaml
   - ./hermes/ks.yaml
   - ./litellm/ks.yaml
+  - ./llmkube/ks.yaml
   - ./open-webui/ks.yaml
   - ./searxng/ks.yaml
   - ./toolhive/ks.yaml

@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name embed
+spec:
+  endpointSelector:
+    matchLabels:
+      embed-pool: "true" # llmkube embed InferenceService pods (ai)
+  ingress:
+    # Same-namespace consumers (litellm proxy → embeddings)
+    - fromEndpoints:
+        - matchLabels: {} # all pods in ai
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+  egress:
+    # Model download from Hugging Face (llmkube init container)
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
