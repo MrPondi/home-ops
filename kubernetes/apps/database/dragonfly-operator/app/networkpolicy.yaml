@@ -9,6 +9,7 @@ spec:
   endpointSelector:
     matchLabels:
       k8s:app.kubernetes.io/name: *name
+  ingress: [] # deny all ingress — consumers open their own egress toward dragonfly
   egress:
     # Kubernetes API
     - toEntities:
