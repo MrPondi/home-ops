@@ -47,7 +47,7 @@ spec:
               REDIS_PASSWORD:
                 valueFrom:
                   secretKeyRef:
-                    name: "{{ .Release.Name }}-secret"
+                    name: "{{ .Release.Name }}-dragonfly-secret"
                     key: password
               TZ: Europe/Warsaw
             envFrom:
