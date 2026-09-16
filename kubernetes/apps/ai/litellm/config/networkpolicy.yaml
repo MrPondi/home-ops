@@ -39,3 +39,11 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
+    # llmkube embeddings pool (embed-1, same namespace)
+    - toEndpoints:
+        - matchLabels:
+            embed-pool: "true"
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
