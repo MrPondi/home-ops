@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: llmkube
+spec:
+  dependsOn:
+    - name: gpu-resource-driver-amd
+      namespace: kube-system
+    - name: gpu-resource-driver-intel
+      namespace: kube-system
+  interval: 1h
+  path: ./kubernetes/apps/ai/llmkube/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  wait: true
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: embed
+spec:
+  dependsOn:
+    - name: llmkube
+    - name: gpu-resource-driver-amd
+      namespace: kube-system
+  healthCheckExprs:
+    - apiVersion: inference.llmkube.dev/v1alpha1
+      kind: InferenceService
+      current: has(status.phase) && status.phase == 'Ready'
+  interval: 1h
+  path: ./kubernetes/apps/ai/llmkube/embed
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system

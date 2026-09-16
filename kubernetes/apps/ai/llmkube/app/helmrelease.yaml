@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: llmkube
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: llmkube
+  interval: 1h
+  values:
+    # Per-service RWO caches: single-node cluster (Longhorn) — the shared RWX
+    # mode used upstream needs an RWX storage class we don't have
+    modelCache:
+      enabled: true
+      mode: perService
+      size: 20Gi
+      storageClass: longhorn
+    prometheus:
+      inferencePodMonitor:
+        enabled: true
+    controllerManager:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 512Mi
