@@ -19,6 +19,15 @@ spec:
         - ports:
             - port: "4000"
               protocol: TCP
+    # Prometheus ServiceMonitor
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            k8s:app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "4000"
+              protocol: TCP
     # open-webui (OpenAI-compatible backend)
     - fromEndpoints:
         - matchLabels:
@@ -31,15 +40,6 @@ spec:
     - fromEndpoints:
         - matchLabels:
             app.kubernetes.io/name: hermes
-      toPorts:
-        - ports:
-            - port: "4000"
-              protocol: TCP
-    # Prometheus ServiceMonitor
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
       toPorts:
         - ports:
             - port: "4000"

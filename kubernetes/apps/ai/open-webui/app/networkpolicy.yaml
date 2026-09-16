@@ -82,23 +82,11 @@ spec:
         - ports:
             - port: "10443"
               protocol: TCP
-    # Ollama on trusted hosts (PC over LAN, or management VPN), default port 11434
-    - toCIDR:
-        - 192.168.1.0/24
-        - 10.0.199.0/24
-      toPorts:
-        - ports:
-            - port: "11434"
-              protocol: TCP
-    # Internet (LLM APIs)
-    - toCIDRSet:
-        - cidr: 0.0.0.0/0
-          except:
-            - 10.0.0.0/8
-            - 169.254.0.0/16
-            - 172.16.0.0/12
-            - 192.168.0.0/16
-      toPorts:
-        - ports:
-            - port: "443"
-              protocol: TCP
+    # # Ollama on trusted hosts (PC over LAN, or management VPN), default port 11434
+    # - toCIDR:
+    #     - 192.168.1.0/24
+    #     - 10.0.199.0/24
+    #   toPorts:
+    #     - ports:
+    #         - port: "11434"
+    #           protocol: TCP
