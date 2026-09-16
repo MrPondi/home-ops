@@ -5,13 +5,8 @@ kind: Kustomization
 metadata:
   name: llmkube
 spec:
-  dependsOn:
-    - name: gpu-resource-driver-amd
-      namespace: kube-system
-    - name: gpu-resource-driver-intel
-      namespace: kube-system
   interval: 1h
-  path: ./kubernetes/apps/ai/llmkube/app
+  path: ./kubernetes/apps/ai/llmkube/models
   prune: true
   sourceRef:
     kind: GitRepository
@@ -27,8 +22,6 @@ metadata:
 spec:
   dependsOn:
     - name: llmkube
-    - name: gpu-resource-driver-amd
-      namespace: kube-system
   healthCheckExprs:
     - apiVersion: inference.llmkube.dev/v1alpha1
       kind: InferenceService

@@ -8,12 +8,4 @@ spec:
   format: gguf
   quantization: Q8_0
   hardware:
-    accelerator: rocm
-    gpu:
-      enabled: true
-      vendor: amd
-      runtime: rocm
-      layers: 99
-      resourceClaims:
-        - name: gpu
-          resourceClaimTemplateName: embed-gpu
+    accelerator: cpu

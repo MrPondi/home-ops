@@ -9,9 +9,11 @@ spec:
     matchLabels:
       embed-pool: "true" # llmkube embed InferenceService pods (ai)
   ingress:
-    # Same-namespace consumers (litellm proxy → embeddings)
+    # LiteLLM proxy pods (ai) — the sole consumer of the embeddings endpoint
     - fromEndpoints:
-        - matchLabels: {} # all pods in ai
+        - matchLabels:
+            k8s:app.kubernetes.io/name: litellm
+            k8s:io.kubernetes.pod.namespace: ai
       toPorts:
         - ports:
             - port: "8080"
