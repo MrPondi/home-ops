@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kube-scheduling-rules
+spec:
+  groups:
+    - name: kube-scheduling.rules
+      rules:
+        - alert: PodUnschedulable
+          annotations:
+            description: Pod {{ $labels.namespace }}/{{ $labels.pod }} is Unschedulable (check `kubectl describe pod` for FailureScheduling events; a common cause is a DRA resource claim that cannot be allocated).
+            summary: Pod has been unschedulable for more than 10 minutes.
+          expr: |-
+            kube_pod_status_unschedulable == 1
+          for: 10m
+          labels:
+            severity: critical

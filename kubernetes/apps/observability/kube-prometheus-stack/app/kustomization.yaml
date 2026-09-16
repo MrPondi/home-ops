@@ -8,6 +8,7 @@ resources:
   - ./grafanadashboard.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
+  - ./prometheusrule.yaml
   - ./scrapeconfig.yaml
   # - ./securitypolicy.yaml
   - ./servicemonitor.yaml
