@@ -5,6 +5,8 @@ metadata:
   name: _
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
+  labels:
+    resource.kubernetes.io/admin-access: "true" # permits adminAccess in DRA ResourceClaimTemplates (embed-gpu)
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
 apiVersion: cilium.io/v2
