@@ -10,14 +10,6 @@ spec:
       app.kubernetes.io/name: *name
   ingress: []
   egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
     # GitHub (scale set API, registration)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
@@ -42,15 +34,8 @@ spec:
       app.kubernetes.io/component: runner-scale-set-listener
       app.kubernetes.io/instance: home-ops-runner
   ingress: []
+  # egress: kube-API comes from the namespace-wide default-deny
   egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
     # GitHub (runner scale set API, blob storage)
     - toCIDRSet:
         - cidr: 0.0.0.0/0

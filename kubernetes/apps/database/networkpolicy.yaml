@@ -21,14 +21,6 @@ spec:
             - port: "3306"
               protocol: TCP
   egress:
-    # Kubernetes API (status)
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
     # MariaDB (backup source / restore target)
     - toEndpoints:
         - matchLabels:
@@ -56,15 +48,8 @@ spec:
       - key: kopiur.home-operations.com/config
         operator: Exists
   ingress: []
+  # egress: kube-API comes from the namespace-wide default-deny
   egress:
-    # Kubernetes API (status)
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
     # Repository backend (kopia S3 via envoy-internal VIP)
     - toCIDR:
         - 10.0.30.11/32

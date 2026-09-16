@@ -9,44 +9,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: *name
   ingress:
-    # Same-namespace clients (operator, metrics exporter, backup/restore jobs)
-    - fromEndpoints:
-        - matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-                - mariadb-operator
-                - exporter
-        - matchExpressions:
-            - key: batch.kubernetes.io/job-name
-              operator: Exists
-      toPorts:
-        - ports:
-            - port: "3306"
-              protocol: TCP
-    # nextcloud (default)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: default
-            k8s:app.kubernetes.io/name: nextcloud
-      toPorts:
-        - ports:
-            - port: "3306"
-              protocol: TCP
-    # pelican (default)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: default
-            k8s:app.kubernetes.io/name: pelican
-      toPorts:
-        - ports:
-            - port: "3306"
-              protocol: TCP
-    # gatus health checks (observability)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: gatus-sidecar
+    # Cluster-wide clients on the service port (operator, exporter, gatus, consumer apps, backup/restore jobs)
+    - fromEntities:
+        - cluster
       toPorts:
         - ports:
             - port: "3306"
@@ -63,16 +28,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: exporter
       app.kubernetes.io/instance: mariadb-metrics
-  ingress:
-    # Prometheus metrics (ServiceMonitor)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "9104"
-              protocol: TCP
+  # ingress: metrics from prometheus comes from the namespace-wide default-deny
   egress:
     # MariaDB (exporter)
     - toEndpoints:

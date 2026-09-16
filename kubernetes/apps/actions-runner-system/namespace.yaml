@@ -13,7 +13,19 @@ metadata:
   name: default-deny
 spec:
   endpointSelector: {} # all pods in the namespace
-  ingress: []
+  ingress:
+    # Prometheus metrics (ServiceMonitor/PodMonitor) — namespace-wide allow, per-app CNPs no longer carry it
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            k8s:app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+            - port: "9100"
+              endPort: 9410
+              protocol: TCP
   egress:
     # DNS to kube-dns pods (kube-system) — namespace-wide allow, per-app CNPs no longer carry it
     - toEndpoints:

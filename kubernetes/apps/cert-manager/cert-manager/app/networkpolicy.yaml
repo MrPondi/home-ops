@@ -9,24 +9,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: *name
   ingress:
-    # Prometheus metrics (ServiceMonitor)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "9402"
-              protocol: TCP
+    # Prometheus metrics (ServiceMonitor) — namespace-wide in default-deny
   egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
     # ACME (Let's Encrypt), Cloudflare API
     - toCIDRSet:
         - cidr: 0.0.0.0/0
@@ -64,25 +48,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: cainjector
       app.kubernetes.io/instance: cert-manager
-  ingress:
-    # Prometheus metrics (ServiceMonitor)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "9402"
-              protocol: TCP
-  egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
+  # ingress: metrics from prometheus comes from the namespace-wide default-deny
+  # egress: kube-API comes from the namespace-wide default-deny
+  egress: []
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
 apiVersion: cilium.io/v2
@@ -102,21 +70,5 @@ spec:
         - ports:
             - port: "9443"
               protocol: TCP
-    # Prometheus metrics (ServiceMonitor)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "9402"
-              protocol: TCP
-  egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
+  # egress: kube-API comes from the namespace-wide default-deny
+  egress: []

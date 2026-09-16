@@ -9,12 +9,5 @@ spec:
     matchLabels:
       app.kubernetes.io/name: *name
   ingress: []
-  egress:
-    # Kubernetes API
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
+  # egress: kube-API comes from the namespace-wide default-deny
+  egress: []
