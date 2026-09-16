@@ -7,4 +7,3 @@ resources:
   - ./go-deepseek-v4-flash.yaml
   - ./go-glm-5.3-flash.yaml
   - ./go-muse-spark-1.3.yaml
-  - ./local-embed.yaml
