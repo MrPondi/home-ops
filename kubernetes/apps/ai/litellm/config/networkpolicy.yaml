@@ -72,6 +72,25 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
+  name: &name litellm-operator
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: *name
+  egress:
+    # LiteLLM proxy pods (same ns) — admin API /key/generate for LiteLLMVirtualKey reconcile
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: litellm
+      toPorts:
+        - ports:
+            - port: "4000"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
   name: &name litellm-postgres-init
 spec:
   endpointSelector:
