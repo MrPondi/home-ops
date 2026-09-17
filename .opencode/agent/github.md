@@ -5,17 +5,11 @@ model: opencode-go/glm-5.3-flash
 tools:
     ToolHive_github_*: true
     ToolHive_konflate*: true
+    # Lane boundaries only (single PR-write path via this agent); noise-server
+    # disabling buys nothing with gateway-side tool search.
     ToolHive_flux_*: false
     ToolHive_kubernetes_*: false
     ToolHive_talos_*: false
-    ToolHive_context7_*: false
-    ToolHive_hass_*: false
-    ToolHive_seerr_*: false
-    ToolHive_servarr_*: false
-    ToolHive_unifi-network_*: false
-    ToolHive_grafana_*: false
-    ToolHive_prometheus_*: false
-    ToolHive_victoria-logs_*: false
 ---
 
 You are working with GitHub (PRs, issues, branches, releases) on the home-ops repository, including PR review workflows.
