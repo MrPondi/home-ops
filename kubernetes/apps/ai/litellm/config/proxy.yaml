@@ -8,12 +8,9 @@ spec:
   # renovate: datasource=docker depName=ghcr.io/berriai/litellm
   image: ghcr.io/berriai/litellm:v1.101.0@sha256:d295634e09c648dcdb72c4cc2dd226f5fb87823a73e88cbbed6f205e4deb044b
   replicas: 1
-  apiAccess:
-    masterKeyRef:
-      name: litellm-secret
-      key: LITELLM_MASTER_KEY
   generalSettings:
     health_check_endpoint: /v1/health
+    store_model_in_db: false
   podAnnotations:
     reloader.stakater.com/auto: "true"
   routerSettings:
@@ -25,7 +22,10 @@ spec:
   litellmSettings:
     success_callback:
       - prometheus
+    failure_callback:
+      - prometheus
     prometheus_adapter: true
+    require_auth_for_metrics_endpoint: false
     cache: true
     cache_params:
       type: redis
@@ -45,10 +45,14 @@ spec:
   envFrom:
     - secretRef:
         name: litellm-secret
+  apiAccess:
+    masterKeyRef:
+      name: litellm-secret
+      key: LITELLM_MASTER_KEY
   resources:
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       memory: 2Gi
   service:
