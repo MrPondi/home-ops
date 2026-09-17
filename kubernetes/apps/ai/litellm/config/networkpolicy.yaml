@@ -39,10 +39,20 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # llmkube embeddings pool (embed-1, same namespace)
+    # PostgreSQL (database + init job)
     - toEndpoints:
         - matchLabels:
-            embed-pool: "true"
+            k8s:io.kubernetes.pod.namespace: database
+            k8s:cnpg.io/cluster: postgres
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # All llmkube InferenceService runtime pods (ai) — operator-stamped label
+    - toEndpoints:
+        - matchExpressions:
+            - key: k8s:inference.llmkube.dev/model
+              operator: Exists
       toPorts:
         - ports:
             - port: "8080"
