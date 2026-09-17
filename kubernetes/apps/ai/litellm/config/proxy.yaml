@@ -61,11 +61,12 @@ spec:
   route:
     # Currently unsupported by the operator
     # annotations:
-    #   gethomepage.dev/description: LLM API gateway
     #   gethomepage.dev/enabled: "true"
+    #   gethomepage.dev/name: LiteLLM
     #   gethomepage.dev/group: Home & Automation
     #   gethomepage.dev/icon: sh-litellm
-    #   gethomepage.dev/name: LiteLLM
+    #   gethomepage.dev/description: LLM API gateway
+    #   gethomepage.dev/href: https://litellm.pondi.dev/ui
     #   gethomepage.dev/weight: "2"
     hostnames:
       - litellm.pondi.dev
