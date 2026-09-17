@@ -2,6 +2,21 @@ data "bitwarden-secrets_secret" "litellm" {
   id = "63923a43-e89c-4a97-a4a0-b489011d8b3f"
 }
 
+resource "authentik_property_mapping_provider_scope" "litellm-scope" {
+  name       = "LiteLLM Role"
+  scope_name = "litellm_role"
+  expression = <<EOF
+entitlement_names = {
+  entitlement.name
+  for entitlement in request.user.app_entitlements(provider.application)
+}
+
+return {
+  "litellm_role": "proxy_admin" if (request.user.is_superuser or "Admins" in entitlement_names) else "internal_user",
+}
+EOF
+}
+
 resource "authentik_provider_oauth2" "litellm" {
   name          = "LiteLLM OAuth2 Provider"
   client_id     = jsondecode(data.bitwarden-secrets_secret.litellm.value)["LITELLM_OIDC_CLIENT_ID"]
@@ -29,6 +44,7 @@ resource "authentik_provider_oauth2" "litellm" {
   ]
 
   property_mappings = [
+    authentik_property_mapping_provider_scope.litellm-scope.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
@@ -42,7 +58,7 @@ resource "authentik_application" "litellm" {
   slug              = "litellm"
   protocol_provider = authentik_provider_oauth2.litellm.id
   meta_icon         = "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/litellm.svg"
-  meta_launch_url   = "https://litellm.pondi.dev"
+  meta_launch_url   = "https://litellm.pondi.dev/ui"
   open_in_new_tab   = true
 }
 
@@ -55,8 +71,20 @@ resource "authentik_group" "ai-admins" {
   parents      = [authentik_group.ai-access.id]
 }
 
+resource "authentik_application_entitlement" "litellm-admins" {
+  name        = "Admins"
+  application = authentik_application.litellm.uuid
+}
+
+resource "authentik_policy_binding" "litellm-admins-access" {
+  target = authentik_application_entitlement.litellm-admins.id
+  group  = authentik_group.ai-admins.id
+  order  = 10
+}
+
+
 resource "authentik_policy_binding" "litellm-access" {
   target = authentik_application.litellm.uuid
-  group  = authentik_group.ai-admins.id
+  group  = authentik_group.ai-access.id
   order  = 10
 }

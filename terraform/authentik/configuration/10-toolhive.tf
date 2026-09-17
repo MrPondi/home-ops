@@ -44,6 +44,7 @@ resource "authentik_application" "toolhive" {
   protocol_provider = authentik_provider_oauth2.toolhive.id
   meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/toolhive.svg"
   meta_launch_url   = "https://mcp.pondi.dev"
+  meta_hide         = true
   open_in_new_tab   = true
 }
 
