@@ -3,10 +3,6 @@ description: GitHub operations and PR review — issues, PRs, branches, plus kon
 mode: primary
 model: opencode-go/glm-5.3-flash
 tools:
-    ToolHive_github_*: true
-    ToolHive_konflate*: true
-    # Lane boundaries only (single PR-write path via this agent); noise-server
-    # disabling buys nothing with gateway-side tool search.
     ToolHive_flux_*: false
     ToolHive_kubernetes_*: false
     ToolHive_talos_*: false

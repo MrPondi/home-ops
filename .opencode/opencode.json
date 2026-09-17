@@ -1,6 +1,9 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "default_agent": "homelab-k8s",
+  "tools": {
+    "ToolHive_context7_*": false
+  },
   "mcp": {
     "ToolHive": {
       "type": "remote",

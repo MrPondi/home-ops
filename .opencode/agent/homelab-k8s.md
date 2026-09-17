@@ -3,13 +3,6 @@ description: Coordinator and default agent — plans the work, hands it to role 
 mode: primary
 model: opencode-go/glm-5.3-flash
 tools:
-    ToolHive_flux_*: true
-    ToolHive_kubernetes_*: true
-    ToolHive_talos_*: true
-    ToolHive_konflate*: true
-    # Duplicates of directly-enabled MCP servers (context7) or parallel write
-    # lanes (github agent): keep these two off, everything else stays enabled.
-    ToolHive_context7_*: false
     ToolHive_github_*: false
 ---
 
