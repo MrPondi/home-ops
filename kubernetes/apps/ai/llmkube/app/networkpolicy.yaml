@@ -17,6 +17,15 @@ spec:
             - port: "9443"
               protocol: TCP
   egress:
+    # All llmkube InferenceService runtime pods
+    - toEndpoints:
+        - matchExpressions:
+            - key: k8s:inference.llmkube.dev/model
+              operator: Exists
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
     # Internet access for model metadata
     - toCIDRSet:
         - cidr: 0.0.0.0/0

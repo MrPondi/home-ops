@@ -39,7 +39,7 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # PostgreSQL (database + init job)
+    # PostgreSQL
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: database
@@ -56,4 +56,24 @@ spec:
       toPorts:
         - ports:
             - port: "8080"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name litellm-postgres-init
+spec:
+  endpointSelector:
+    matchLabels:
+      batch.kubernetes.io/job-name: *name
+  egress:
+    # PostgreSQL
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            k8s:cnpg.io/cluster: postgres
+      toPorts:
+        - ports:
+            - port: "5432"
               protocol: TCP
