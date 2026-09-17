@@ -5,6 +5,8 @@ kind: Kustomization
 resources:
   - ./externalsecret.yaml
   - ./networkpolicy.yaml
+  - ./postgres-init.yaml
   - ./proxy.yaml
   - ./servicemonitor.yaml
+  - ./keys/
   - ./models/

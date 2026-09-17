@@ -31,6 +31,14 @@ spec:
         - ports:
             - port: "6379"
               protocol: TCP
+    # LiteLLM (embedding provider)
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: litellm
+      toPorts:
+        - ports:
+            - port: "4000"
+              protocol: TCP
     # Local MCPServer proxies
     - toEndpoints:
         - matchLabels:
@@ -87,6 +95,14 @@ spec:
       toPorts:
         - ports:
             - port: "6379"
+              protocol: TCP
+    # LiteLLM (embedding provider)
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: litellm
+      toPorts:
+        - ports:
+            - port: "4000"
               protocol: TCP
     # Local MCPServer proxies
     - toEndpoints:

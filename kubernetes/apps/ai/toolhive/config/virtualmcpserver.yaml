@@ -37,6 +37,11 @@ spec:
       conflictResolution: prefix
       conflictResolutionConfig:
         prefixFormat: "{workload}."
+    optimizer:
+      embeddingModel: embed
+      embeddingProvider: openai
+      embeddingService: http://litellm.ai.svc.cluster.local:4000/v1
+      embeddingServiceTimeout: 180s
   groupRef:
     name: mcp-tools
   telemetryConfigRef:
@@ -79,6 +84,11 @@ spec:
           env:
             - name: INSECURE_DISABLE_URL_VALIDATION
               value: "true"
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: toolhive-embed-secret
+                  key: api-key
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/virtualmcpserver_v1beta1.json
 apiVersion: toolhive.stacklok.dev/v1beta1
@@ -121,3 +131,9 @@ spec:
             - --config=/etc/vmcp-config/config.yaml
             - --host=0.0.0.0
             - --port=4483
+          env:
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: toolhive-embed-secret
+                  key: api-key

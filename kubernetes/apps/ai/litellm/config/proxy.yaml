@@ -34,6 +34,8 @@ spec:
       value: PRODUCTION
     - name: PROXY_BASE_URL
       value: "https://litellm.pondi.dev"
+    - name: AUTO_REDIRECT_UI_LOGIN_TO_SSO
+      value: "true"
   envFrom:
     - secretRef:
         name: litellm-secret
@@ -52,3 +54,9 @@ spec:
     parentRefs:
       - name: envoy-internal
         namespace: network
+    filters:
+      - type: RequestHeaderModifier
+        requestHeaderModifier:
+          set:
+            - name: x-litellm-session-id
+              value: "%REQ(x-session-id)%"
