@@ -7,5 +7,5 @@ metadata:
 spec:
   proxyRef: litellm
   keyAlias: Open WebUI
-  secretName: litellm-key-open_webui
+  secretName: litellm-key-open-webui
   secretKey: api-key
