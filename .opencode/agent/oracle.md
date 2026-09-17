@@ -1,7 +1,7 @@
 ---
-description: Hard debugging, root-cause, architecture — DeepSeek V4 Pro (1M ctx, deep reasoning, small monthly cap — ration).
+description: Hard debugging, root-cause, architecture — Kimi K3 (#1 open agentic model, AA coding 76.2, 1M ctx — small monthly cap, ration).
 mode: subagent
-model: opencode-go/deepseek-v4-pro
+model: opencode-go/kimi-k3
 tools:
     write: false
     edit: false

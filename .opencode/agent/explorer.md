@@ -1,7 +1,7 @@
 ---
-description: Read-only recon — repo scouting, search, conventions lookups, "where/how is X". Fan-out 3-4 at a time. MiniMax M2.7 (cheap, 1M ctx).
+description: Read-only recon — repo scouting, search, conventions lookups, "where/how is X". Fan-out 3-4 at a time. MiMo V2.5 (cheapest read lane, 30K req/5h).
 mode: subagent
-model: opencode-go/minimax-m2.7
+model: opencode-go/mimo-v2.5
 tools:
     write: false
     edit: false

@@ -1,7 +1,7 @@
 ---
-description: Scoped mechanical edits — small, file-local changes to a settled plan. MiMo V2.5 (cheapest edit lane).
+description: Scoped mechanical edits — small, file-local changes to a settled plan. Muse Spark 1.2 Contributor (AA coding 72.2, near-free edit lane).
 mode: subagent
-model: opencode-go/mimo-v2.5
+model: opencode-go/muse-spark-1.2-contributor
 tools:
     ToolHive_*: false
 ---

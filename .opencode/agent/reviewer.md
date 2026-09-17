@@ -1,7 +1,7 @@
 ---
-description: Independent critical review — a fresh pass over a diff for bugs, edge cases, and conventions violations. MiniMax M3 (different family from the GLM workhorse).
+description: Independent critical review — a fresh pass over a diff for bugs, edge cases, and conventions violations. GPT-5.6 Luna (different family from the Muse workhorse, AA coding 71.4).
 mode: subagent
-model: opencode-go/minimax-m3
+model: opencode-go/gpt-5.6-luna
 tools:
     write: false
     edit: false
