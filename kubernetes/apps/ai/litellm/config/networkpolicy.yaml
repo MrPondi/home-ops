@@ -28,7 +28,6 @@ spec:
             - port: "6379"
               protocol: TCP
     # Authentik server (security) — SSO token/userinfo exchange.
-    # Service :80 -> pod :9000; Cilium enforces post-DNAT, so 9000 is required, 80 kept as pre-NAT fallback.
     - toEndpoints:
         - matchLabels:
             k8s:app.kubernetes.io/component: server
@@ -36,8 +35,6 @@ spec:
             k8s:io.kubernetes.pod.namespace: security
       toPorts:
         - ports:
-            - port: "80"
-              protocol: TCP
             - port: "9000"
               protocol: TCP
     # LLM provider APIs
