@@ -16,3 +16,12 @@ spec:
         - ports:
             - port: "9443"
               protocol: TCP
+  egress:
+    # LiteLLM proxy pods (same ns) — admin API /key/generate for LiteLLMVirtualKey reconcile
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: litellm
+      toPorts:
+        - ports:
+            - port: "4000"
+              protocol: TCP
