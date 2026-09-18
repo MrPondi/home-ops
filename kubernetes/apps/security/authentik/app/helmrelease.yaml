@@ -27,13 +27,18 @@ spec:
       existingSecret:
         secretName: authentik-secret
     server:
-      initContainers:
-        - name: init-db
-          image: ghcr.io/home-operations/postgres-init:18.6
-          imagePullPolicy: IfNotPresent
-          envFrom:
-            - secretRef:
-                name: authentik-secret
+      env:
+        - name: AUTHENTIK_POSTGRESQL__HOST
+          value: authentik-rw.security.svc.cluster.local
+        - name: AUTHENTIK_POSTGRESQL__NAME
+          value: authentik
+        - name: AUTHENTIK_POSTGRESQL__USER
+          value: authentik
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-app
+              key: password
       volumeMounts:
         - name: data
           mountPath: /data
@@ -74,6 +79,18 @@ spec:
         readOnlyRootFilesystem: true
         capabilities: { drop: ["ALL"] }
     worker:
+      env:
+        - name: AUTHENTIK_POSTGRESQL__HOST
+          value: authentik-rw.security.svc.cluster.local
+        - name: AUTHENTIK_POSTGRESQL__NAME
+          value: authentik
+        - name: AUTHENTIK_POSTGRESQL__USER
+          value: authentik
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-app
+              key: password
       resources:
         requests:
           cpu: 100m
