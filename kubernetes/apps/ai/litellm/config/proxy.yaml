@@ -34,6 +34,11 @@ spec:
     drop_params: true
     merge_reasoning_content_in_choices: true
   env:
+    - name: DATABASE_URL
+      valueFrom:
+        secretKeyRef:
+          name: litellm-app
+          key: uri
     - name: LITELLM_LOG
       value: INFO
     - name: LITELLM_MODE

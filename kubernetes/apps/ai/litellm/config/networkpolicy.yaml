@@ -49,11 +49,11 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # PostgreSQL
+    # PostgreSQL (litellm cluster, ai)
     - toEndpoints:
+        # litellm cluster instance pods (ai)
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: database
-            k8s:cnpg.io/cluster: postgres
+            cnpg.io/cluster: ${APP}
       toPorts:
         - ports:
             - port: "5432"
@@ -72,18 +72,48 @@ spec:
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name litellm-postgres-init
+  name: litellm-postgres
 spec:
+  # CNPG instance pods (litellm cluster, ai)
   endpointSelector:
     matchLabels:
-      batch.kubernetes.io/job-name: *name
-  egress:
-    # PostgreSQL
-    - toEndpoints:
+      cnpg.io/cluster: ${APP}
+  ingress:
+    # Self + future replicas (streaming replication)
+    - fromEndpoints:
+        # litellm cluster instance pods (ai)
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: database
-            k8s:cnpg.io/cluster: postgres
+            cnpg.io/cluster: ${APP}
       toPorts:
         - ports:
             - port: "5432"
+              protocol: TCP
+    # LiteLLM proxy pods (ai)
+    - fromEndpoints:
+        # litellm proxy pods (ai)
+        - matchLabels:
+            app.kubernetes.io/name: ${APP}
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # cloudnative-pg operator (database) — instance manager API + psql
+    - fromEndpoints:
+        # cloudnative-pg operator pods (database)
+        - matchLabels:
+            k8s:app.kubernetes.io/name: cloudnative-pg
+            k8s:io.kubernetes.pod.namespace: database
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
+  egress:
+    # QNAP MinIO (WAL archiving + barman backups, direct — same as database cluster CNP)
+    - toCIDR:
+        - 10.0.25.25/32
+      toPorts:
+        - ports:
+            - port: "9000"
               protocol: TCP

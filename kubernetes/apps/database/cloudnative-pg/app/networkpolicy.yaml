@@ -46,3 +46,14 @@ spec:
               protocol: TCP
             - port: "8000"
               protocol: TCP
+    # litellm cluster pods (ai) — per-app cluster
+    - toEndpoints:
+        - matchLabels:
+            k8s:cnpg.io/cluster: litellm
+            k8s:io.kubernetes.pod.namespace: ai
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
