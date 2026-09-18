@@ -10,6 +10,7 @@ resources:
   - ./github/
   - ./grafana/
   # - ./hass/
+  - ./jellyfin/
   - ./konflate/
   - ./kubernetes/
   - ./longhorn/

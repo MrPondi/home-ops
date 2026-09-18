@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name jellyfin
+spec:
+  # Jellyfin MCP server pod (ai)
+  endpointSelector:
+    matchLabels:
+      toolhive: "true"
+      toolhive-name: *name
+      app: *name
+  # No ingress - stdio transport binds no TCP port; proxy runner attaches via kube API
+  egress:
+    # Jellyfin (media) - port 8096 per media/jellyfin/app/helmrelease.yaml
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: jellyfin
+      toPorts:
+        - ports:
+            - port: "8096"
+              protocol: TCP
