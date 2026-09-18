@@ -3,17 +3,16 @@
 
 Registry-driven: derives from the root ``kubernetes/flux/cluster/ks.yaml``
 ``spec.patches`` which ``labelSelector`` pairs with a JSON6902 ``add`` to
-``/spec/components``. The registry currently has 2 strategic-merge labelSelector entries (cnpg=init, non-cluster) plus 3 JSON6902 append entries (plus 1 unqualified defaults entry); strategic-merge labels need NO precondition.
+``/spec/components``, ``/spec/dependsOn`` or ``/spec/healthCheckExprs``. The registry currently has 2 strategic-merge labelSelector entries (cnpg=init, non-cluster) plus 3 components appends + 2 dependsOn appends + 2 healthCheckExprs appends (plus 1 unqualified defaults entry); strategic-merge labels need NO precondition.
 
 Rules:
   A. If a KS (``kubernetes/apps/**/ks.yaml``) matches a selector that needs
-     ``spec.components`` (JSON6902 append), it must carry ``spec.components``
-     as a list (empty ``[]`` allowed).
+     ``spec.components`` / ``spec.dependsOn`` / ``spec.healthCheckExprs`` (JSON6902 append), it must carry each required field as a list (empty ``[]`` allowed).
   B. If a KS carries any label starting ``components.`` that matches NO root
      selector key, it is an undefined label (typo or removed machinery).
 
-Scope is per-consumer (option 2): only KSs that ADOPT a components-appending
-label need ``spec.components``.
+Scope is per-consumer (option 2): only KSs that ADOPT a label with a JSON6902 append
+need the corresponding spec field as a list.
 
 Usage:
     uv run scripts/ks_label_precondition_audit.py [--path kubernetes/] [--quiet]
@@ -29,27 +28,30 @@ from pathlib import Path
 import yaml
 
 
-def parse_registry(root_ks: Path) -> tuple[list[tuple[str, bool]], set[str], list[str]]:
+def parse_registry(root_ks: Path) -> tuple[list[tuple[str, set[str]]], set[str], list[str]]:
     """Parse root ks.yaml patches for labelSelector registry.
 
     Returns (selectors, selector_keys, errors) where selectors is list of
-    (selector_string, needs_components).
+    (selector_string, required_fields_set).
     """
     errors: list[str] = []
-    selectors: list[tuple[str, bool]] = []
+    # Dict to union required fields per selector across multiple patch entries
+    selector_to_fields: dict[str, set[str]] = {}
+    # Keep order of first appearance
+    selector_order: list[str] = []
     try:
         text = root_ks.read_text()
     except FileNotFoundError:
-        return selectors, set(), [f"{root_ks}: not found"]
+        return [], set(), [f"{root_ks}: not found"]
     try:
         doc = yaml.safe_load(text)
     except yaml.YAMLError as exc:
-        return selectors, set(), [f"{root_ks}: unparseable YAML ({exc})"]
+        return [], set(), [f"{root_ks}: unparseable YAML ({exc})"]
     if not isinstance(doc, dict):
-        return selectors, set(), [f"{root_ks}: no document"]
+        return [], set(), [f"{root_ks}: no document"]
     patches = (doc.get("spec") or {}).get("patches") or []
     if not isinstance(patches, list):
-        return selectors, set(), [f"{root_ks}: spec.patches not a list"]
+        return [], set(), [f"{root_ks}: spec.patches not a list"]
     for entry in patches:
         if not isinstance(entry, dict):
             continue
@@ -61,13 +63,14 @@ def parse_registry(root_ks: Path) -> tuple[list[tuple[str, bool]], set[str], lis
         selector_str = str(selector).strip()
         if not selector_str:
             continue
+        if selector_str not in selector_to_fields:
+            selector_to_fields[selector_str] = set()
+            selector_order.append(selector_str)
         patch_text = entry.get("patch") or ""
-        # Detect JSON6902 append to /spec/components by YAML-parsing the patch
-        # body. needs=True only if some list operation is a dict with
-        # op=="add" and path startswith "/spec/components" (valid paths are
-        # exactly "/spec/components" or "/spec/components/-").
-        # Strategic-merge mapping bodies (dict) evaluate False.
-        needs = False
+        # Detect JSON6902 appends to /spec/components, /spec/dependsOn, /spec/healthCheckExprs
+        # by YAML-parsing the patch body. Records field as required if some list operation
+        # is a dict with op=="add" and path exactly matching the allowed set.
+        # Components tolerates both "/spec/components" and "/spec/components/-"; others require "/-".
         if isinstance(patch_text, str) and patch_text.strip():
             try:
                 parsed = yaml.safe_load(patch_text)
@@ -81,17 +84,25 @@ def parse_registry(root_ks: Path) -> tuple[list[tuple[str, bool]], set[str], lis
                     if op.get("op") != "add":
                         continue
                     op_path = op.get("path")
-                    if isinstance(op_path, str) and op_path in ("/spec/components", "/spec/components/-"):
-                        needs = True
-                        break
-        selectors.append((selector_str, needs))
+                    if not isinstance(op_path, str):
+                        continue
+                    field: str | None = None
+                    if op_path in ("/spec/components", "/spec/components/-"):
+                        field = "components"
+                    elif op_path == "/spec/dependsOn/-":
+                        field = "dependsOn"
+                    elif op_path == "/spec/healthCheckExprs/-":
+                        field = "healthCheckExprs"
+                    if field is not None:
+                        selector_to_fields[selector_str].add(field)
+    selectors: list[tuple[str, set[str]]] = [(s, selector_to_fields[s]) for s in selector_order]
     selector_keys = {s.split("=", 1)[0] for s, _ in selectors}
     return selectors, selector_keys, errors
 
 
 def audit_file(
     path: Path,
-    selectors: list[tuple[str, bool]],
+    selectors: list[tuple[str, set[str]]],
     selector_keys: set[str],
     selector_keys_by_value: dict[str, str],
 ) -> tuple[list[str], list[str]]:
@@ -127,35 +138,32 @@ def audit_file(
                         f"(no matching root selector; typo or removed machinery)"
                     )
 
-        # Rule A: if matches a selector that needs components
-        for selector, needs in selectors:
-            if not needs:
+        # Rule A: if matches a selector that needs specific fields
+        for selector, required_fields in selectors:
+            if not required_fields:
                 continue
             # selector match: exact key=value
+            matched = False
             if "=" in selector:
                 k, v = selector.split("=", 1)
                 if str_labels.get(k) == v:
-                    spec = doc.get("spec") or {}
-                    if not isinstance(spec, dict):
-                        spec = {}
-                    components = spec.get("components")
-                    if not isinstance(components, list):
-                        violations.append(
-                            f"{path}: Kustomization/{name} label '{selector}' requires spec.components as a list "
-                            f"(empty [] allowed) — JSON6902 append will fail without it"
-                        )
+                    matched = True
             else:
                 # selector without value — match key presence (defensive)
                 if selector in str_labels:
-                    spec = doc.get("spec") or {}
-                    if not isinstance(spec, dict):
-                        spec = {}
-                    components = spec.get("components")
-                    if not isinstance(components, list):
-                        violations.append(
-                            f"{path}: Kustomization/{name} label '{selector}' requires spec.components as a list "
-                            f"(empty [] allowed) — JSON6902 append will fail without it"
-                        )
+                    matched = True
+            if not matched:
+                continue
+            spec = doc.get("spec") or {}
+            if not isinstance(spec, dict):
+                spec = {}
+            for field in sorted(required_fields):
+                value = spec.get(field)
+                if not isinstance(value, list):
+                    violations.append(
+                        f"{path}: Kustomization/{name} label '{selector}' requires spec.{field} as a list "
+                        f"(empty [] allowed) — JSON6902 append will fail without it"
+                    )
     return violations, errors
 
 
