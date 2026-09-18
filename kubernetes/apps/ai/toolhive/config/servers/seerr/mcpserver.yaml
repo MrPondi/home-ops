@@ -5,34 +5,14 @@ kind: MCPServer
 metadata:
   name: seerr
 spec:
-  image: docker.io/node:24-alpine
-  transport: stdio
-  proxyPort: 8080
+  image: ghcr.io/jhomen368/overseerr-mcp:2.3.0@sha256:53dc6c79701b91801309cbfe9108fcb8d7e7bd06f97e937d88c5eb50ab81c8cb
+  transport: streamable-http
+  mcpPort: 8085
   env:
-    - name: HOME
-      value: /tmp
-    - name: NPM_CONFIG_CACHE
-      value: /tmp/.npm
     - name: SEERR_URL
       value: http://seerr.media.svc.cluster.local
   secrets:
     - name: toolhive-seerr-secret
       key: SEERR_API_KEY
-  podTemplateSpec:
-    spec:
-      containers:
-        - name: mcp
-          image: docker.io/node:24-alpine
-          command:
-            - npx
-          args:
-            - -y
-            - "@jhomen368/overseerr-mcp"
-          volumeMounts:
-            - name: tmp
-              mountPath: /tmp
-      volumes:
-        - name: tmp
-          emptyDir: {}
   groupRef:
     name: mcp-tools
