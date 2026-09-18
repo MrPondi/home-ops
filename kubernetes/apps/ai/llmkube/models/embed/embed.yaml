@@ -16,7 +16,6 @@ spec:
   priority: normal
   podLabels:
     cpu-inference: "true"
-    embed-pool: "true"
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:

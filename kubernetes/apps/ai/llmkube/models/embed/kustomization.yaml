@@ -5,4 +5,3 @@ kind: Kustomization
 resources:
   - ./embed.yaml
   - ./model.yaml
-  - ./networkpolicy.yaml

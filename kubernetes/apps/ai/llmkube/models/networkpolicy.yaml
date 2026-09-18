@@ -6,10 +6,20 @@ metadata:
   name: &name embed
 spec:
   endpointSelector:
-    matchLabels:
-      embed-pool: "true" # llmkube embed InferenceService pods (ai)
+    matchExpressions:
+      - key: k8s:inference.llmkube.dev/model
+        operator: Exists
   ingress:
-    # LiteLLM proxy pods (ai) — the sole consumer of the embeddings endpoint
+    # LLMKube operator pods
+    - fromEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/name: llmkube
+            k8s:io.kubernetes.pod.namespace: ai
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # LiteLLM proxy pods
     - fromEndpoints:
         - matchLabels:
             k8s:app.kubernetes.io/name: litellm
@@ -19,7 +29,7 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # Model download from Hugging Face (llmkube init container)
+    # Model download from Hugging Face (init container)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
           except:
