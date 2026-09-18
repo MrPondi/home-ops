@@ -100,6 +100,10 @@ When `PHASE` is `Completed`, delete the `labels: {components.postgres/cnpg: init
 
 Real example: `kubernetes/apps/default/pstream/ks.yaml` (`pstream-db` Kustomization) ships this label until its first backup.
 
+### Label precondition (per-consumer)
+
+The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it is a strategic-merge `spec.patches` injection. Any **future** label that appends to `spec.components` via a JSON6902 `op: add` with `path: /spec/components` _does_ require the labeled `Kustomization` to carry `spec.components` as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced by `scripts/ks_label_precondition_audit.py` and `.github/workflows/validate.yaml` (job `label-preconditions`), registry-driven from `kubernetes/flux/cluster/ks.yaml` (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components`; strategic-merge injections like the current three root patches need no precondition).
+
 ## Usage
 
 ### Consumer Kustomization
