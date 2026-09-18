@@ -52,5 +52,5 @@ spec:
     limits:
       memory: 1Gi
   storage:
-    size: ${POSTGRES_STORAGE_SIZE:=8Gi}
+    size: ${POSTGRES_STORAGE_SIZE:=5Gi}
     storageClass: miroir-slow-local

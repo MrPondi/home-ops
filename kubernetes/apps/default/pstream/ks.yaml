@@ -20,8 +20,6 @@ spec:
   postBuild:
     substitute:
       APP: pstream-backend
-      POSTGRES_STORAGE_SIZE: 5Gi
-      POSTGRES_USERNAME: pstream
   prune: true
   sourceRef:
     kind: GitRepository
@@ -64,31 +62,3 @@ spec:
   #     name: flux-system
   #     namespace: flux-system
   #   wait: false
----
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  # TEMPORARY net-new bootstrap — remove after first backup lands (just kube pg-initial-backup default pstream); recovery is the default once a backup exists
-  labels:
-    components.postgres/cnpg: init
-    components.postgres/enabled: "true"
-  name: pstream-db
-spec:
-  components: []
-  dependsOn:
-    - name: external-secrets-store
-      namespace: external-secrets
-  healthCheckExprs: []
-  interval: 1h
-  path: ./kubernetes/apps/default/pstream/db
-  postBuild:
-    substitute:
-      APP: pstream
-      POSTGRES_STORAGE_SIZE: 5Gi
-  prune: false
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  wait: false
