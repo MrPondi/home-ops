@@ -48,3 +48,40 @@ spec:
       target:
         group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
+    - 
+      # net-new CNPG cluster initdb; label components.postgres/cnpg=init
+      # Labeled KSs must not define their own spec.patches (strategic merge would replace them).
+      patch: |-
+        apiVersion: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        metadata:
+          name: _
+        spec:
+          patches:
+            - patch: |-
+                - op: replace
+                  path: /spec/bootstrap
+                  value:
+                    initdb:
+                      database: ${POSTGRES_USERNAME:=${APP}}
+                      owner: ${POSTGRES_USERNAME:=${APP}}
+                - op: remove
+                  path: /spec/externalClusters
+              target:
+                group: postgresql.cnpg.io
+                version: v1
+                kind: Cluster
+      target:
+        kind: Kustomization
+        labelSelector: "components.postgres/cnpg=init"
+    - 
+      # opt-in dragonfly auth sub-component; label components.dragonfly/auth=enabled
+      # do NOT combine with an explicit spec.components entry for dragonfly/authentication (duplicate component). Existing explicit users (pelican, toolhive) stay as-is.
+      # JSON6902 append — label only on KSs that already have a spec.components list, i.e. ones explicitly attaching components/dragonfly
+      patch: |-
+        - op: add
+          path: /spec/components/-
+          value: ../../../../components/dragonfly/authentication
+      target:
+        kind: Kustomization
+        labelSelector: "components.dragonfly/auth=enabled"

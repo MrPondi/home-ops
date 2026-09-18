@@ -35,3 +35,14 @@ spec:
               protocol: TCP
             - port: "8000"
               protocol: TCP
+    # pstream cluster pods (default) — pilot per-app cluster
+    - toEndpoints:
+        - matchLabels:
+            k8s:cnpg.io/cluster: pstream
+            k8s:io.kubernetes.pod.namespace: default
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
