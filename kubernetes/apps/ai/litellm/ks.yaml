@@ -18,10 +18,11 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  labels:
+    components.dragonfly/enabled: "true"
   name: litellm
 spec:
-  components:
-    - ../../../../components/dragonfly
+  components: []
   dependsOn:
     - name: litellm-operator
     - name: external-secrets-store

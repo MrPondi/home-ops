@@ -3,11 +3,12 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  labels:
+    components.dragonfly/authentication: "true"
+    components.dragonfly/enabled: "true"
   name: pelican
 spec:
   components:
-    - ../../../../components/dragonfly
-    - ../../../../components/dragonfly/authentication
     - ../../../../components/kopiur/backup
   dependsOn:
     - name: external-secrets-store

@@ -16,7 +16,7 @@ spec:
     namespace: flux-system
   wait: false
   patches:
-    # Label UX registry: entries below keyed by labelSelector; JSON6902 appends to spec.components require labeled KSs to carry a components list (enforced by scripts/ks_label_precondition_audit.py + validate.yaml).
+    # Label UX registry: entries below keyed by labelSelector; JSON6902 appends to spec.components require labeled KSs to carry a components list (enforced by scripts/ks_label_precondition_audit.py + validate.yaml). Rule A is now active (3 JSON6902 append entries).
     - # Add Kustomization defaults for all child Kustomizations
       patch: |-
         apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -101,3 +101,24 @@ spec:
       target:
         kind: Kustomization
         labelSelector: "components.dragonfly/cluster-mode=non-cluster"
+    - patch: |-
+        - op: add
+          path: /spec/components/-
+          value: ../../../../components/postgres
+      target:
+        kind: Kustomization
+        labelSelector: "components.postgres/enabled=true"
+    - patch: |-
+        - op: add
+          path: /spec/components/-
+          value: ../../../../components/dragonfly
+      target:
+        kind: Kustomization
+        labelSelector: "components.dragonfly/enabled=true"
+    - patch: |-
+        - op: add
+          path: /spec/components/-
+          value: ../../../../components/dragonfly/authentication
+      target:
+        kind: Kustomization
+        labelSelector: "components.dragonfly/authentication=true"
