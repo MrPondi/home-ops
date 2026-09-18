@@ -31,12 +31,11 @@ spec:
           resource: limits.memory
           divisor: 1Mi
   args:
-    # - --dbfilename=dump
     - --maxmemory=$(MAX_MEMORY)Mi
     - --proactor_threads=2
     - --cluster_mode=emulated
-    - --default_lua_flags=allow-undeclared-keys
     - --version_check=false
+    # - --dbfilename=dump
   resources:
     requests:
       cpu: 25m

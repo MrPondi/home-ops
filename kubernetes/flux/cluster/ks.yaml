@@ -16,7 +16,6 @@ spec:
     namespace: flux-system
   wait: false
   patches:
-    # Label UX registry: entries below keyed by labelSelector; JSON6902 appends to spec.components/spec.dependsOn/spec.healthCheckExprs require labeled KSs to carry that field as a list (enforced by scripts/ks_label_precondition_audit.py + validate.yaml). Rule A is now active (3 components appends + 2 dependsOn appends + 2 healthCheckExprs appends; 2 strategic-merge + unqualified defaults).
     - # Add Kustomization defaults for all child Kustomizations
       patch: |-
         apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -49,6 +48,7 @@ spec:
       target:
         group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
+    # Label UX registry: entries below keyed by labelSelector; JSON6902 appends to spec.components/spec.dependsOn/spec.healthCheckExprs require labeled KSs to carry that field as a list.
     - 
       # net-new CNPG cluster initdb; label components.postgres/cnpg=init
       # Labeled KSs must not define their own spec.patches (strategic merge would replace them).
@@ -73,6 +73,7 @@ spec:
                 version: v1
                 kind: Cluster
       target:
+        group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
         labelSelector: "components.postgres/cnpg=init"
     - 
@@ -99,58 +100,24 @@ spec:
                   path: /spec/args/-
                   value: --default_lua_flags=allow-undeclared-keys
       target:
+        group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
         labelSelector: "components.dragonfly/cluster-mode=non-cluster"
-    - patch: |-
+    - # Postgres consumers: component + operator dependsOn + CNPG health checks; label components.postgres/enabled=true
+      patch: |-
         - op: add
           path: /spec/components/-
           value: ../../../../components/postgres
-      target:
-        kind: Kustomization
-        labelSelector: "components.postgres/enabled=true"
-    - patch: |-
-        - op: add
-          path: /spec/components/-
-          value: ../../../../components/dragonfly
-      target:
-        kind: Kustomization
-        labelSelector: "components.dragonfly/enabled=true"
-    - patch: |-
-        - op: add
-          path: /spec/components/-
-          value: ../../../../components/dragonfly/authentication
-      target:
-        kind: Kustomization
-        labelSelector: "components.dragonfly/authentication=true"
-    - patch: |-
-        - op: add
-          path: /spec/dependsOn/-
-          value:
-            name: dragonfly-operator
-            namespace: database
-      target:
-        kind: Kustomization
-        labelSelector: "components.dragonfly/enabled=true"
-    - patch: |-
-        - op: add
-          path: /spec/healthCheckExprs/-
-          value:
-            apiVersion: dragonflydb.io/v1alpha1
-            kind: Dragonfly
-            current: "has(status.phase) && status.phase == 'Ready'"
-      target:
-        kind: Kustomization
-        labelSelector: "components.dragonfly/enabled=true"
-    - patch: |-
         - op: add
           path: /spec/dependsOn/-
           value:
             name: barman-cloud
             namespace: database
-      target:
-        kind: Kustomization
-        labelSelector: "components.postgres/enabled=true"
-    - patch: |-
+        - op: add
+          path: /spec/dependsOn/-
+          value:
+            name: cloudnative-pg
+            namespace: database
         - op: add
           path: /spec/healthCheckExprs/-
           value:
@@ -159,5 +126,35 @@ spec:
             failed: "status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')"
             current: "status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')"
       target:
+        group: kustomize.toolkit.fluxcd.io
         kind: Kustomization
         labelSelector: "components.postgres/enabled=true"
+    - # Dragonfly consumers: component + operator dependsOn + Ready health check; label components.dragonfly/enabled=true
+      patch: |-
+        - op: add
+          path: /spec/components/-
+          value: ../../../../components/dragonfly
+        - op: add
+          path: /spec/dependsOn/-
+          value:
+            name: dragonfly-operator
+            namespace: database
+        - op: add
+          path: /spec/healthCheckExprs/-
+          value:
+            apiVersion: dragonflydb.io/v1alpha1
+            kind: Dragonfly
+            current: "has(status.phase) && status.phase == 'Ready'"
+      target:
+        group: kustomize.toolkit.fluxcd.io
+        kind: Kustomization
+        labelSelector: "components.dragonfly/enabled=true"
+    - # Opt-in dragonfly auth sub-component; label components.dragonfly/authentication=true
+      patch: |-
+        - op: add
+          path: /spec/components/-
+          value: ../../../../components/dragonfly/authentication
+      target:
+        group: kustomize.toolkit.fluxcd.io
+        kind: Kustomization
+        labelSelector: "components.dragonfly/authentication=true"

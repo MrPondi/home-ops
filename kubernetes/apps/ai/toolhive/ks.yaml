@@ -39,6 +39,7 @@ metadata:
   labels:
     components.dragonfly/authentication: "true"
     components.dragonfly/enabled: "true"
+    components.dragonfly/cluster-mode: "non-cluster"
   name: toolhive-config
 spec:
   components: []

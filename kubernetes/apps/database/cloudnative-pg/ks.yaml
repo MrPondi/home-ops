@@ -22,9 +22,6 @@ metadata:
   name: barman-cloud
   namespace: database
 spec:
-  # Stack chain: operator first — consumers depend on barman-cloud only
-  dependsOn:
-    - name: cloudnative-pg
   interval: 1h
   path: ./kubernetes/apps/database/cloudnative-pg/barman-cloud
   prune: true
@@ -42,6 +39,7 @@ metadata:
   namespace: database
 spec:
   dependsOn:
+    - name: cloudnative-pg
     - name: barman-cloud
     - name: external-secrets-store
       namespace: external-secrets
