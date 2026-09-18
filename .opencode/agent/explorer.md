@@ -5,7 +5,6 @@ model: opencode-go/mimo-v2.5
 tools:
     write: false
     edit: false
-    bash: false
     ToolHive_*: false
 ---
 
