@@ -8,11 +8,11 @@ Per-app [CloudNativePG](https://cloudnative-pg.io/) `Cluster` via the **Barman C
 
 Set in the consumer `Kustomization` `postBuild.substitute` (see [Consumer snippets](#consumer-kustomization-snippets)).
 
-| Variable                | Required | Default  | Description                                                                                                                                            |
-| ----------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `APP`                   | **yes**  | —        | App / Cluster name. Used for `Cluster.metadata.name`, `ObjectStore` name, `ExternalSecret` name (`${APP}-s3`), backup server name and S3 prefix.       |
-| `POSTGRES_USERNAME`     | no       | `${APP}` | Database and owner created on first `initdb`. Referenced as `${POSTGRES_USERNAME:=${APP}}` so omitting it falls back to `APP`.                         |
-| `POSTGRES_STORAGE_SIZE` | no       | `8Gi`    | PVC size for the Cluster (`spec.storage.size`). Override per app, e.g. `5Gi` for pstream. Storage class is fixed to `miroir-slow-local` (single-node). |
+| Variable                | Required | Default  | Description                                                                                                                                                                                                                                                       |
+| ----------------------- | -------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `APP`                   | **yes**  | —        | App / Cluster name. Used for `Cluster.metadata.name`, `ObjectStore` name, `ExternalSecret` name (`${APP}-s3`), and backup server name (`serverName`/`barmanObjectName` `${APP}`; `destinationPath` `s3://backups/cloudnative-pg` is shared across all consumers). |
+| `POSTGRES_USERNAME`     | no       | `${APP}` | Database and owner created on first `initdb`. Referenced as `${POSTGRES_USERNAME:=${APP}}` so omitting it falls back to `APP`.                                                                                                                                    |
+| `POSTGRES_STORAGE_SIZE` | no       | `5Gi`    | PVC size for the Cluster (`spec.storage.size`). Override per app as needed. Storage class is fixed to `miroir-slow-local` (single-node).                                                                                                                          |
 
 All other values are fixed for this homelab: single instance (`instances: 1`, `enablePDB: false`, `podAntiAffinityType: required` is best-effort on one node), image `ghcr.io/cloudnative-pg/postgresql:18.6`, QNAP S3 endpoint `http://qnap.internal:9000`.
 
@@ -21,7 +21,7 @@ All other values are fixed for this homelab: single instance (`instances: 1`, `e
 | File                                             | Kind                                        | Description                                                                                                                                                                                                                                                                                                                                                                               |
 | ------------------------------------------------ | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`cluster.yaml`](./cluster.yaml)                 | `Cluster` (`postgresql.cnpg.io/v1`)         | Single-node CNPG Cluster `name: ${APP}`, `storageClass: miroir-slow-local`, `imageName: ghcr.io/cloudnative-pg/postgresql:18.6@sha256:…`. Plugin `barman-cloud.cloudnative-pg.io` with `barmanObjectName: ${APP}` / `serverName: ${APP}` for both WAL archiving and restore. `annotations: cnpg.io/skipEmptyWalArchiveCheck: "enabled"` lets a fresh recovery Cluster start without WALs. |
-| [`objectstore.yaml`](./objectstore.yaml)         | `ObjectStore` (`barmancloud.cnpg.io/v1`)    | Per-app S3 store `name: ${APP}`. `destinationPath: s3://backups/${APP}`, `endpointURL: http://qnap.internal:9000`, `retentionPolicy: 7d`, bzip2 compression, `maxParallel: 4`. Credentials from Secret `${APP}-s3` (`MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY`). Sidecar requests `50m` / limits `300Mi`.                                                                                    |
+| [`objectstore.yaml`](./objectstore.yaml)         | `ObjectStore` (`barmancloud.cnpg.io/v1`)    | Per-app S3 store `name: ${APP}`. `destinationPath: s3://backups/cloudnative-pg` (shared across all consumers), `endpointURL: http://qnap.internal:9000`, `retentionPolicy: 7d`, bzip2 compression, `maxParallel: 4`. Credentials from Secret `${APP}-s3` (`MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY`). Sidecar requests `50m` / limits `300Mi`.                                              |
 | [`scheduledbackup.yaml`](./scheduledbackup.yaml) | `ScheduledBackup` (`postgresql.cnpg.io/v1`) | `name: ${APP}-daily`, `schedule: "@daily"`, `immediate: true`, `method: plugin`, `pluginConfiguration.name: barman-cloud.cloudnative-pg.io`. Creates daily base backups and drives WAL archiving via the plugin.                                                                                                                                                                          |
 | [`externalsecret.yaml`](./externalsecret.yaml)   | `ExternalSecret` (`external-secrets.io/v1`) | `name: ${APP}-s3` → `ClusterSecretStore/bitwarden-secretsmanager`, `key: cloudnative-pg` (shared Bitwarden item). Syncs `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` into Secret `${APP}-s3` in the consumer namespace. One secret per app namespace; no cross-namespace sharing.                                                                                                            |
 
@@ -49,16 +49,16 @@ spec:
               parameters:
                   barmanObjectName: ${APP}
                   serverName: ${APP} # must match ObjectStore serverName
-                  # destinationPath is s3://backups/${APP}, set in ObjectStore
+                  # destinationPath is s3://backups/cloudnative-pg (shared across all consumers), set in ObjectStore
 ```
 
 - `serverName: ${APP}` — Barman server name; ties `Cluster` ↔ `ObjectStore` ↔ `ScheduledBackup`.
-- `s3://backups/${APP}` — per-app prefix on QNAP MinIO (`http://qnap.internal:9000`), retention `7d`.
+- `s3://backups/cloudnative-pg` — shared prefix on QNAP MinIO (`http://qnap.internal:9000`), retention `7d`; per-app isolation via `serverName`/`barmanObjectName` `${APP}`.
 - `skipEmptyWalArchiveCheck: "enabled"` — recovery succeeds even when the WAL archive is still empty (fresh namespace).
 
-### Net-new cluster (empty S3 prefix)
+### Net-new cluster (empty backup set)
 
-On the very first deploy the prefix `s3://backups/${APP}` is empty, so recovery would fail. Add a **temporary** label to the consumer `Kustomization` to swap bootstrap to `initdb`; remove it after the first backup lands. The root `cluster-apps` Kustomization watches for this label and injects the initdb patch.
+On the very first deploy there is no backup for `serverName` `${APP}` under the shared prefix `s3://backups/cloudnative-pg`, so recovery would fail. Add a **temporary** label to the consumer `Kustomization` to swap bootstrap to `initdb`; remove it after the first backup lands. The root `cluster-apps` Kustomization watches for this label and injects the initdb patch.
 
 ```yaml
 # kubernetes/apps/<ns>/<app>/ks.yaml — TEMPORARY label, remove after first backup
@@ -67,10 +67,10 @@ kind: Kustomization
 metadata:
     name: <app>-db
     labels:
+        components.postgres/enabled: "true"
         components.postgres/cnpg: init # TEMPORARY net-new bootstrap — remove after first backup lands (just kube pg-initial-backup <ns> <app>); recovery is the default once a backup exists
 spec:
-    components:
-        - ../../../../components/postgres
+    components: [] # existing entries like ../../../../components/kopiur/backup are fine — root patch appends ../../../../components/postgres
     # ... dependsOn, healthCheckExprs, postBuild ...
 ```
 
@@ -98,15 +98,15 @@ kubectl get backup -n <ns>
 
 When `PHASE` is `Completed`, delete the `labels: {components.postgres/cnpg: init}` entry (and the TEMPORARY comment), commit, and Flux will reconcile. Future rebuilds use `recovery` automatically.
 
-Real example: `kubernetes/apps/default/pstream/ks.yaml` (`pstream-db` Kustomization) ships this label until its first backup.
+Real example: `kubernetes/apps/default/pstream/ks.yaml` (`pstream-backend` Kustomization) carried this label until its first backup landed (since removed — recovery is the default).
 
 ### Label precondition (per-consumer)
 
-The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it is a strategic-merge `spec.patches` injection (like `components.dragonfly/cluster-mode=non-cluster`). Labels that append via JSON6902 `op: add` with `path: /spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-` _do_ require the labeled `Kustomization` to carry each required field as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced by `scripts/ks_label_precondition_audit.py` and `.github/workflows/validate.yaml` (job `label-preconditions`), registry-driven from `kubernetes/flux/cluster/ks.yaml` (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-`; 2 strategic-merge selectors need no precondition, 3 components appends + 2 dependsOn appends + 2 healthCheckExprs appends have Rule A active).
+The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it is a strategic-merge `spec.patches` injection (like `components.dragonfly/cluster-mode=non-cluster`). Labels that append via JSON6902 `op: add` with `path: /spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-` _do_ require the labeled `Kustomization` to carry each required field as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced by `scripts/ks_label_precondition_audit.py` and `.github/workflows/validate.yaml` (job `label-preconditions`), registry-driven from `kubernetes/flux/cluster/ks.yaml` (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-`; 2 strategic-merge selectors need no precondition, 3 components appends + 3 dependsOn appends + 2 healthCheckExprs appends have Rule A active).
 
 ### Label adoption
 
-Consumers set label `components.postgres/enabled=true` with `spec.components: []`, `spec.dependsOn` containing only `external-secrets-store` (ns `external-secrets`) and `spec.healthCheckExprs: []`; the root `cluster-apps` Kustomization injects `../../../../components/postgres` via a JSON6902 `add` to `/spec/components/-` selected by `components.postgres/enabled=true`, and also injects a `dependsOn` entry for `barman-cloud` (`database`) and a `healthCheckExprs` entry for `Cluster` readiness (`status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')` with `failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')`). Consumers therefore keep only `external-secrets-store` in `dependsOn` and an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist). Rendered output is identical to the former literal `dependsOn` + `healthCheckExprs` declarations.
+Consumers set label `components.postgres/enabled=true` with `spec.components` as a list (empty `[]` or existing entries like `kopiur/backup` — patch appends), `spec.dependsOn` containing only `external-secrets-store` (ns `external-secrets`) and `spec.healthCheckExprs: []`; the root `cluster-apps` Kustomization injects `../../../../components/postgres` via a JSON6902 `add` to `/spec/components/-` selected by `components.postgres/enabled=true`, and also injects `dependsOn` entries for `barman-cloud` (`database`) and `cloudnative-pg` (`database`) and a `healthCheckExprs` entry for `Cluster` readiness (`status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')` with `failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')`). Consumers therefore keep only `external-secrets-store` in `dependsOn` and an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist). Rendered output is identical to the former literal `dependsOn` + `healthCheckExprs` declarations. `external-secrets-store` stays a manual consumer `dependsOn` (not root-injected) to preserve `AGENTS.md` dependency-chain order, since patched entries append last.
 
 ## Usage
 
@@ -118,16 +118,21 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
     name: <app>-db
+    labels:
+        components.postgres/enabled: "true"
 spec:
-    components:
-        - ../../../../components/postgres
-    # see "Consumer Kustomization snippets" below for dependsOn + healthCheckExprs
+    components: [] # existing entries like ../../../../components/kopiur/backup are fine — root patch appends ../../../../components/postgres
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets
+        # + any app-specific deps; root patch appends barman-cloud + cloudnative-pg (both ns database)
+    healthCheckExprs: [] # placeholder — root patch injects CNPG Cluster readiness check
     interval: 1h
     path: ./kubernetes/apps/<ns>/<app>/db
     postBuild:
         substitute:
             APP: <app> # required
-            POSTGRES_STORAGE_SIZE: 8Gi # optional, default 8Gi
+            POSTGRES_STORAGE_SIZE: 5Gi # optional, default 5Gi
             # POSTGRES_USERNAME defaults to ${APP} — set only if different
     prune: true
     sourceRef:
@@ -164,11 +169,11 @@ The recipe is `arg order ns app` matching `just kube apply-ks` / `browse-pvc`.
 
 ## Backups
 
-- **Schedule:** `ScheduledBackup` `s3://backups/${APP}` with `schedule: "@daily"` and `immediate: true` — first backup runs shortly after the Cluster becomes ready, then daily at midnight.
+- **Schedule:** `ScheduledBackup` `s3://backups/cloudnative-pg` (shared across all consumers) with `schedule: "@daily"` and `immediate: true` — first backup runs shortly after the Cluster becomes ready, then daily at midnight.
 - **Method:** `plugin` via `barman-cloud.cloudnative-pg.io` (Barman Cloud plugin). Both base backups and WAL archiving go through the same `ObjectStore`.
 - **WAL archiving:** continuous via the plugin sidecar (`isWALArchiver: true`, `maxParallel: 4`, bzip2). Enables PITR within the retention window.
 - **Retention:** `7d` (`retentionPolicy: 7d` on the `ObjectStore`; `ScheduledBackup` uses `backupOwnerReference: self` so old Backups are pruned with the Cluster).
-- **Backend:** QNAP MinIO at `http://qnap.internal:9000` (`s3://backups/${APP}`), credentials from Bitwarden item `cloudnative-pg` via `${APP}-s3`.
+- **Backend:** QNAP MinIO at `http://qnap.internal:9000` (`s3://backups/cloudnative-pg`, shared; per-app isolation via `serverName` `${APP}`), credentials from Bitwarden item `cloudnative-pg` via `${APP}-s3`.
 - **On-demand:** `just kube pg-initial-backup <ns> <app>` or `kubectl apply` a `Backup` CR as above. Check `kubectl get backup -n <ns>` and `kubectl cnpg status <app> -n <ns>`.
 
 ## Connecting
@@ -245,31 +250,53 @@ Point apps at `<app>-pooler-rw.<ns>.svc.cluster.local:5432` when using the poole
 
 ## Consumer Kustomization snippets
 
-### Explicit `dependsOn` (no patches-magic)
+### `dependsOn` (label-injected operators)
 
-The consumer `ks.yaml` must declare its dependencies explicitly — the component does not inject them via patches:
+Consumers keep only `external-secrets-store` (+ any app-specific deps) in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.postgres/enabled=true`) appends `barman-cloud` and `cloudnative-pg` (both `database`) via JSON6902:
 
 ```yaml
-# kubernetes/apps/<ns>/<app>/ks.yaml
+# kubernetes/apps/<ns>/<app>/ks.yaml — what you write
 spec:
     dependsOn:
         - name: external-secrets-store
           namespace: external-secrets
-        - name: barman-cloud # plugin-barman-cloud HelmRelease (cnpg-barman-cloud)
+        # + app-specific deps if needed
+```
+
+Effective rendered `dependsOn` after the root patch:
+
+```yaml
+spec:
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets
+        - name: barman-cloud
+          namespace: database
+        - name: cloudnative-pg
           namespace: database
 ```
 
-`barman-cloud` transitively depends on `cloudnative-pg` operator, so consumers depend on `barman-cloud` only. Order follows `AGENTS.md`: same-namespace deps first (if any), then `external-secrets-store`, then remaining cross-namespace deps.
+Order follows `AGENTS.md`: same-namespace deps first (if any), then `external-secrets-store`, then remaining cross-namespace deps — the root patch appends last, preserving this order.
 
-### `healthCheckExprs`
+### `healthCheckExprs` (label-injected)
+
+Consumers keep an explicit `healthCheckExprs: []` placeholder; the root patch injects the CNPG `Cluster` readiness check:
+
+```yaml
+# kubernetes/apps/<ns>/<app>/ks.yaml — what you write
+spec:
+    healthCheckExprs: []
+```
+
+Effective rendered entry after the root patch:
 
 ```yaml
 spec:
     healthCheckExprs:
         - apiVersion: postgresql.cnpg.io/v1
           kind: Cluster
-          failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
-          current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
+          failed: "status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')"
+          current: "status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')"
 ```
 
 This mirrors the CNPG `Cluster` Ready condition; `healthCheckExprs` (not `healthChecks`) is required for Flux to gate the Kustomization as healthy.
@@ -282,10 +309,10 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
 
     ```bash
     just kube render-local-ks <ns> <ks>
-    # e.g. just kube render-local-ks default pstream-db
+    # e.g. just kube render-local-ks default pstream-backend
     ```
 
-    Confirm rendered `Cluster` has `bootstrap.recovery.source: <app>-backup`, `serverName: <app>`, `barmanObjectName: <app>`, `size: <POSTGRES_STORAGE_SIZE>`, and `ObjectStore` `destinationPath: s3://backups/<app>`.
+    Confirm rendered `Cluster` has `bootstrap.recovery.source: <app>-backup`, `serverName: <app>`, `barmanObjectName: <app>`, `size: <POSTGRES_STORAGE_SIZE>`, and `ObjectStore` `destinationPath: s3://backups/cloudnative-pg` (shared across all consumers).
 
 2. **Hubble drops — zero policy denies:**
 
@@ -315,7 +342,7 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
     kubectl -n <ns> get objectstore <app> -o yaml
     ```
 
-    `Backup` should reach `Completed`; `ObjectStore` `status` shows last backup; S3 prefix `s3://backups/<app>` contains the backup on QNAP (`http://qnap.internal:9000`).
+    `Backup` should reach `Completed`; `ObjectStore` `status` shows last backup; S3 prefix `s3://backups/cloudnative-pg` (shared prefix with per-app `serverName` `${APP}`) contains the backup on QNAP (`http://qnap.internal:9000`).
 
 5. **Secret & service:**
 
