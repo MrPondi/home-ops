@@ -258,15 +258,13 @@ The consumer `ks.yaml` must declare its dependencies explicitly — the componen
 # kubernetes/apps/<ns>/<app>/ks.yaml
 spec:
     dependsOn:
-        - name: cloudnative-pg # operator HelmRelease
-          namespace: database
-        - name: barman-cloud # plugin-barman-cloud HelmRelease (cnpg-barman-cloud)
-          namespace: database
         - name: external-secrets-store
           namespace: external-secrets
+        - name: barman-cloud # plugin-barman-cloud HelmRelease (cnpg-barman-cloud)
+          namespace: database
 ```
 
-Order follows `AGENTS.md`: same-namespace deps first (if any), then `external-secrets-store`, then remaining cross-namespace deps.
+`barman-cloud` transitively depends on `cloudnative-pg` operator, so consumers depend on `barman-cloud` only. Order follows `AGENTS.md`: same-namespace deps first (if any), then `external-secrets-store`, then remaining cross-namespace deps.
 
 ### `healthCheckExprs`
 
