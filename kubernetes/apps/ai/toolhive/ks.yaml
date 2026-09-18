@@ -36,11 +36,12 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  labels:
+    components.dragonfly/authentication: "true"
+    components.dragonfly/enabled: "true"
   name: toolhive-config
 spec:
-  components:
-    - ../../../../components/dragonfly
-    - ../../../../components/dragonfly/authentication
+  components: []
   dependsOn:
     - name: toolhive-operator
     - name: app-postbuild

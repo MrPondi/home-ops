@@ -65,10 +65,10 @@ metadata:
   # TEMPORARY net-new bootstrap — remove after first backup lands (just kube pg-initial-backup default pstream); recovery is the default once a backup exists
   labels:
     components.postgres/cnpg: init
+    components.postgres/enabled: "true"
   name: pstream-db
 spec:
-  components:
-    - ../../../../components/postgres
+  components: []
   dependsOn:
     - name: external-secrets-store
       namespace: external-secrets

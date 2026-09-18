@@ -3,8 +3,7 @@
 
 Registry-driven: derives from the root ``kubernetes/flux/cluster/ks.yaml``
 ``spec.patches`` which ``labelSelector`` pairs with a JSON6902 ``add`` to
-``/spec/components``. Labels using strategic-merge ``spec.patches`` injection
-(all three current root patches are strategic-merge) need NO precondition.
+``/spec/components``. The registry currently has 2 strategic-merge labelSelector entries (cnpg=init, non-cluster) plus 3 JSON6902 append entries (plus 1 unqualified defaults entry); strategic-merge labels need NO precondition.
 
 Rules:
   A. If a KS (``kubernetes/apps/**/ks.yaml``) matches a selector that needs
@@ -82,7 +81,7 @@ def parse_registry(root_ks: Path) -> tuple[list[tuple[str, bool]], set[str], lis
                     if op.get("op") != "add":
                         continue
                     op_path = op.get("path")
-                    if isinstance(op_path, str) and op_path.startswith("/spec/components"):
+                    if isinstance(op_path, str) and op_path in ("/spec/components", "/spec/components/-"):
                         needs = True
                         break
         selectors.append((selector_str, needs))

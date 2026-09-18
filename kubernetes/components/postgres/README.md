@@ -102,7 +102,11 @@ Real example: `kubernetes/apps/default/pstream/ks.yaml` (`pstream-db` Kustomizat
 
 ### Label precondition (per-consumer)
 
-The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it is a strategic-merge `spec.patches` injection. Any **future** label that appends to `spec.components` via a JSON6902 `op: add` with `path: /spec/components` _does_ require the labeled `Kustomization` to carry `spec.components` as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced by `scripts/ks_label_precondition_audit.py` and `.github/workflows/validate.yaml` (job `label-preconditions`), registry-driven from `kubernetes/flux/cluster/ks.yaml` (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components`; strategic-merge injections like the current three root patches need no precondition).
+The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it is a strategic-merge `spec.patches` injection (like `components.dragonfly/cluster-mode=non-cluster`). Labels that append via JSON6902 `op: add` with `path: /spec/components/-` _do_ require the labeled `Kustomization` to carry `spec.components` as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced by `scripts/ks_label_precondition_audit.py` and `.github/workflows/validate.yaml` (job `label-preconditions`), registry-driven from `kubernetes/flux/cluster/ks.yaml` (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components/-`; 2 strategic-merge selectors need no precondition, 3 JSON6902 append selectors have Rule A active).
+
+### Label adoption
+
+Consumers set label `components.postgres/enabled=true` + `spec.components: []`; root injects `../../../../components/postgres`; rendered output identical to literal adoption.
 
 ## Usage
 

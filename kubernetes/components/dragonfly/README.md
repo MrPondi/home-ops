@@ -56,6 +56,10 @@ spec:
 
 Existing explicit users: `pelican`, `toolhive` (`toolhive-config` also sets `DRAGONFLY_APP_NAME: virtualmcpserver`).
 
+### Label adoption
+
+Consumers use `components.dragonfly/enabled=true` label with `spec.components: []` instead of the literal `../../../../components/dragonfly` entry; the root `cluster-apps` Kustomization injects the path via a JSON6902 `add` to `/spec/components/-` selected by `components.dragonfly/enabled=true`. The optional auth sub-component uses `components.dragonfly/authentication=true` (additive — requires `enabled` as well) to inject `../../../../components/dragonfly/authentication`. Both labels are currently carried by `pelican` (`kubernetes/apps/default/pelican/ks.yaml`) and `toolhive-config` (`kubernetes/apps/ai/toolhive/ks.yaml` — also sets `DRAGONFLY_APP_NAME: virtualmcpserver`).
+
 ### Cluster-mode override — ToolHive Lua auth storage
 
 Label `components.dragonfly/cluster-mode=non-cluster` triggers the root `cluster-apps` patch (labelSelector `components.dragonfly/cluster-mode=non-cluster` on `kind: Kustomization`) which injects a `spec.patches` JSON6902 patch on the `Dragonfly` CR:
