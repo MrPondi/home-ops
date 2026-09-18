@@ -12,7 +12,6 @@ spec:
   ingress:
     # Same-namespace consumers (override label via POSTGRES_APP_NAME)
     - fromEndpoints:
-        # consumer app pods (same namespace)
         - matchLabels:
             app.kubernetes.io/name: ${POSTGRES_APP_NAME:=${APP}}
       toPorts:
@@ -21,7 +20,6 @@ spec:
               protocol: TCP
     # Cluster peers (streaming replication for future replicas)
     - fromEndpoints:
-        # sibling instance pods (${APP} cluster)
         - matchLabels:
             cnpg.io/cluster: ${APP}
       toPorts:
@@ -30,7 +28,6 @@ spec:
               protocol: TCP
     # cloudnative-pg operator (database) — instance manager API + psql
     - fromEndpoints:
-        # cloudnative-pg operator pods (database)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: database
             k8s:app.kubernetes.io/name: cloudnative-pg
@@ -40,9 +37,8 @@ spec:
               protocol: TCP
             - port: "8000"
               protocol: TCP
-    # Prometheus metrics (PodMonitor, port 9187)
+    # Prometheus metrics (PodMonitor)
     - fromEndpoints:
-        # prometheus pods (observability)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: observability
             k8s:app.kubernetes.io/name: prometheus
@@ -52,7 +48,6 @@ spec:
               protocol: TCP
   egress:
     - toEndpoints:
-        # kube-dns pods (kube-system)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: kube-system
             k8s:k8s-app: kube-dns
