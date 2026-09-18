@@ -106,7 +106,7 @@ The `components.postgres/cnpg=init` label itself needs **no** `spec.components` 
 
 ### Label adoption
 
-Consumers set label `components.postgres/enabled=true` with `spec.components` as a list (empty `[]` or existing entries like `kopiur/backup` — patch appends), `spec.dependsOn: []` placeholder (or app-specific deps, add as needed) and `spec.healthCheckExprs: []`; the root `cluster-apps` Kustomization injects `../../../../components/postgres` via a JSON6902 `add` to `/spec/components/-` selected by `components.postgres/enabled=true`, and also injects `dependsOn` entries for `external-secrets-store` (`external-secrets`) FIRST, then `barman-cloud` (`database`) and `cloudnative-pg` (`database`), and a `healthCheckExprs` entry for `Cluster` readiness (`status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')` with `failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')`). Consumers therefore keep only app-specific deps in `dependsOn` and an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist). Rendered output is identical to the former literal `dependsOn` + `healthCheckExprs` declarations.
+Consumers set label `components.postgres/enabled=true` with `spec.components` as a list (empty `[]` or existing entries like `kopiur/backup` — patch appends), `spec.dependsOn` containing the manual `external-secrets-store` (`external-secrets`) entry (every consumer ships its own `externalsecret.yaml`) plus any app-specific deps, and `spec.healthCheckExprs: []`; the root `cluster-apps` Kustomization injects `../../../../components/postgres` via a JSON6902 `add` to `/spec/components/-` selected by `components.postgres/enabled=true`, and also injects `dependsOn` entries for `external-secrets-store` (`external-secrets`) FIRST, then `barman-cloud` (`database`) and `cloudnative-pg` (`database`), and a `healthCheckExprs` entry for `Cluster` readiness (`status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')` with `failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')`). The manual `external-secrets-store` entry is kept — every labelled consumer ships its own `externalsecret.yaml`, so the rendered list intentionally contains `external-secrets-store` twice (manual + injected); Flux tolerates the duplicate as a redundant Ready check. Consumers keep an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist).
 
 ## Usage
 
@@ -122,7 +122,10 @@ metadata:
         components.postgres/enabled: "true"
 spec:
     components: [] # existing entries like ../../../../components/kopiur/backup are fine — root patch appends ../../../../components/postgres
-    dependsOn: [] # placeholder — root patch injects external-secrets-store + barman-cloud + cloudnative-pg; add app-specific deps here as needed
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets # app ships own externalsecret.yaml — keep manual entry; root patch adds second copy first (intentional duplicate, Flux tolerates)
+        # add app-specific deps here as needed
     healthCheckExprs: [] # placeholder — root patch injects CNPG Cluster readiness check
     interval: 1h
     path: ./kubernetes/apps/<ns>/<app>/db
@@ -249,25 +252,30 @@ Point apps at `<app>-pooler-rw.<ns>.svc.cluster.local:5432` when using the poole
 
 ### `dependsOn` (label-injected operators)
 
-Consumers declare only app-specific deps (or `[]` placeholder) in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.postgres/enabled=true`) injects `external-secrets-store` (`external-secrets`) first, then `barman-cloud` and `cloudnative-pg` (both `database`) via JSON6902:
+Consumers declare the manual `external-secrets-store` (`external-secrets`) entry (every consumer ships its own `externalsecret.yaml`) plus any app-specific deps in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.postgres/enabled=true`) injects `external-secrets-store` (`external-secrets`) first, then `barman-cloud` and `cloudnative-pg` (both `database`) via JSON6902 (intentional duplicate — Flux tolerates the redundant Ready check):
 
 ```yaml
 # kubernetes/apps/<ns>/<app>/ks.yaml — what you write
 spec:
-    dependsOn: [] # placeholder — root patch injects external-secrets-store + barman-cloud + cloudnative-pg; add app-specific deps here as needed
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets # app ships own externalsecret.yaml — keep; root patch adds second copy
+        # add app-specific deps here as needed
 ```
 
-Effective rendered `dependsOn` after the root patch:
+Effective rendered `dependsOn` after the root patch (manual + injected):
 
 ```yaml
 spec:
     dependsOn:
         - name: external-secrets-store
-          namespace: external-secrets
+          namespace: external-secrets # manual — app's own externalsecret.yaml
+        - name: external-secrets-store
+          namespace: external-secrets # injected — root patch (FIRST)
         - name: barman-cloud
-          namespace: database
+          namespace: database # injected
         - name: cloudnative-pg
-          namespace: database
+          namespace: database # injected
 ```
 
 ### `healthCheckExprs` (label-injected)

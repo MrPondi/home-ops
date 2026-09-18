@@ -137,11 +137,6 @@ spec:
     - # Dragonfly consumers: component + operator dependsOn + Ready health check; label components.dragonfly/enabled=true
       patch: |-
         - op: add
-          path: /spec/dependsOn/-
-          value:
-            name: external-secrets-store
-            namespace: external-secrets
-        - op: add
           path: /spec/components/-
           value: ../../../../components/dragonfly
         - op: add
@@ -161,6 +156,11 @@ spec:
         labelSelector: "components.dragonfly/enabled=true"
     - # Opt-in dragonfly auth sub-component; label components.dragonfly/authentication=true
       patch: |-
+        - op: add
+          path: /spec/dependsOn/-
+          value:
+            name: external-secrets-store
+            namespace: external-secrets
         - op: add
           path: /spec/components/-
           value: ../../../../components/dragonfly/authentication

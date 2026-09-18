@@ -46,6 +46,8 @@ spec:
   dependsOn:
     - name: toolhive-operator
     - name: app-postbuild
+    - name: external-secrets-store
+      namespace: external-secrets
     - name: litellm
       namespace: ai
   healthCheckExprs: []

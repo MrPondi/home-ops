@@ -10,6 +10,8 @@ spec:
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
+    - name: external-secrets-store
+      namespace: external-secrets
     - name: searxng
       namespace: ai
   healthCheckExprs: []

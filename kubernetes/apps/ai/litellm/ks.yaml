@@ -25,6 +25,8 @@ spec:
   components: []
   dependsOn:
     - name: litellm-operator
+    - name: external-secrets-store
+      namespace: external-secrets
   healthCheckExprs:
     - apiVersion: external-secrets.io/v1
       kind: ClusterSecretStore

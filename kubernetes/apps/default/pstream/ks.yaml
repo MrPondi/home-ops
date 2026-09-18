@@ -9,7 +9,9 @@ metadata:
 spec:
   components:
     - ../../../../components/kopiur/backup
-  dependsOn: []
+  dependsOn:
+    - name: external-secrets-store
+      namespace: external-secrets
   healthCheckExprs: []
   interval: 1h
   path: ./kubernetes/apps/default/pstream/backend

@@ -35,7 +35,10 @@ metadata:
         components.dragonfly/enabled: "true"
 spec:
     components: [] # existing entries like ../../../../components/kopiur/backup are fine — root patch appends ../../../../components/dragonfly
-    dependsOn: [] # placeholder — root patch injects external-secrets-store + dragonfly-operator; add app-specific deps here as needed
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets # app ships own externalsecret.yaml — keep manual entry
+        # add app-specific deps here as needed — root patch appends dragonfly-operator (base component ships no ExternalSecret, so no injected ESS)
     healthCheckExprs: [] # placeholder — root patch injects Dragonfly readiness check
     interval: 1h
     path: ./kubernetes/apps/<ns>/<app>/app
@@ -63,7 +66,10 @@ metadata:
         components.dragonfly/authentication: "true" # additive — requires enabled as well
 spec:
     components: [] # existing entries fine — root patches append dragonfly + authentication
-    dependsOn: [] # placeholder — root patch injects external-secrets-store + dragonfly-operator; add app-specific deps here as needed
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets # app ships own externalsecret.yaml — keep manual entry; auth patch adds second copy FIRST (intentional duplicate, Flux tolerates)
+        # add app-specific deps here as needed — root patches append external-secrets-store (auth, FIRST) + dragonfly-operator (enabled)
     healthCheckExprs: [] # placeholder — root patch injects Dragonfly readiness check
     postBuild:
         substitute:
@@ -79,7 +85,7 @@ Labeled consumers (`components.dragonfly/enabled=true`) x6: `pelican` (default, 
 
 ### Label adoption
 
-Consumers use `components.dragonfly/enabled=true` label with `spec.components: []` instead of the literal `../../../../components/dragonfly` entry; the root `cluster-apps` Kustomization injects the path via a JSON6902 `add` to `/spec/components/-` selected by `components.dragonfly/enabled=true`, and also injects `dependsOn` entries for `external-secrets-store` (`external-secrets`) first, then `dragonfly-operator` (`database`), and a `healthCheckExprs` entry for `Dragonfly` readiness (`has(status.phase) && status.phase == 'Ready'`). Consumers therefore keep only app-specific `dependsOn` entries and an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist) — `litellm` retains its `ClusterSecretStore` health check alongside the injected Dragonfly check. The optional auth sub-component uses `components.dragonfly/authentication=true` (additive — requires `enabled` as well) to inject `../../../../components/dragonfly/authentication`. Enabled x6: `pelican` (`kubernetes/apps/default/pelican/ks.yaml`, +authentication), `nextcloud` (`kubernetes/apps/default/nextcloud/ks.yaml`), `toolhive-config` (`kubernetes/apps/ai/toolhive/ks.yaml`, +authentication, +cluster-mode non-cluster, `DRAGONFLY_APP_NAME` `virtualmcpserver`), `searxng` (`kubernetes/apps/ai/searxng/ks.yaml`), `litellm` (`kubernetes/apps/ai/litellm/ks.yaml`, keeps its own `ClusterSecretStore` health check alongside the injected Dragonfly check), `open-webui` (`kubernetes/apps/ai/open-webui/ks.yaml`); authentication is additive on `pelican` and `toolhive-config`.
+Consumers use `components.dragonfly/enabled=true` label with `spec.components: []` instead of the literal `../../../../components/dragonfly` entry; the root `cluster-apps` Kustomization injects the path via a JSON6902 `add` to `/spec/components/-` selected by `components.dragonfly/enabled=true`, and also injects a `dependsOn` entry for `dragonfly-operator` (`database`) and a `healthCheckExprs` entry for `Dragonfly` readiness (`has(status.phase) && status.phase == 'Ready'`). The base component ships no `ExternalSecret`, so the enabled patch does not inject `external-secrets-store`; consumers that ship their own `externalsecret.yaml` keep the manual `external-secrets-store` (`external-secrets`) entry in `spec.dependsOn` alongside any app-specific deps, with an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist) — `litellm` retains its `ClusterSecretStore` health check alongside the injected Dragonfly check. The optional auth sub-component uses `components.dragonfly/authentication=true` (additive — requires `enabled` as well) to inject `../../../../components/dragonfly/authentication` and an `external-secrets-store` (`external-secrets`) `dependsOn` entry FIRST (auth sub-component ships an `ExternalSecret`); auth consumers therefore keep their manual `external-secrets-store` entry and the rendered list intentionally contains it twice (manual + injected, Flux tolerates). Enabled x6: `pelican` (`kubernetes/apps/default/pelican/ks.yaml`, +authentication), `nextcloud` (`kubernetes/apps/default/nextcloud/ks.yaml`), `toolhive-config` (`kubernetes/apps/ai/toolhive/ks.yaml`, +authentication, +cluster-mode non-cluster, `DRAGONFLY_APP_NAME` `virtualmcpserver`), `searxng` (`kubernetes/apps/ai/searxng/ks.yaml`), `litellm` (`kubernetes/apps/ai/litellm/ks.yaml`, keeps its own `ClusterSecretStore` health check alongside the injected Dragonfly check), `open-webui` (`kubernetes/apps/ai/open-webui/ks.yaml`); authentication is additive on `pelican` and `toolhive-config`.
 
 ### Cluster-mode override — ToolHive Lua auth storage
 
@@ -92,23 +98,51 @@ Prerequisite: the `Dragonfly` CR must have `>=3` `spec.args` entries (patch remo
 
 ### Dependencies
 
-Consumers declare only app-specific deps (or `[]` placeholder) in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.dragonfly/enabled=true`) injects `external-secrets-store` (`external-secrets`) first, then `dragonfly-operator` (`database`) via JSON6902.
+Consumers declare the manual `external-secrets-store` (`external-secrets`) entry (every labelled consumer ships its own `externalsecret.yaml`) plus any app-specific deps in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.dragonfly/enabled=true`) injects `dragonfly-operator` (`database`) via JSON6902 (base component ships no `ExternalSecret`, so no `external-secrets-store` injection). The `components.dragonfly/authentication=true` patch injects `external-secrets-store` (`external-secrets`) FIRST (auth sub-component ships an `ExternalSecret`) — auth consumers therefore render the duplicate intentionally (Flux tolerates).
 
 ```yaml
-# kubernetes/apps/<ns>/<app>/ks.yaml — what you write
+# kubernetes/apps/<ns>/<app>/ks.yaml — what you write (without auth)
 spec:
-    dependsOn: [] # placeholder — root patch injects external-secrets-store + dragonfly-operator; add app-specific deps here as needed
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets # app ships own externalsecret.yaml — keep
+        # add app-specific deps here as needed
 ```
 
-Effective rendered `dependsOn` after the root patch:
+Effective rendered `dependsOn` after the root patch (without auth):
 
 ```yaml
 spec:
     dependsOn:
         - name: external-secrets-store
-          namespace: external-secrets
+          namespace: external-secrets # manual
         - name: dragonfly-operator
-          namespace: database
+          namespace: database # injected (enabled)
+```
+
+With authentication (`components.dragonfly/authentication=true` additive):
+
+```yaml
+# kubernetes/apps/<ns>/<app>/ks.yaml — what you write (with auth)
+spec:
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets # app ships own externalsecret.yaml — keep; auth patch adds second copy
+        # add app-specific deps here as needed
+```
+
+Effective rendered `dependsOn` after the root patches (with auth, manual + injected duplicate):
+
+```yaml
+spec:
+    dependsOn:
+        - name: external-secrets-store
+          namespace: external-secrets # manual
+        # ... app-specific deps (if any) ...
+        - name: external-secrets-store
+          namespace: external-secrets # injected — auth patch (FIRST)
+        - name: dragonfly-operator
+          namespace: database # injected — enabled patch
 ```
 
 ### Health check
