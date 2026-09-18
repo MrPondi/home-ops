@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: ${APP}
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
+spec:
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
+    podAntiAffinityType: required
+  bootstrap:
+    recovery:
+      source: ${APP}-backup
+  enableSuperuserAccess: true
+  externalClusters:
+    - name: ${APP}-backup
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        enabled: true
+        isWALArchiver: true
+        parameters:
+          barmanObjectName: ${APP}
+          serverName: ${APP}
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.6@sha256:899d3ed526b659d77935dde0e6bf2d69dbbf17d3d8c6486ca8cfd04bd3c18533
+  instances: 1
+  enablePDB: false # Not for single node clusters
+  managed:
+    services:
+      disabledDefaultServices:
+        - "r"
+        - "ro"
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      enabled: true
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: ${APP}
+        serverName: ${APP}
+  postgresql:
+    parameters:
+      max_connections: "300"
+      shared_buffers: 128MB
+      work_mem: 64MB
+  primaryUpdateStrategy: unsupervised
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  storage:
+    size: ${POSTGRES_STORAGE_SIZE:=8Gi}
+    storageClass: miroir-slow-local

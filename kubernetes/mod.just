@@ -153,3 +153,18 @@ hubble-capture ns="" seconds="60" file="": hubble-ensure
               ]
             | @tsv' > "$file" || true
     gum log -t rfc3339 -s -l info "captured $(wc -l < "$file") flows -> $file"
+
+[doc('Trigger an immediate CNPG base backup for a cluster (plugin method)')]
+pg-initial-backup ns app:
+    kubectl apply -n "{{ ns }}" -f - <<EOF
+    apiVersion: postgresql.cnpg.io/v1
+    kind: Backup
+    metadata:
+      name: {{ app }}-initial
+    spec:
+      cluster:
+        name: {{ app }}
+      method: plugin
+      pluginConfiguration:
+        name: barman-cloud.cloudnative-pg.io
+    EOF
