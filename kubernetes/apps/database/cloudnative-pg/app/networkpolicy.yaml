@@ -35,11 +35,24 @@ spec:
               protocol: TCP
             - port: "8000"
               protocol: TCP
-    # pstream-backend cluster pods (default) — pilot per-app cluster
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: cloudnative-pg-clusters
+spec:
+  description: Operator egress to all CNPG instance pods cluster-wide (no per-cluster rules needed)
+  # cloudnative-pg operator pods (database)
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/name: cloudnative-pg
+  egress:
+    # All CNPG cluster instance pods (any namespace — Exists matcher, no maintenance needed)
     - toEndpoints:
-        - matchLabels:
-            k8s:cnpg.io/cluster: pstream-backend
-            k8s:io.kubernetes.pod.namespace: default
+        - matchExpressions:
+            - key: k8s:cnpg.io/cluster
+              operator: Exists
       toPorts:
         - ports:
             - port: "5432"

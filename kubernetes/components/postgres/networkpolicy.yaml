@@ -1,0 +1,66 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: ${APP}-postgres
+spec:
+  # CNPG instance pods (${APP} cluster) — universal server-side policy shipped by the component; complete on its own for open namespaces, additive in fail-closed ones
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: ${APP}
+  ingress:
+    # Prometheus scrape (observability) — required in open namespaces; additive where default-deny ships it
+    - fromEndpoints:
+        # prometheus pods (observability)
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: observability
+            k8s:app.kubernetes.io/name: prometheus
+    # Cluster-wide clients on the service port (same convention as the shared postgres cluster CNP)
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # cloudnative-pg operator (database) — instance manager API
+    - fromEndpoints:
+        # cloudnative-pg operator pods (database)
+        - matchLabels:
+            k8s:app.kubernetes.io/name: cloudnative-pg
+            k8s:io.kubernetes.pod.namespace: database
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
+  egress:
+    # DNS to kube-dns (kube-system) — required in open namespaces; shipped by default-deny in fail-closed ones
+    - toEndpoints:
+        # kube-dns pods (kube-system)
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    # Kubernetes API — required in open namespaces; shipped by default-deny in fail-closed ones
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # QNAP MinIO (WAL archiving + barman backups, direct)
+    - toCIDR:
+        - 10.0.25.25/32
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
