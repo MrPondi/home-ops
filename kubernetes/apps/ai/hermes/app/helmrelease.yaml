@@ -95,14 +95,14 @@ spec:
             image: *image
             args: ["sleep", "infinity"]
             env:
-              HOME: /opt/data
-              HERMES_HOME: /opt/data
-              # WhatsApp cloud webhook (unused — platform disabled in config.yaml)
-              # WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
-              SEARXNG_URL: http://searxng.ai.svc.cluster.local:8080
               API_SERVER_ENABLED: true
               API_SERVER_HOST: 0.0.0.0
               API_SERVER_PORT: &api-port 8642
+              HERMES_HOME: /opt/data
+              HOME: /opt/data
+              # WhatsApp cloud webhook (unused — platform disabled in config.yaml)
+              # WHATSAPP_CLOUD_WEBHOOK_PORT: &whatsapp-port 8090
+              SEARXNG_URL: http://searxng.ai.svc.cluster.local:8080
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
@@ -148,10 +148,10 @@ spec:
               - --host
               - "0.0.0.0"
             env:
-              HOME: /opt/data
-              HERMES_HOME: /opt/data
-              HERMES_DASHBOARD_PORT: &dashboard-port 9119
               GATEWAY_HEALTH_URL: http://localhost:8642
+              HERMES_DASHBOARD_PORT: &dashboard-port 9119
+              HERMES_HOME: /opt/data
+              HOME: /opt/data
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:

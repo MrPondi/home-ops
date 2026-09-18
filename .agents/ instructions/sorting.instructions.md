@@ -77,6 +77,10 @@ Unless a more specific rule applies, keys within any section should be ordered a
     - `image`
     - Any other fields should be added next in alphabetical order.
 
+- Items within `spec.values.controllers.*.containers.*.env` and `spec.values.controllers.*.initContainers.*.env` sections should NOT be sorted alphabetically. Instead:
+    - Group variables by similarity / shared prefix (e.g. `SONARR__APP__*` together, `SONARR__AUTH__*` together, `WEB_*` together). Within each group, keep alphabetical order.
+    - `TZ: Europe/Warsaw` always goes last, on the far bottom, after all other variables. Every app-template deployment should include it. This applies to both map syntax (`KEY: value`) and list syntax (`- name: KEY`).
+
 - Items within `spec.values.controllers.*.containers.resources` and `spec.values.controllers.*.initContainers.resources` sections should be sorted as follows:
     - `requests`
     - `limits`
