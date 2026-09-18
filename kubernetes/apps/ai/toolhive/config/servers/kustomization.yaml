@@ -4,6 +4,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./networkpolicy.yaml
+  - ./authentik/
   - ./context7/
   - ./flux/
   - ./github/
@@ -11,6 +12,7 @@ resources:
   # - ./hass/
   - ./konflate/
   - ./kubernetes/
+  - ./longhorn/
   - ./prometheus/
   - ./seerr/
   - ./servarr/

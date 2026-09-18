@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name authentik
+spec:
+  # Authentik MCP server pod (ai)
+  endpointSelector:
+    matchLabels:
+      toolhive: "true"
+      toolhive-name: *name
+      app: *name
+  # No ingress - stdio transport binds no TCP port; proxy runner attaches via kube API
+  egress:
+    # Authentik server pods (security) - selector verified via kubectl get pods -n security --show-labels (app.kubernetes.io/name=authentik, port 80 on svc/authentik-server)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: security
+            k8s:app.kubernetes.io/name: authentik
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
