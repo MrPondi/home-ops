@@ -20,11 +20,11 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # PostgreSQL (init + database)
+    # PostgreSQL (open-webui cluster, ai)
     - toEndpoints:
+        # open-webui cluster instance pods (ai)
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: database
-            k8s:cnpg.io/cluster: postgres
+            cnpg.io/cluster: ${APP}
       toPorts:
         - ports:
             - port: "5432"
