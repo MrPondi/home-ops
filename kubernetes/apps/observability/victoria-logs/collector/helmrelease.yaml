@@ -27,9 +27,13 @@ spec:
         - kubernetes.pod_labels.app.kubernetes.io/name
     extraArgs:
       "kubernetesCollector.decolorizeFields": _msg
+      # _msg sources (first match wins): defaults + structlog `event` (authentik) + nested `error.message` (JSON-RPC/MCP servers)
+      "kubernetesCollector.msgField": message,msg,log,event,error.message
       # Cilium hubble exported flows on the node (rotated by the exporter)
       "fileCollector.glob": /var/run/cilium/hubble/policy-drops*.log
       "fileCollector.extraFields": '{"log_source":"cilium-hubble"}'
+      # hubble flow summary (e.g. "ICMPv6 NeighborSolicitation") as _msg; file collector only tails hubble drops
+      "fileCollector.msgField": flow.Summary,message,msg,log
       # single stream per node instead of default hostname+file → stream-filterable & compress better
       "fileCollector.streamFields": hostname,log_source
       # use the flow event time, not tailing time
