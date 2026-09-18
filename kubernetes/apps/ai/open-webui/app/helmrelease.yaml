@@ -14,39 +14,34 @@ spec:
       open-webui:
         annotations:
           reloader.stakater.com/auto: "true"
-        initContainers:
-          postgres-init:
-            image:
-              repository: ghcr.io/home-operations/postgres-init
-              tag: 18.6@sha256:b6d3af974df781c673d37e49bdddfa14a6f5be28b18d2cb7713f0449bea4057b
-            envFrom:
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
         containers:
           app:
             image:
               repository: ghcr.io/open-webui/open-webui
               tag: v0.11.3@sha256:41daa0cf2561a5d4c8d1ff31ee2a98d93ab4d3ac2605cac69366ff6a3374a933
             env:
-              WEBUI_URL: https://chat.pondi.dev
               CORS_ALLOW_ORIGIN: https://chat.pondi.dev
+              DATABASE_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: open-webui-app
+                    key: uri
+              DEFAULT_LOCALE: pl
+              ENABLE_API_KEYS: "true"
               ENABLE_PERSISTENT_CONFIG: "false"
               ENABLE_VERSION_UPDATE_CHECK: "false"
-              ENABLE_API_KEYS: "true"
-              DEFAULT_LOCALE: pl
-              TOOL_SERVER_CONNECTIONS: '[{"type":"mcp","url":"http://vmcp-mcp-gateway-internal.ai.svc.cluster.local:4483/mcp","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"mcp-gateway","name":"MCP Gateway","description":""}}]'
-              # SearXNG
               ENABLE_WEB_SEARCH: True
+              ENABLE_WEBSOCKET_SUPPORT: true
+              REDIS_URL: redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379/0
+              SEARXNG_QUERY_URL: "http://searxng.ai.svc.cluster.local:8080/search?q=<query>"
+              TOOL_SERVER_CONNECTIONS: '[{"type":"mcp","url":"http://vmcp-mcp-gateway-internal.ai.svc.cluster.local:4483/mcp","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"mcp-gateway","name":"MCP Gateway","description":""}}]'
+              TZ: Europe/Warsaw
+              WEB_SEARCH_CONCURRENT_REQUESTS: 10
               WEB_SEARCH_ENGINE: "searxng"
               WEB_SEARCH_RESULT_COUNT: 3
-              WEB_SEARCH_CONCURRENT_REQUESTS: 10
-              SEARXNG_QUERY_URL: "http://searxng.ai.svc.cluster.local:8080/search?q=<query>"
-              # Websockets / Redis
-              REDIS_URL: redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379/0
-              ENABLE_WEBSOCKET_SUPPORT: true
               WEBSOCKET_MANAGER: redis
               WEBSOCKET_REDIS_URL: redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379/1
-              TZ: Europe/Warsaw
+              WEBUI_URL: https://chat.pondi.dev
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
