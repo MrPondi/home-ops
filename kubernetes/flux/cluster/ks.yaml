@@ -106,6 +106,11 @@ spec:
     - # Postgres consumers: component + operator dependsOn + CNPG health checks; label components.postgres/enabled=true
       patch: |-
         - op: add
+          path: /spec/dependsOn/-
+          value:
+            name: external-secrets-store
+            namespace: external-secrets
+        - op: add
           path: /spec/components/-
           value: ../../../../components/postgres
         - op: add
@@ -131,6 +136,11 @@ spec:
         labelSelector: "components.postgres/enabled=true"
     - # Dragonfly consumers: component + operator dependsOn + Ready health check; label components.dragonfly/enabled=true
       patch: |-
+        - op: add
+          path: /spec/dependsOn/-
+          value:
+            name: external-secrets-store
+            namespace: external-secrets
         - op: add
           path: /spec/components/-
           value: ../../../../components/dragonfly

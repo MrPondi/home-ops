@@ -8,9 +8,7 @@ metadata:
   name: searxng
 spec:
   components: []
-  dependsOn:
-    - name: external-secrets-store
-      namespace: external-secrets
+  dependsOn: []
   healthCheckExprs: []
   interval: 1h
   path: ./kubernetes/apps/ai/searxng/app

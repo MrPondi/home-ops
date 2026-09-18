@@ -35,10 +35,7 @@ metadata:
         components.dragonfly/enabled: "true"
 spec:
     components: [] # existing entries like ../../../../components/kopiur/backup are fine — root patch appends ../../../../components/dragonfly
-    dependsOn:
-        - name: external-secrets-store
-          namespace: external-secrets
-        # + any app-specific deps; root patch appends dragonfly-operator (ns database)
+    dependsOn: [] # placeholder — root patch injects external-secrets-store + dragonfly-operator; add app-specific deps here as needed
     healthCheckExprs: [] # placeholder — root patch injects Dragonfly readiness check
     interval: 1h
     path: ./kubernetes/apps/<ns>/<app>/app
@@ -66,10 +63,7 @@ metadata:
         components.dragonfly/authentication: "true" # additive — requires enabled as well
 spec:
     components: [] # existing entries fine — root patches append dragonfly + authentication
-    dependsOn:
-        - name: external-secrets-store
-          namespace: external-secrets
-        # + app-specific deps; root patch appends dragonfly-operator (ns database)
+    dependsOn: [] # placeholder — root patch injects external-secrets-store + dragonfly-operator; add app-specific deps here as needed
     healthCheckExprs: [] # placeholder — root patch injects Dragonfly readiness check
     postBuild:
         substitute:
@@ -85,7 +79,7 @@ Labeled consumers (`components.dragonfly/enabled=true`) x6: `pelican` (default, 
 
 ### Label adoption
 
-Consumers use `components.dragonfly/enabled=true` label with `spec.components: []` instead of the literal `../../../../components/dragonfly` entry; the root `cluster-apps` Kustomization injects the path via a JSON6902 `add` to `/spec/components/-` selected by `components.dragonfly/enabled=true`, and also injects a `dependsOn` entry for `dragonfly-operator` (`database`) and a `healthCheckExprs` entry for `Dragonfly` readiness (`has(status.phase) && status.phase == 'Ready'`). Consumers therefore keep only app-specific `dependsOn` entries and an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist) — `litellm` retains its `ClusterSecretStore` health check alongside the injected Dragonfly check. The optional auth sub-component uses `components.dragonfly/authentication=true` (additive — requires `enabled` as well) to inject `../../../../components/dragonfly/authentication`. Enabled x6: `pelican` (`kubernetes/apps/default/pelican/ks.yaml`, +authentication), `nextcloud` (`kubernetes/apps/default/nextcloud/ks.yaml`), `toolhive-config` (`kubernetes/apps/ai/toolhive/ks.yaml`, +authentication, +cluster-mode non-cluster, `DRAGONFLY_APP_NAME` `virtualmcpserver`), `searxng` (`kubernetes/apps/ai/searxng/ks.yaml`), `litellm` (`kubernetes/apps/ai/litellm/ks.yaml`, keeps its own `ClusterSecretStore` health check alongside the injected Dragonfly check), `open-webui` (`kubernetes/apps/ai/open-webui/ks.yaml`); authentication is additive on `pelican` and `toolhive-config`.
+Consumers use `components.dragonfly/enabled=true` label with `spec.components: []` instead of the literal `../../../../components/dragonfly` entry; the root `cluster-apps` Kustomization injects the path via a JSON6902 `add` to `/spec/components/-` selected by `components.dragonfly/enabled=true`, and also injects `dependsOn` entries for `external-secrets-store` (`external-secrets`) first, then `dragonfly-operator` (`database`), and a `healthCheckExprs` entry for `Dragonfly` readiness (`has(status.phase) && status.phase == 'Ready'`). Consumers therefore keep only app-specific `dependsOn` entries and an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist) — `litellm` retains its `ClusterSecretStore` health check alongside the injected Dragonfly check. The optional auth sub-component uses `components.dragonfly/authentication=true` (additive — requires `enabled` as well) to inject `../../../../components/dragonfly/authentication`. Enabled x6: `pelican` (`kubernetes/apps/default/pelican/ks.yaml`, +authentication), `nextcloud` (`kubernetes/apps/default/nextcloud/ks.yaml`), `toolhive-config` (`kubernetes/apps/ai/toolhive/ks.yaml`, +authentication, +cluster-mode non-cluster, `DRAGONFLY_APP_NAME` `virtualmcpserver`), `searxng` (`kubernetes/apps/ai/searxng/ks.yaml`), `litellm` (`kubernetes/apps/ai/litellm/ks.yaml`, keeps its own `ClusterSecretStore` health check alongside the injected Dragonfly check), `open-webui` (`kubernetes/apps/ai/open-webui/ks.yaml`); authentication is additive on `pelican` and `toolhive-config`.
 
 ### Cluster-mode override — ToolHive Lua auth storage
 
@@ -98,15 +92,12 @@ Prerequisite: the `Dragonfly` CR must have `>=3` `spec.args` entries (patch remo
 
 ### Dependencies
 
-Consumers declare only `external-secrets-store` (ns `external-secrets`) plus any app-specific dependencies in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.dragonfly/enabled=true`) injects `dragonfly-operator` (`database`) via JSON6902.
+Consumers declare only app-specific deps (or `[]` placeholder) in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.dragonfly/enabled=true`) injects `external-secrets-store` (`external-secrets`) first, then `dragonfly-operator` (`database`) via JSON6902.
 
 ```yaml
 # kubernetes/apps/<ns>/<app>/ks.yaml — what you write
 spec:
-    dependsOn:
-        - name: external-secrets-store
-          namespace: external-secrets
-        # + app-specific deps if needed
+    dependsOn: [] # placeholder — root patch injects external-secrets-store + dragonfly-operator; add app-specific deps here as needed
 ```
 
 Effective rendered `dependsOn` after the root patch:
@@ -116,12 +107,9 @@ spec:
     dependsOn:
         - name: external-secrets-store
           namespace: external-secrets
-        # + app-specific deps
         - name: dragonfly-operator
           namespace: database
 ```
-
-Order follows `AGENTS.md`: same-namespace deps first, then `external-secrets-store`, then remaining cross-namespace deps — the root patch appends last, preserving this order. `external-secrets-store` stays a manual consumer `dependsOn` (not root-injected) to preserve dependency-chain order since patched entries append last.
 
 ### Health check
 

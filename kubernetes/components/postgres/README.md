@@ -102,11 +102,11 @@ Real example: `kubernetes/apps/default/pstream/ks.yaml` (`pstream-backend` Kusto
 
 ### Label precondition (per-consumer)
 
-The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it is a strategic-merge `spec.patches` injection (like `components.dragonfly/cluster-mode=non-cluster`). Labels that append via JSON6902 `op: add` with `path: /spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-` _do_ require the labeled `Kustomization` to carry each required field as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced by `scripts/ks_label_precondition_audit.py` and `.github/workflows/validate.yaml` (job `label-preconditions`), registry-driven from `kubernetes/flux/cluster/ks.yaml` (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-`; 2 strategic-merge selectors need no precondition, 3 components appends + 3 dependsOn appends + 2 healthCheckExprs appends have Rule A active).
+The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it is a strategic-merge `spec.patches` injection (like `components.dragonfly/cluster-mode=non-cluster`). Labels that append via JSON6902 `op: add` with `path: /spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-` _do_ require the labeled `Kustomization` to carry each required field as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced by `scripts/ks_label_precondition_audit.py` and `.github/workflows/validate.yaml` (job `label-preconditions`), registry-driven from `kubernetes/flux/cluster/ks.yaml` (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-`; 2 strategic-merge selectors need no precondition, 3 components appends + 5 dependsOn appends + 2 healthCheckExprs appends have Rule A active).
 
 ### Label adoption
 
-Consumers set label `components.postgres/enabled=true` with `spec.components` as a list (empty `[]` or existing entries like `kopiur/backup` — patch appends), `spec.dependsOn` containing only `external-secrets-store` (ns `external-secrets`) and `spec.healthCheckExprs: []`; the root `cluster-apps` Kustomization injects `../../../../components/postgres` via a JSON6902 `add` to `/spec/components/-` selected by `components.postgres/enabled=true`, and also injects `dependsOn` entries for `barman-cloud` (`database`) and `cloudnative-pg` (`database`) and a `healthCheckExprs` entry for `Cluster` readiness (`status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')` with `failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')`). Consumers therefore keep only `external-secrets-store` in `dependsOn` and an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist). Rendered output is identical to the former literal `dependsOn` + `healthCheckExprs` declarations. `external-secrets-store` stays a manual consumer `dependsOn` (not root-injected) to preserve `AGENTS.md` dependency-chain order, since patched entries append last.
+Consumers set label `components.postgres/enabled=true` with `spec.components` as a list (empty `[]` or existing entries like `kopiur/backup` — patch appends), `spec.dependsOn: []` placeholder (or app-specific deps, add as needed) and `spec.healthCheckExprs: []`; the root `cluster-apps` Kustomization injects `../../../../components/postgres` via a JSON6902 `add` to `/spec/components/-` selected by `components.postgres/enabled=true`, and also injects `dependsOn` entries for `external-secrets-store` (`external-secrets`) FIRST, then `barman-cloud` (`database`) and `cloudnative-pg` (`database`), and a `healthCheckExprs` entry for `Cluster` readiness (`status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')` with `failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')`). Consumers therefore keep only app-specific deps in `dependsOn` and an explicit `healthCheckExprs: []` placeholder (the root JSON6902 `append` needs the list to exist). Rendered output is identical to the former literal `dependsOn` + `healthCheckExprs` declarations.
 
 ## Usage
 
@@ -122,10 +122,7 @@ metadata:
         components.postgres/enabled: "true"
 spec:
     components: [] # existing entries like ../../../../components/kopiur/backup are fine — root patch appends ../../../../components/postgres
-    dependsOn:
-        - name: external-secrets-store
-          namespace: external-secrets
-        # + any app-specific deps; root patch appends barman-cloud + cloudnative-pg (both ns database)
+    dependsOn: [] # placeholder — root patch injects external-secrets-store + barman-cloud + cloudnative-pg; add app-specific deps here as needed
     healthCheckExprs: [] # placeholder — root patch injects CNPG Cluster readiness check
     interval: 1h
     path: ./kubernetes/apps/<ns>/<app>/db
@@ -252,15 +249,12 @@ Point apps at `<app>-pooler-rw.<ns>.svc.cluster.local:5432` when using the poole
 
 ### `dependsOn` (label-injected operators)
 
-Consumers keep only `external-secrets-store` (+ any app-specific deps) in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.postgres/enabled=true`) appends `barman-cloud` and `cloudnative-pg` (both `database`) via JSON6902:
+Consumers declare only app-specific deps (or `[]` placeholder) in `spec.dependsOn`; the root `cluster-apps` Kustomization (label `components.postgres/enabled=true`) injects `external-secrets-store` (`external-secrets`) first, then `barman-cloud` and `cloudnative-pg` (both `database`) via JSON6902:
 
 ```yaml
 # kubernetes/apps/<ns>/<app>/ks.yaml — what you write
 spec:
-    dependsOn:
-        - name: external-secrets-store
-          namespace: external-secrets
-        # + app-specific deps if needed
+    dependsOn: [] # placeholder — root patch injects external-secrets-store + barman-cloud + cloudnative-pg; add app-specific deps here as needed
 ```
 
 Effective rendered `dependsOn` after the root patch:
@@ -275,8 +269,6 @@ spec:
         - name: cloudnative-pg
           namespace: database
 ```
-
-Order follows `AGENTS.md`: same-namespace deps first (if any), then `external-secrets-store`, then remaining cross-namespace deps — the root patch appends last, preserving this order.
 
 ### `healthCheckExprs` (label-injected)
 
