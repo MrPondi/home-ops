@@ -35,13 +35,13 @@ spec:
               REDIS_URL: redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379/0
               SEARXNG_QUERY_URL: "http://searxng.ai.svc.cluster.local:8080/search?q=<query>"
               TOOL_SERVER_CONNECTIONS: '[{"type":"mcp","url":"http://vmcp-mcp-gateway-internal.ai.svc.cluster.local:4483/mcp","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"mcp-gateway","name":"MCP Gateway","description":""}}]'
-              TZ: Europe/Warsaw
               WEB_SEARCH_CONCURRENT_REQUESTS: 10
               WEB_SEARCH_ENGINE: "searxng"
               WEB_SEARCH_RESULT_COUNT: 3
               WEBSOCKET_MANAGER: redis
               WEBSOCKET_REDIS_URL: redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379/1
               WEBUI_URL: https://chat.pondi.dev
+              TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"

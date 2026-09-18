@@ -20,13 +20,13 @@ spec:
               repository: ghcr.io/autobrr/autobrr
               tag: v1.86.0@sha256:0b8b997c40424557a4bd688a4cb487dd8a765a69b5aa5b003c0d8106f6a895af
             env:
+              AUTOBRR__CHECK_FOR_UPDATES: false
               AUTOBRR__HOST: 0.0.0.0
-              AUTOBRR__PORT: &port 80
+              AUTOBRR__LOG_LEVEL: INFO
               AUTOBRR__METRICS_ENABLED: true
               AUTOBRR__METRICS_HOST: 0.0.0.0
               AUTOBRR__METRICS_PORT: &metricsPort 9074
-              AUTOBRR__CHECK_FOR_UPDATES: false
-              AUTOBRR__LOG_LEVEL: INFO
+              AUTOBRR__PORT: &port 80
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:

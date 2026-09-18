@@ -20,13 +20,13 @@ spec:
               repository: ghcr.io/autobrr/qui
               tag: v1.29.0@sha256:263c131adb007be98469959d5d3625e88476417c900519a1abad0bd609f0f103
             env:
+              QUI__CHECK_FOR_UPDATES: false
               QUI__HOST: 0.0.0.0
-              QUI__PORT: &port 80
+              QUI__LOG_LEVEL: INFO
               QUI__METRICS_ENABLED: true
               QUI__METRICS_HOST: 0.0.0.0
               QUI__METRICS_PORT: &metricsPort 9074
-              QUI__CHECK_FOR_UPDATES: false
-              QUI__LOG_LEVEL: INFO
+              QUI__PORT: &port 80
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:

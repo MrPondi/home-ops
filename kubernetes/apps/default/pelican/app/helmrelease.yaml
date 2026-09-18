@@ -42,13 +42,13 @@ spec:
               repository: ghcr.io/pelican/panel
               tag: v1.0.0-beta38@sha256:46f356f3fda423b1d43f0dc3c71efc056cd8b9bec365d1d7817306a17ee5694a
             env:
-              XDG_DATA_HOME: /pelican-data
               FILAMENT_UPLOADABLE_AVATARS: "true"
               REDIS_PASSWORD:
                 valueFrom:
                   secretKeyRef:
                     name: "{{ .Release.Name }}-dragonfly-secret"
                     key: password
+              XDG_DATA_HOME: /pelican-data
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
