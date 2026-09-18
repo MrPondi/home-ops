@@ -31,7 +31,7 @@ spec:
         - format:
             type: JSON
             json:
-              message: '[%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%" %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED% %BYTES_SENT% %DURATION% "%REQ(X-FORWARDED-FOR)%" "%REQ(USER-AGENT)%" "%REQ(X-REQUEST-ID)%" "%REQ(:AUTHORITY)%" "%UPSTREAM_HOST%"'
+              message: '%REQ(:METHOD)% - %REQ(:AUTHORITY)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% - "%REQ(X-FORWARDED-FOR)%" (%REQ(USER-AGENT)%)'
               start_time: "%START_TIME%"
               method: "%REQ(:METHOD)%"
               x-envoy-origin-path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
