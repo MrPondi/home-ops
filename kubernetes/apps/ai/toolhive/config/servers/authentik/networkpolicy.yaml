@@ -13,12 +13,12 @@ spec:
       app: *name
   # No ingress - stdio transport binds no TCP port; proxy runner attaches via kube API
   egress:
-    # Authentik server pods (security) - selector verified via kubectl get pods -n security --show-labels (app.kubernetes.io/name=authentik, port 80 on svc/authentik-server)
+    # Authentik server pods (security) - pod port 9000 (svc/authentik-server maps 80->9000); selector verified live via kubectl get pods -n security --show-labels
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: security
             k8s:app.kubernetes.io/name: authentik
       toPorts:
         - ports:
-            - port: "80"
+            - port: "9000"
               protocol: TCP

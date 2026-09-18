@@ -14,6 +14,7 @@ resources:
   - ./kubernetes/
   - ./longhorn/
   - ./prometheus/
+  - ./qbittorrent/
   - ./seerr/
   - ./servarr/
   - ./talos/

@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: MCPServer
+metadata:
+  name: qbittorrent
+spec:
+  image: ghcr.io/nicholaswilde/qbittorrent-mcp-rs:0.3.7@sha256:328b01cf0e731fde084c8b1fffb0d23aa206405127f03d7bbdfe4045a45c8934
+  transport: stdio
+  proxyPort: 8080
+  env:
+    - name: QBITTORRENT_HOST
+      value: http://qbittorrent.media.svc.cluster.local
+    - name: QBITTORRENT_PORT
+      value: "80"
+    - name: QBITTORRENT_SERVER_MODE
+      value: stdio
+  groupRef:
+    name: mcp-tools
