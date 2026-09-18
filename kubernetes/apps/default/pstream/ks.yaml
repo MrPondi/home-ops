@@ -72,8 +72,6 @@ spec:
   dependsOn:
     - name: external-secrets-store
       namespace: external-secrets
-    - name: cloudnative-pg
-      namespace: database
     - name: barman-cloud
       namespace: database
   healthCheckExprs:

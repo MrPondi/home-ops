@@ -45,9 +45,7 @@ spec:
     # DRAGONFLY_APP_NAME defaults to ${APP} — set only if different
 ```
 
-### With authentication — two equivalent ways
-
-**Explicit component (existing users stay as-is):**
+### With authentication
 
 ```yaml
 spec:
@@ -58,25 +56,14 @@ spec:
 
 Existing explicit users: `pelican`, `toolhive` (`toolhive-config` also sets `DRAGONFLY_APP_NAME: virtualmcpserver`).
 
-**Label-triggered (new, preferred for new consumers):**
+### Cluster-mode override — ToolHive Lua auth storage
 
-```yaml
-# kubernetes/apps/<ns>/<app>/ks.yaml
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-    name: <app>
-    labels:
-        components.dragonfly/auth: enabled
-spec:
-    components:
-        - ../../../../components/dragonfly
-    # ... dependsOn, postBuild ...
-```
+Label `components.dragonfly/cluster-mode=non-cluster` triggers the root `cluster-apps` patch (labelSelector `components.dragonfly/cluster-mode=non-cluster` on `kind: Kustomization`) which injects a `spec.patches` JSON6902 patch on the `Dragonfly` CR:
 
-Label `components.dragonfly/auth=enabled` triggers the root `cluster-apps` patch (labelSelector `components.dragonfly/auth=enabled` on `kind: Kustomization`) which injects a strategic-merge doc adding `spec.components: ["../../../../components/dragonfly/authentication"]` (uniform depth: all consumer paths are `kubernetes/apps/<ns>/<app>/<subdir>`).
+- `remove` `/spec/args/2` — drops `--cluster_mode=emulated` (standalone mode required by ToolHive's Redis Lua scripts; replication remains enabled)
+- `add` `/spec/args/-` `value: --default_lua_flags=allow-undeclared-keys` — allows Lua scripts to access undeclared keys
 
-> **Do NOT combine** an explicit `spec.components` entry for `dragonfly/authentication` with the label — that would duplicate the component.
+Prerequisite: the `Dragonfly` CR must have `>=3` `spec.args` entries (patch removes index 2). The default component `cluster.yaml` satisfies this. Currently no consumer uses this label — definition only, zero blast radius.
 
 ### Dependencies
 
