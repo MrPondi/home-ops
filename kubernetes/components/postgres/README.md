@@ -203,27 +203,14 @@ env:
               key: host
 ```
 
+When possible use {{ .Release.Name }} instead of ${APP}
+
 Services managed by CNPG (in the Cluster namespace):
 
 - `${APP}-rw` — read-write (primary) — use this for app connections.
 - `${APP}-ro` / `${APP}-r` — disabled in this component (`disabledDefaultServices: ["r","ro"]`); re-enable in `cluster.yaml` if you need read-only.
 
-Example `ExternalSecret` templating a `DATABASE_URL` for an app in the same namespace:
-
-```yaml
-# kubernetes/apps/<ns>/<app>/app/externalsecret.yaml
-apiVersion: external-secrets.io/v1
-kind: ExternalSecret
-metadata:
-    name: <app>
-spec:
-    # ... secretStoreRef ...
-    target:
-        name: <app>-secret
-        template:
-            data:
-                DATABASE_URL: 'postgresql://{{ .POSTGRES_USERNAME | default "${APP}" }}:{{ .POSTGRES_PASSWORD }}@${APP}-rw.${NAMESPACE}.svc.cluster.local:5432/{{ .POSTGRES_USERNAME | default "${APP}" }}'
-```
+````
 
 ## Optional Pooler (not shipped by default)
 
@@ -252,7 +239,7 @@ spec:
             reserve_pool_size: "5"
             reserve_pool_timeout: "5"
             max_db_connections: "40"
-```
+````
 
 Point apps at `<app>-pooler-rw.<ns>.svc.cluster.local:5432` when using the pooler. Keep `instances: 1` on this single-node cluster unless you have tested HA.
 
