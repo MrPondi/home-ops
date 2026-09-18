@@ -15,13 +15,6 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          postgres-init:
-            image:
-              repository: ghcr.io/home-operations/postgres-init
-              tag: 18.6@sha256:b6d3af974df781c673d37e49bdddfa14a6f5be28b18d2cb7713f0449bea4057b
-            envFrom:
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
           init-metrics:
             image:
               repository: ghcr.io/home-operations/busybox
@@ -40,6 +33,11 @@ spec:
               repository: ghcr.io/dumbutdumber/backend
               tag: latest@sha256:ca7225a7d143ef681a5336f7d36a54d3600df3520a07762528780b811ce84f43
             env:
+              DATABASE_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: pstream-backend-app
+                    key: uri
               META_NAME: pondi-backend
               META_DESCRIPTION: "Backend for P-Stream, (Pondi Stream)."
               TZ: Europe/Warsaw

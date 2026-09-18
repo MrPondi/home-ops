@@ -14,7 +14,7 @@ spec:
   configuration:
     data:
       compression: bzip2
-    destinationPath: s3://backups/${APP}
+    destinationPath: s3://backups/cloudnative-pg/${APP}
     endpointURL: http://qnap.internal:9000
     s3Credentials:
       accessKeyId:
