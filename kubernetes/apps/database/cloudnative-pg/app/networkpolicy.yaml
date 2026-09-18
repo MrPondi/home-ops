@@ -1,13 +1,15 @@
 ---
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
 apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
+kind: CiliumClusterwideNetworkPolicy
 metadata:
-  name: &name cloudnative-pg
+  name: cloudnative-pg
 spec:
+  description: Operator ingress (kube-apiserver webhook) + egress (kube API, barman plugin, all CNPG instances)
+  # cloudnative-pg operator pods (database)
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/name: *name
+      k8s:app.kubernetes.io/name: cloudnative-pg
   ingress:
     # Admission webhook from kube-apiserver (host-networked)
     - fromEntities:
@@ -17,39 +19,27 @@ spec:
             - port: "9443"
               protocol: TCP
   egress:
-    # Barman cloud plugin API (gRPC)
+    # Kubernetes API
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "6443"
+              protocol: TCP
+    # Barman cloud plugin API (gRPC, database)
     - toEndpoints:
+        # plugin-barman-cloud pods (database)
         - matchLabels:
-            app.kubernetes.io/name: plugin-barman-cloud
+            k8s:io.kubernetes.pod.namespace: database
+            k8s:app.kubernetes.io/name: plugin-barman-cloud
       toPorts:
         - ports:
             - port: "9090"
               protocol: TCP
-    # Postgres instances (instance manager API + psql)
+    # All CNPG cluster instance pods (any namespace — Exists matcher, no per-cluster rules needed)
     - toEndpoints:
-        - matchLabels:
-            cnpg.io/cluster: postgres
-      toPorts:
-        - ports:
-            - port: "5432"
-              protocol: TCP
-            - port: "8000"
-              protocol: TCP
----
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumclusterwidenetworkpolicy_v2.json
-apiVersion: cilium.io/v2
-kind: CiliumClusterwideNetworkPolicy
-metadata:
-  name: cloudnative-pg-clusters
-spec:
-  description: Operator egress to all CNPG instance pods cluster-wide (no per-cluster rules needed)
-  # cloudnative-pg operator pods (database)
-  endpointSelector:
-    matchLabels:
-      k8s:app.kubernetes.io/name: cloudnative-pg
-  egress:
-    # All CNPG cluster instance pods (any namespace — Exists matcher, no maintenance needed)
-    - toEndpoints:
+        # CNPG instance pods (cluster-wide)
         - matchExpressions:
             - key: k8s:cnpg.io/cluster
               operator: Exists
