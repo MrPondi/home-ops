@@ -71,7 +71,7 @@ jobs:
     strategy:
       matrix:
         image: ${{ fromJSON(needs.extract.outputs.images) }}
-      max-parallel: 4
+      max-parallel: 2
       fail-fast: false
     steps:
       - name: Setup Mise
