@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: MCPServer
+metadata:
+  name: jellyfin
+spec:
+  image: ghcr.io/jaredtrent/jellyfin-mcp:2026.604.2@sha256:350b6ebb56920c960645d84fdb332240bfa848eb3ee7caf4fd6b02ce2368b665
+  transport: stdio
+  proxyPort: 8080
+  env:
+    - name: JELLYFIN_URL
+      value: http://jellyfin.media.svc.cluster.local:8096
+  secrets:
+    - name: toolhive-jellyfin-secret
+      key: JELLYFIN_API_KEY
+  groupRef:
+    name: mcp-tools

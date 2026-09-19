@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: MCPServer
+metadata:
+  name: authentik
+spec:
+  image: ghcr.io/samik081/mcp-authentik:0.8.1@sha256:9c684ef1e1499fad143cca527378eebadcde0598ee2756d5e1c82f635688a9b6
+  transport: stdio
+  proxyPort: 8080
+  env:
+    - name: AUTHENTIK_URL
+      value: http://authentik-server.security.svc.cluster.local
+    - name: AUTHENTIK_ACCESS_TIER
+      value: read-only
+  secrets:
+    - name: toolhive-authentik-secret
+      key: AUTHENTIK_TOKEN
+  groupRef:
+    name: mcp-tools

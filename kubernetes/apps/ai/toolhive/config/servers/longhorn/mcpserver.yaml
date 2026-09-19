@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: MCPServer
+metadata:
+  name: longhorn
+spec:
+  image: ghcr.io/rafaelgaspar/longhorn-mcp:0.1.7@sha256:8116b3fa07ae5bb9506e439a92cdb49312d1a32d761bffd53a6bd523becdc5f8
+  transport: stdio
+  proxyPort: 8080
+  env: []
+  args:
+    - --read-only
+  groupRef:
+    name: mcp-tools

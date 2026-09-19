@@ -10,16 +10,6 @@ spec:
       toolhive: "true"
       toolhive-name: *name
       app: *name
-  ingress:
-    # Proxy runner -> server
-    - fromEndpoints:
-        - matchLabels:
-            toolhive-name: servarr
-            app.kubernetes.io/name: mcpserver
-      toPorts:
-        - ports:
-            - port: "3000"
-              protocol: TCP
   egress:
     # Sonarr (media namespace)
     - toEndpoints:
@@ -47,26 +37,4 @@ spec:
       toPorts:
         - ports:
             - port: "80"
-              protocol: TCP
----
-# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
-apiVersion: cilium.io/v2
-kind: CiliumNetworkPolicy
-metadata:
-  name: servarr-proxy-runner
-spec:
-  endpointSelector:
-    matchLabels:
-      toolhive: "true"
-      toolhive-name: &name servarr
-      app.kubernetes.io/name: mcpserver
-  egress:
-    # Proxy runner -> MCP server
-    - toEndpoints:
-        - matchLabels:
-            toolhive-name: *name
-            app: *name
-      toPorts:
-        - ports:
-            - port: "3000"
               protocol: TCP

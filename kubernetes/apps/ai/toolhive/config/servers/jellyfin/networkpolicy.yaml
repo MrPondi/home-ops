@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name jellyfin
+spec:
+  endpointSelector:
+    matchLabels:
+      toolhive: "true"
+      toolhive-name: *name
+      app: *name
+  egress:
+    # Jellyfin (media)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: jellyfin
+      toPorts:
+        - ports:
+            - port: "8096"
+              protocol: TCP
