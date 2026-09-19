@@ -1,0 +1,42 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tuppr
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: tuppr
+      app.kubernetes.io/instance: tuppr
+  ingress:
+    # Admission webhook from kube-apiserver (host-networked)
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "9443"
+              protocol: TCP
+    # Kubelet liveness/readiness probes on the metrics port (host-networked kubelet; prometheus scrape comes via the namespace baseline)
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "8081"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tuppr-talos
+spec:
+  endpointSelector: {} # all pods in namespace — namespace-wide scope is deliberate (upgrade Job labels are runtime-generated); narrow to live Job labels after observing a real upgrade via hubble
+  egress:
+    # Talos API on node management network (10.0.30.0/24:50000)
+    - toCIDR:
+        - 10.0.30.0/24
+      toPorts:
+        - ports:
+            - port: "50000"
+              protocol: TCP

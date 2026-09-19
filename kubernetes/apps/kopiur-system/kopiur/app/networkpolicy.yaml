@@ -1,0 +1,105 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kopiur-controller
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kopiur
+      app.kubernetes.io/instance: kopiur
+      app.kubernetes.io/component: controller
+  egress:
+    # S3 repository (s3.pondi.dev) — Cilium enforces egress on the DNAT-ed backend,
+    # so the rule targets the envoy-internal pods (s3.pondi.dev listener is 10080)
+    - toEndpoints:
+        # envoy-internal pods (network)
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10080"
+              protocol: TCP
+    # S3 repository fallback — direct VIP match (pre-NAT); toCIDR alone is NOT
+    # sufficient (verified: mover dial to 10.0.30.11:80 times out without the
+    # backend rule above)
+    - toCIDR:
+        - 10.0.30.11/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # kopia-server pods (kopiur-system) — controller -> kopia-server status checks
+    - toEndpoints:
+        # kopia-server pods (kopiur-system)
+        - matchLabels:
+            app.kubernetes.io/name: kopiur-server
+            app.kubernetes.io/component: kopia-server
+      toPorts:
+        - ports:
+            - port: "51515"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kopiur-webhook
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kopiur
+      app.kubernetes.io/instance: kopiur
+      app.kubernetes.io/component: webhook
+  ingress:
+    # Admission webhook from kube-apiserver (host-networked)
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "8443"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kopiur-server
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: kopiur-server
+      app.kubernetes.io/component: kopia-server
+  ingress:
+    # Cluster-wide clients on the service port (envoy HTTPRoute kopiur.pondi.dev)
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "51515"
+              protocol: TCP
+  egress:
+    # S3 repository (s3.pondi.dev) — Cilium enforces egress on the DNAT-ed backend,
+    # so the rule targets the envoy-internal pods (s3.pondi.dev listener is 10080)
+    - toEndpoints:
+        # envoy-internal pods (network)
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10080"
+              protocol: TCP
+    # S3 repository fallback — direct VIP match (pre-NAT); toCIDR alone is NOT
+    # sufficient (verified: mover dial to 10.0.30.11:80 times out without the
+    # backend rule above)
+    - toCIDR:
+        - 10.0.30.11/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
