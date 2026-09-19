@@ -6,8 +6,8 @@ metadata:
   name: proxmox
 spec:
   image: docker.io/mcp/proxmox:latest@sha256:6e30b4d837b201a12dd6cc4ee0ef0de6e3bfd5f1173294b2e3597efe897375a3
-  transport: streamable-http
-  mcpPort: 3000
+  transport: stdio
+  proxyPort: 8080
   env:
     - name: PROXMOX_HOST
       value: pve.internal
