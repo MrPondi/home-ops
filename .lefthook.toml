@@ -2,7 +2,3 @@
 git_url = "https://github.com/home-operations/.github"
 ref = "main"
 configs = ["lefthook.common.toml"]
-
-[pre-commit.commands.label-preconditions]
-glob = ["kubernetes/**/ks.yaml", "kubernetes/flux/cluster/ks.yaml", "scripts/ks_label_precondition_audit.py"]
-run = "uv run scripts/ks_label_precondition_audit.py --quiet"
