@@ -5,7 +5,6 @@ model: opencode-go/gpt-5.6-luna
 tools:
     write: false
     edit: false
-    bash: false
     ToolHive_*: false
 ---
 
