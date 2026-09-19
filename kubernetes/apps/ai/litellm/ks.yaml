@@ -23,7 +23,6 @@ metadata:
     components.postgres/enabled: "true"
   name: litellm
 spec:
-  components: []
   dependsOn:
     - name: litellm-operator
     - name: external-secrets-store
