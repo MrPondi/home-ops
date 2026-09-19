@@ -7,5 +7,11 @@ metadata:
 spec:
   remoteUrl: https://mcp.cloudflare.com/mcp
   transport: streamable-http
+  headerForward:
+    addHeadersFromSecret:
+      - headerName: Authorization
+        valueSecretRef:
+          key: CLOUDFLARE_API_TOKEN
+          name: toolhive-cloudflare-secret
   groupRef:
     name: mcp-tools

@@ -21,7 +21,6 @@ resources:
   - ./seerr/
   - ./servarr/
   - ./talos/
-  - ./terraform/
   - ./unifi/
   - ./victoria-logs/
 patches:
