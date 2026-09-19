@@ -10,7 +10,6 @@ spec:
       toolhive: "true"
       toolhive-name: *name
       app: *name
-  # no ingress — stdio runner attaches via kube API :6443, verified live via hubble during gateway tool call; workload :8080 listener is never dialed
   egress:
     # Internet (GitHub API)
     - toCIDRSet:
