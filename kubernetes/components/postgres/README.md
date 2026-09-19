@@ -40,7 +40,7 @@ spec:
     bootstrap:
         recovery:
             source: ${APP}-backup
-            database: ${POSTGRES_USERNAME:=${APP}} # must match the initdb-created DB name — the metrics exporter connects here; leaving it unset makes the operator default to `app`, which does not exist
+            database: ${POSTGRES_USERNAME:=${APP}} # must match the initdb-created DB name
             owner: ${POSTGRES_USERNAME:=${APP}} # must match the initdb owner
     externalClusters:
         - name: ${APP}-backup
