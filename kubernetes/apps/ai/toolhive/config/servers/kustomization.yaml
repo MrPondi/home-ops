@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./networkpolicy.yaml
   - ./authentik/
+  - ./cloudflare/
   - ./context7/
   - ./flux/
   - ./github/
@@ -14,11 +15,13 @@ resources:
   - ./konflate/
   - ./kubernetes/
   - ./longhorn/
+  - ./proxmox/
   - ./prometheus/
   - ./qbittorrent/
   - ./seerr/
   - ./servarr/
   - ./talos/
+  - ./terraform/
   - ./unifi/
   - ./victoria-logs/
 patches:
