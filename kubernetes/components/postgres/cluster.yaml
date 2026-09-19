@@ -13,6 +13,8 @@ spec:
     podAntiAffinityType: required
   bootstrap:
     recovery:
+      database: ${POSTGRES_USERNAME:=${APP}}
+      owner: ${POSTGRES_USERNAME:=${APP}}
       source: ${APP}-backup
   enableSuperuserAccess: true
   externalClusters:
