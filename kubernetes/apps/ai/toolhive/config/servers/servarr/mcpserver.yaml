@@ -6,8 +6,8 @@ metadata:
   name: servarr
 spec:
   image: ghcr.io/aplaceforallmystuff/mcp-arr:1.7.3@sha256:ace72c56448e8695e1d2d060e7437470e3f883fcc9316f1294e3a7f682e1efa1
-  transport: streamable-http
-  mcpPort: 3000
+  transport: stdio
+  proxyPort: 8080
   env:
     - name: SONARR_URL
       value: http://sonarr.media.svc.cluster.local
@@ -15,12 +15,6 @@ spec:
       value: http://radarr.media.svc.cluster.local
     - name: PROWLARR_URL
       value: http://prowlarr.media.svc.cluster.local
-    - name: MCP_TRANSPORT
-      value: http
-    - name: HOST
-      value: 0.0.0.0
-    - name: PORT
-      value: "3000"
   secrets:
     - name: toolhive-radarr-secret
       key: RADARR_API_KEY
