@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name proxmox
+spec:
+  endpointSelector:
+    matchLabels:
+      toolhive: "true"
+      toolhive-name: *name
+      app: *name
+  ingress:
+    # Proxy runner -> server
+    - fromEndpoints:
+        - matchLabels:
+            toolhive-name: proxmox
+            app.kubernetes.io/name: mcpserver
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+  egress:
+    # Proxmox VE API (pve.internal via proxmox-backend EndpointSlice 10.0.10.10)
+    - toCIDR:
+        - 10.0.10.10/32
+      toPorts:
+        - ports:
+            - port: "8006"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: proxmox-proxy-runner
+spec:
+  endpointSelector:
+    matchLabels:
+      toolhive: "true"
+      toolhive-name: &name proxmox
+      app.kubernetes.io/name: mcpserver
+  egress:
+    # Proxy runner -> MCP server
+    - toEndpoints:
+        - matchLabels:
+            toolhive-name: *name
+            app: *name
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP

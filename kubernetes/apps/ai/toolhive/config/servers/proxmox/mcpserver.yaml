@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: MCPServer
+metadata:
+  name: proxmox
+spec:
+  image: docker.io/mcp/proxmox:latest@sha256:6e30b4d837b201a12dd6cc4ee0ef0de6e3bfd5f1173294b2e3597efe897375a3
+  transport: streamable-http
+  mcpPort: 3000
+  env:
+    - name: PROXMOX_HOST
+      value: pve.internal
+    - name: PROXMOX_PORT
+      value: "8006"
+    - name: PROXMOX_USER
+      value: root@pam
+    - name: PROXMOX_VERIFY_SSL
+      value: "false"
+    - name: TOOL_ROUTING
+      value: "true"
+    - name: PROXMOX_READ_ONLY
+      value: "true"
+  secrets:
+    - name: toolhive-proxmox-password-secret
+      key: PROXMOX_PASSWORD
+  groupRef:
+    name: mcp-tools
