@@ -5,15 +5,13 @@ kind: CiliumNetworkPolicy
 metadata:
   name: &name authentik
 spec:
-  # Authentik MCP server pod (ai)
   endpointSelector:
     matchLabels:
       toolhive: "true"
       toolhive-name: *name
       app: *name
-  # No ingress - stdio transport binds no TCP port; proxy runner attaches via kube API
   egress:
-    # Authentik server pods (security) - pod port 9000 (svc/authentik-server maps 80->9000); selector verified live via kubectl get pods -n security --show-labels
+    # Authentik server pods (security)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: security

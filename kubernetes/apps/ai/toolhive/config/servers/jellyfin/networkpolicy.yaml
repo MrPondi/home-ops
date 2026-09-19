@@ -5,15 +5,13 @@ kind: CiliumNetworkPolicy
 metadata:
   name: &name jellyfin
 spec:
-  # Jellyfin MCP server pod (ai)
   endpointSelector:
     matchLabels:
       toolhive: "true"
       toolhive-name: *name
       app: *name
-  # No ingress - stdio transport binds no TCP port; proxy runner attaches via kube API
   egress:
-    # Jellyfin (media) - port 8096 per media/jellyfin/app/helmrelease.yaml
+    # Jellyfin (media)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
