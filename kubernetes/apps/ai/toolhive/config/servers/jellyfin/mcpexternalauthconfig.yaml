@@ -8,5 +8,5 @@ spec:
   type: bearerToken
   bearerToken:
     tokenSecretRef:
-      name: toolhive-jellyfin-secret
+      name: toolhive-jellyfin-http-token-secret
       key: JELLYFIN_MCP_HTTP_TOKEN
