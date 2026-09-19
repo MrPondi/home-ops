@@ -14,7 +14,7 @@ spec:
   secrets:
     - name: toolhive-jellyfin-secret
       key: JELLYFIN_API_KEY
-    - name: toolhive-jellyfin-secret
+    - name: toolhive-jellyfin-http-token-secret
       key: JELLYFIN_MCP_HTTP_TOKEN
   args:
     - --http
