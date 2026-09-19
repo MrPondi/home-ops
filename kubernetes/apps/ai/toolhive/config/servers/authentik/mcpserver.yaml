@@ -6,19 +6,13 @@ metadata:
   name: authentik
 spec:
   image: ghcr.io/samik081/mcp-authentik:0.8.1@sha256:9c684ef1e1499fad143cca527378eebadcde0598ee2756d5e1c82f635688a9b6
-  transport: streamable-http
-  mcpPort: 3000
+  transport: stdio
+  proxyPort: 8080
   env:
     - name: AUTHENTIK_URL
       value: http://authentik-server.security.svc.cluster.local
     - name: AUTHENTIK_ACCESS_TIER
       value: read-only
-    - name: MCP_TRANSPORT
-      value: http
-    - name: MCP_PORT
-      value: "3000"
-    - name: MCP_HOST
-      value: 0.0.0.0
   secrets:
     - name: toolhive-authentik-secret
       key: AUTHENTIK_TOKEN
