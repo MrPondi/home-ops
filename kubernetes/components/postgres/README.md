@@ -40,6 +40,8 @@ spec:
     bootstrap:
         recovery:
             source: ${APP}-backup
+            database: ${POSTGRES_USERNAME:=${APP}} # must match the initdb-created DB name
+            owner: ${POSTGRES_USERNAME:=${APP}} # must match the initdb owner
     externalClusters:
         - name: ${APP}-backup
           plugin:
