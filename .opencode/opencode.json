@@ -18,6 +18,11 @@
       "headers": {
         "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
       }
+    },
+    "dashboard-icons": {
+      "type": "remote",
+      "url": "https://dashboardicons.com/api/mcp",
+      "enabled": true
     }
     // "terraform": {
     //   "type": "local",
