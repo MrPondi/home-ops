@@ -103,29 +103,32 @@ spec:
     matchLabels:
       app.kubernetes.io/name: authentik-outpost-ldap
   ingress:
-    # Cluster clients (jellyfin hairpin) — LDAP
+    # NOTE: the Service exposes 389/636 but Cilium enforces on the DNAT-ed
+    # backend ports — the outpost pod listens on ldap=3389, ldaps=6636
+    # (pod named-ports + hubble drop evidence). Rules must name backend ports.
+    # Cluster clients (jellyfin hairpin) — LDAP/LDAPS backend ports
     - fromEntities:
         - cluster
       toPorts:
         - ports:
-            - port: "389"
+            - port: "3389"
               protocol: TCP
-            - port: "636"
+            - port: "6636"
               protocol: TCP
-    # RFC1918 clients (TrueNAS, LAN, VPN) — LDAP
+    # RFC1918 clients (TrueNAS, LAN, VPN) — LDAP/LDAPS backend ports
     - fromCIDR:
         - 10.0.25.25/32
         - 192.168.1.0/24
         - 10.0.199.0/24
       toPorts:
         - ports:
-            - port: "389"
+            - port: "3389"
               protocol: TCP
-            - port: "636"
+            - port: "6636"
               protocol: TCP
-    # gatus-sidecar health check (observability) — odd port 3389 observed (flagging)
+    # gatus-sidecar health check (observability) — targets the backend ldap port
     - fromEndpoints:
-        - matchLabels: # gatus-sidecar pods (observability) — odd port 3389 observed
+        - matchLabels: # gatus-sidecar pods (observability)
             k8s:io.kubernetes.pod.namespace: observability
             k8s:app.kubernetes.io/name: gatus-sidecar
       toPorts:
