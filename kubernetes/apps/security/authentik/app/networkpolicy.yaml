@@ -1,0 +1,173 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: authentik-server
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: authentik
+      app.kubernetes.io/component: server
+  ingress:
+    # Shared-service: cluster-wide clients on service ports (envoy, homepage, etc.)
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+            - port: "9000"
+              protocol: TCP
+  egress:
+    # PostgreSQL cluster (security)
+    - toEndpoints:
+        - matchLabels: # authentik postgres pods (security)
+            cnpg.io/cluster: authentik
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # SMTP relay (default)
+    - toEndpoints:
+        - matchLabels: # smtp-relay pods (default)
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: smtp-relay
+      toPorts:
+        - ports:
+            - port: "25"
+              protocol: TCP
+    # Internet — general egress (Turnstile/Duo/HIBP)
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: authentik-worker
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: authentik
+      app.kubernetes.io/component: worker
+  egress:
+    # PostgreSQL cluster (security)
+    - toEndpoints:
+        - matchLabels: # authentik postgres pods (security)
+            cnpg.io/cluster: authentik
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # SMTP relay (default)
+    - toEndpoints:
+        - matchLabels: # smtp-relay pods (default)
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: smtp-relay
+      toPorts:
+        - ports:
+            - port: "25"
+              protocol: TCP
+    # Internet — general egress (Turnstile/Duo/HIBP)
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: authentik-outpost-ldap
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: authentik-outpost-ldap
+  ingress:
+    # Cluster clients (jellyfin hairpin) — LDAP
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "389"
+              protocol: TCP
+            - port: "636"
+              protocol: TCP
+    # RFC1918 clients (TrueNAS, LAN, VPN) — LDAP
+    - fromCIDR:
+        - 10.0.25.25/32
+        - 192.168.1.0/24
+        - 10.0.199.0/24
+      toPorts:
+        - ports:
+            - port: "389"
+              protocol: TCP
+            - port: "636"
+              protocol: TCP
+    # gatus-sidecar health check (observability) — odd port 3389 observed (flagging)
+    - fromEndpoints:
+        - matchLabels: # gatus-sidecar pods (observability) — odd port 3389 observed
+            k8s:io.kubernetes.pod.namespace: observability
+            k8s:app.kubernetes.io/name: gatus-sidecar
+      toPorts:
+        - ports:
+            - port: "3389"
+              protocol: TCP
+  egress:
+    # Authentik server API via envoy-internal (outposts poll public URL through envoy — observed)
+    - toEndpoints:
+        - matchLabels: # envoy-internal gateway pods (network)
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10443"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: authentik-outpost-rac
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: authentik-outpost-rac
+  egress:
+    # Authentik server API via envoy-internal (outposts poll public URL through envoy — observed)
+    - toEndpoints:
+        - matchLabels: # envoy-internal gateway pods (network)
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10443"
+              protocol: TCP
+    # RAC provider — wings0.pondi.dev (SSH)
+    - toFQDNs:
+        - matchName: wings0.pondi.dev
+      toPorts:
+        - ports:
+            - port: "22"
+              protocol: TCP
