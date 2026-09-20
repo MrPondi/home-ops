@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nut-exporter
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: nut-exporter
+  egress:
+    # NUT UPS pve.internal LAN
+    - toCIDRSet:
+        - cidr: 10.0.0.0/8
+        - cidr: 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "3493"
+              protocol: TCP

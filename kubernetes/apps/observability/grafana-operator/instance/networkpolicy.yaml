@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: grafana
+spec:
+  endpointSelector:
+    matchLabels:
+      app: grafana
+  ingress:
+    # envoy UI grafana.pondi.dev + prometheus scrape — cluster-wide service port
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+  egress:
+    # prometheus datasource, observability/same-ns
+    - toEndpoints:
+        # prometheus datasource, observability/same-ns
+        - matchLabels:
+            app.kubernetes.io/name: prometheus
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+    # alertmanager datasource, same-ns
+    - toEndpoints:
+        # alertmanager datasource, same-ns
+        - matchLabels:
+            app.kubernetes.io/name: alertmanager
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+    # victoria-logs datasource, same-ns — verified live label app.kubernetes.io/name=victoria-logs-single
+    - toEndpoints:
+        # victoria-logs datasource, same-ns — verified live label app.kubernetes.io/name=victoria-logs-single
+        - matchLabels:
+            app.kubernetes.io/name: victoria-logs-single
+      toPorts:
+        - ports:
+            - port: "9428"
+              protocol: TCP
+    # authentik OIDC token/userinfo, security ns
+    - toEndpoints:
+        # authentik OIDC token/userinfo, security ns
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: security
+            k8s:app.kubernetes.io/name: authentik
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

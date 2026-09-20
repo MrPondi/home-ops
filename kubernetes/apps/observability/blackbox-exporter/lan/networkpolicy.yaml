@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: blackbox-exporter-lan
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-blackbox-exporter
+      app.kubernetes.io/instance: blackbox-exporter-lan
+  egress:
+    # ICMP/HTTP probe targets LAN+internet incl future probes — QNAP NFS :2049, Cloudflare/Google/Quad9 ICMP
+    - toEntities:
+        - cluster
+        - world
