@@ -11,8 +11,7 @@ spec:
   egress:
     # NUT UPS pve.internal LAN
     - toCIDRSet:
-        - cidr: 10.0.0.0/8
-        - cidr: 192.168.0.0/16
+        - cidr: 10.0.10.10/32
       toPorts:
         - ports:
             - port: "3493"

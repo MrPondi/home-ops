@@ -19,9 +19,8 @@ spec:
             - port: "443"
               protocol: TCP
   egress:
-    # prometheus query API, same-ns
+    # prometheus query API
     - toEndpoints:
-        # prometheus pods (observability/same-ns)
         - matchLabels:
             app.kubernetes.io/name: prometheus
       toPorts:

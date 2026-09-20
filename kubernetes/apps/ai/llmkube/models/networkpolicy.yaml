@@ -7,7 +7,7 @@ metadata:
 spec:
   endpointSelector:
     matchExpressions:
-      - key: k8s:inference.llmkube.dev/model
+      - key: inference.llmkube.dev/model
         operator: Exists
   ingress:
     # LLMKube operator pods

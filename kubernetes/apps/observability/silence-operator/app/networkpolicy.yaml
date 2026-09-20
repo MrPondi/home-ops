@@ -9,9 +9,8 @@ spec:
     matchLabels:
       app.kubernetes.io/name: silence-operator
   egress:
-    # alertmanager silence API, same-ns
+    # alertmanager silence API
     - toEndpoints:
-        # alertmanager pods (observability/same-ns)
         - matchLabels:
             app.kubernetes.io/name: alertmanager
       toPorts:

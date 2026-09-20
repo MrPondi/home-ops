@@ -8,8 +8,38 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: gatus-sidecar
+  ingress:
+    # HTTPRoute {status,gatus-sidecar}.pondi.dev (envoy-external)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-external
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
   egress:
-    # HTTP/ICMP endpoint checks + ntfy/pushover alerting incl future endpoints
+    # TCP health checks to any cluster service port — no per-service touch-ups
     - toEntities:
         - cluster
+      toPorts:
+        - ports:
+            - port: "1"
+              endPort: 65535
+              protocol: TCP
+    # TCP health checks + ntfy alerting + external DNS resolver tcp://1.1.1.1:53 — any internet port
+    - toEntities:
         - world
+      toPorts:
+        - ports:
+            - port: "1"
+              endPort: 65535
+              protocol: TCP
+    # ICMP echo — icmp://1.1.1.1, 8.8.8.8, 9.9.9.9 connectivity checks
+    - toEntities:
+        - world
+      icmps:
+        - fields:
+            - type: 8
+              family: IPv4

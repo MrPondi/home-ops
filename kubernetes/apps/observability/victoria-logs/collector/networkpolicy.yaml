@@ -11,7 +11,6 @@ spec:
   egress:
     # remoteWrite to victoria-logs server, same-ns
     - toEndpoints:
-        # remoteWrite to victoria-logs server, same-ns
         - matchLabels:
             app.kubernetes.io/name: victoria-logs-single
       toPorts:

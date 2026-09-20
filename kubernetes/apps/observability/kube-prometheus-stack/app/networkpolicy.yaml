@@ -17,13 +17,27 @@ spec:
             - port: "9090"
               protocol: TCP
   egress:
-    # broad scrape egress — any current/future pod/service/LAN/internet target, no per-target touch-ups
     - toEntities:
         - cluster
+    # node-local hostNetwork targets — node-exporter :9100 on node IP
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "9100"
+              protocol: TCP
+    # external exporters — node-exporter :9100, smartctl :9633
+    - toEntities:
         - world
-    # S3 s3.pondi.dev via envoy-internal DNAT backend — copied from components/kopiur/base
+      toPorts:
+        - ports:
+            - port: "9100"
+              protocol: TCP
+            - port: "9633"
+              protocol: TCP
     - toEndpoints:
-        # S3 s3.pondi.dev via envoy-internal pods (network)
+        # envoy-internal pods (network ns)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
@@ -31,13 +45,6 @@ spec:
       toPorts:
         - ports:
             - port: "10080"
-              protocol: TCP
-    # S3 pre-NAT VIP fallback
-    - toCIDR:
-        - 10.0.30.11/32
-      toPorts:
-        - ports:
-            - port: "80"
               protocol: TCP
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
@@ -50,7 +57,6 @@ spec:
     matchLabels:
       app.kubernetes.io/name: alertmanager
   ingress:
-    # envoy UI alertmanager.pondi.dev, grafana datasource, silence-operator, prometheus
     - fromEntities:
         - cluster
       toPorts:

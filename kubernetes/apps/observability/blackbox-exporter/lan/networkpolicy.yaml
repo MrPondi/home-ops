@@ -10,7 +10,23 @@ spec:
       app.kubernetes.io/name: prometheus-blackbox-exporter
       app.kubernetes.io/instance: blackbox-exporter-lan
   egress:
-    # ICMP/HTTP probe targets LAN+internet incl future probes — QNAP NFS :2049, Cloudflare/Google/Quad9 ICMP
+    # NFS — qnap.internal portmapper :111 + nfs :2049 (lan-nfs tcp_connect probe)
     - toEntities:
-        - cluster
         - world
+      toPorts:
+        - ports:
+            - port: "111"
+              protocol: TCP
+            - port: "111"
+              protocol: UDP
+            - port: "2049"
+              protocol: TCP
+            - port: "2049"
+              protocol: UDP
+    # ICMP echo — qnap.internal lan-icmp probe
+    - toEntities:
+        - world
+      icmps:
+        - fields:
+            - type: 8
+              family: IPv4
