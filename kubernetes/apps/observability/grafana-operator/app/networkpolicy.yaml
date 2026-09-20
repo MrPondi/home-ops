@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: grafana-operator
+spec:
+  endpointSelector:
+    matchLabels:
+      # Grafana operator pods (observability/same-ns) -> Grafana instance API
+      app.kubernetes.io/name: grafana-operator
+  egress:
+    # Grafana instance API, same-ns
+    - toEndpoints:
+        # Grafana instance pods (observability/same-ns)
+        - matchLabels:
+            app: grafana
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
