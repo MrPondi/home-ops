@@ -36,6 +36,13 @@ spec:
             - port: "1"
               endPort: 65535
               protocol: TCP
+    # External DNS resolver + connectivity checker udp://1.1.1.1:53
+    - toCIDR:
+        - 1.1.1.1/32
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
     # ICMP echo — icmp://1.1.1.1, 8.8.8.8, 9.9.9.9 connectivity checks
     - toEntities:
         - world

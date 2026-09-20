@@ -36,6 +36,15 @@ spec:
               protocol: TCP
             - port: "9633"
               protocol: TCP
+    # Ultrafeeder ADS-B LAN exporter — ServiceMonitor ultrafeeder :9273/:9274
+    - toCIDR:
+        - 192.168.1.174/32
+      toPorts:
+        - ports:
+            - port: "9273"
+              protocol: TCP
+            - port: "9274"
+              protocol: TCP
     - toEndpoints:
         # envoy-internal pods (network ns)
         - matchLabels:
