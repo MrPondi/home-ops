@@ -1,0 +1,91 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: prometheus
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+  ingress:
+    # cluster-wide clients — envoy UI prometheus.pondi.dev, grafana datasource, prometheus-adapter
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+  egress:
+    # broad scrape egress — any current/future pod/service/LAN/internet target, no per-target touch-ups
+    - toEntities:
+        - cluster
+        - world
+    # S3 s3.pondi.dev via envoy-internal DNAT backend — copied from components/kopiur/base
+    - toEndpoints:
+        # S3 s3.pondi.dev via envoy-internal pods (network)
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10080"
+              protocol: TCP
+    # S3 pre-NAT VIP fallback
+    - toCIDR:
+        - 10.0.30.11/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: alertmanager
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: alertmanager
+  ingress:
+    # envoy UI alertmanager.pondi.dev, grafana datasource, silence-operator, prometheus
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP
+  egress:
+    # pushover + buddy heartbeat webhooks, internet HTTPS
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kube-prometheus-stack-operator
+spec:
+  endpointSelector:
+    matchLabels:
+      app: kube-prometheus-stack-operator
+  ingress:
+    # kube-apiserver admission webhook callback: validating+mutating kube-prometheus-stack-admission
+    - fromEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "10250"
+              protocol: TCP
