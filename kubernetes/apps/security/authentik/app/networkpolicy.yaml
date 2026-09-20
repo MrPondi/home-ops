@@ -15,16 +15,12 @@ spec:
         - cluster
       toPorts:
         - ports:
-            - port: "80"
-              protocol: TCP
-            - port: "443"
-              protocol: TCP
             - port: "9000"
               protocol: TCP
   egress:
     # PostgreSQL cluster (security)
     - toEndpoints:
-        - matchLabels: # authentik postgres pods (security)
+        - matchLabels:
             cnpg.io/cluster: authentik
       toPorts:
         - ports:
@@ -32,7 +28,7 @@ spec:
               protocol: TCP
     # SMTP relay (default)
     - toEndpoints:
-        - matchLabels: # smtp-relay pods (default)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: default
             k8s:app.kubernetes.io/name: smtp-relay
       toPorts:
@@ -65,7 +61,7 @@ spec:
   egress:
     # PostgreSQL cluster (security)
     - toEndpoints:
-        - matchLabels: # authentik postgres pods (security)
+        - matchLabels:
             cnpg.io/cluster: authentik
       toPorts:
         - ports:
@@ -73,7 +69,7 @@ spec:
               protocol: TCP
     # SMTP relay (default)
     - toEndpoints:
-        - matchLabels: # smtp-relay pods (default)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: default
             k8s:app.kubernetes.io/name: smtp-relay
       toPorts:
@@ -103,10 +99,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: authentik-outpost-ldap
   ingress:
-    # NOTE: the Service exposes 389/636 but Cilium enforces on the DNAT-ed
-    # backend ports — the outpost pod listens on ldap=3389, ldaps=6636
-    # (pod named-ports + hubble drop evidence). Rules must name backend ports.
-    # Cluster clients (jellyfin hairpin) — LDAP/LDAPS backend ports
+    # Cluster clients — LDAP/LDAPS backend ports
     - fromEntities:
         - cluster
       toPorts:
@@ -115,30 +108,19 @@ spec:
               protocol: TCP
             - port: "6636"
               protocol: TCP
-    # RFC1918 clients (TrueNAS, LAN, VPN) — LDAP/LDAPS backend ports
+    # RFC1918 clients (TrueNAS) — LDAP/LDAPS backend ports
     - fromCIDR:
         - 10.0.25.25/32
-        - 192.168.1.0/24
-        - 10.0.199.0/24
       toPorts:
         - ports:
             - port: "3389"
               protocol: TCP
             - port: "6636"
               protocol: TCP
-    # gatus-sidecar health check (observability) — targets the backend ldap port
-    - fromEndpoints:
-        - matchLabels: # gatus-sidecar pods (observability)
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: gatus-sidecar
-      toPorts:
-        - ports:
-            - port: "3389"
-              protocol: TCP
   egress:
-    # Authentik server API via envoy-internal (outposts poll public URL through envoy — observed)
+    # Authentik server API via envoy-internal
     - toEndpoints:
-        - matchLabels: # envoy-internal gateway pods (network)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
             k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
@@ -157,9 +139,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: authentik-outpost-rac
   egress:
-    # Authentik server API via envoy-internal (outposts poll public URL through envoy — observed)
+    # Authentik server API via envoy-internal
     - toEndpoints:
-        - matchLabels: # envoy-internal gateway pods (network)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
             k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
@@ -167,9 +149,9 @@ spec:
         - ports:
             - port: "10443"
               protocol: TCP
-    # RAC provider — wings0.pondi.dev (SSH)
-    - toFQDNs:
-        - matchName: wings0.pondi.dev
+    # RAC provider — VLAN 20 (SSH)
+    - toCIDRSet:
+        - cidr: 10.0.20.0/24
       toPorts:
         - ports:
             - port: "22"
