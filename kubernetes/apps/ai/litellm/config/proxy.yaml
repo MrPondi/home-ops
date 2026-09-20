@@ -11,6 +11,7 @@ spec:
   generalSettings:
     health_check_endpoint: /v1/health
     store_model_in_db: false
+    disable_env_credential_login: true
   podAnnotations:
     reloader.stakater.com/auto: "true"
   routerSettings:
