@@ -1,0 +1,24 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: &name miroir
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: *name
+  egress:
+    # LINSTOR satellite/controller control plane (cross-node)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "3366"
+              protocol: TCP
+            - port: "3367"
+              protocol: TCP
+            - port: "3370"
+              protocol: TCP
+# DRBD data-plane ports are allocated from the LINSTOR port pool and the policy should be extended if multi-replica replication is enabled (replicaCount is currently 1).

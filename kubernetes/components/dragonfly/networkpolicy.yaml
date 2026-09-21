@@ -38,6 +38,7 @@ spec:
             - port: "9999"
               protocol: TCP
   egress:
+    # DNS — kube-dns (kube-system) :53 UDP/TCP with matchPattern "*"
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: kube-system

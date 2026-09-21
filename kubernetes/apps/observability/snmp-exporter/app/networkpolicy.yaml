@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: snmp-exporter
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-snmp-exporter
+      app.kubernetes.io/instance: snmp-exporter
+  egress:
+    # SNMP target 10.0.50.143 (LAN printer/UPS polling)
+    - toCIDRSet:
+        - cidr: 10.0.50.143/32
+      toPorts:
+        - ports:
+            - port: "161"
+              protocol: UDP
