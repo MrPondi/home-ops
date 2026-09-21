@@ -47,26 +47,6 @@ spec:
             - port: "9187"
               protocol: TCP
   egress:
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: kube-system
-            k8s:k8s-app: kube-dns
-      toPorts:
-        - ports:
-            - port: "53"
-              protocol: UDP
-            - port: "53"
-              protocol: TCP
-          rules:
-            dns:
-              - matchPattern: "*"
-    - toEntities:
-        - host
-        - remote-node
-      toPorts:
-        - ports:
-            - port: "6443"
-              protocol: TCP
     # QNAP MinIO (WAL archiving + barman backups, direct)
     - toCIDR:
         - 10.0.25.25/32

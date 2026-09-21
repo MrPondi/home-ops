@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: homepage
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: homepage
+  ingress:
+    # HTTPRoute homepage.pondi.dev (envoy-internal)
+    - fromEndpoints:
+        - matchLabels: # envoy-internal gateway pods (network)
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+  egress:
+    # Cloudflare/Proxmox APIs, widget checks (internet)
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Unifi console, TrueNAS widgets (LAN)
+    - toCIDR:
+        - 192.168.1.0/24
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # In-cluster widget health checks
+    - toEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "443"
+              protocol: TCP
+            - port: "3000"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+            - port: "8081"
+              protocol: TCP

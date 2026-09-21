@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: pstream-backend
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: pstream-backend
+  ingress:
+    # HTTPRoute pstream-backend.pondi.dev (envoy-external)
+    - fromEndpoints:
+        # envoy-external gateway pods (network)
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-external
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+  egress:
+    # PostgreSQL (pstream-backend cluster)
+    - toEndpoints:
+        # pstream-backend cluster instance pods
+        - matchLabels:
+            cnpg.io/cluster: pstream-backend
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # TMDB/Trakt APIs (internet)
+    - toCIDRSet:
+        - cidr: "0.0.0.0/0"
+          except:
+            - "10.0.0.0/8"
+            - "169.254.0.0/16"
+            - "172.16.0.0/12"
+            - "192.168.0.0/16"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
