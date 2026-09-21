@@ -18,12 +18,18 @@ LIMITATIONS:
 (a) Fail-closed namespace inference relies on `apps/<ns>/` path layout; custom
     --path layouts that do not contain an `apps` segment silently skip
     duplicated-inherited-rule checks (inferred namespace is None).
-(b) Scope-trap warnings are intentionally noisy — any CNP selector without an
-    explicit `k8s:io.kubernetes.pod.namespace` or
-    `io.cilium.k8s.namespace.labels.*` key warns, including same-namespace
-    plain selectors. Current-tree baseline is ~73 warnings. Warnings never
-    affect exit code.
-"""
+(b) Scope-trap warnings (Check 3, warnings-only) are narrowed: only a CNP
+    (not CCNP) fromEndpoints/toEndpoints/fromRequires/toRequires selector that
+    contains >=1 `k8s:`-prefixed pod-label key but neither
+    `k8s:io.kubernetes.pod.namespace` nor any
+    `io.cilium.k8s.namespace.labels.*` key warns — a prefixed-without-
+    namespace selector is still clamped to its own namespace and is genuinely
+    suspicious (redundant prefix or missing namespace key). Plain-only
+    selectors are the correct same-namespace convention and stay silent;
+    selectors with `io.cilium.k8s.namespace.labels.*` are valid cross-namespace
+    groupings and never warn. Current-tree baseline is ~0 warnings. Warnings
+    never affect exit code. Skips: endpointSelector, empty selectors, CCNPs.
+""" 
 
 from __future__ import annotations
 
@@ -484,17 +490,25 @@ def check_policy_spec(
                         # Existing prefix validation
                         check_selector(f"{direction}[{i}].{rule_key}[{j}]", sel, policy_kind, policy_name, path, violations)
                         # Check 3: scope-trap warnings (CNP only, not CCNP, not endpointSelector, not empty)
+                        # Narrowed: warn only when selector contains >=1 k8s:-prefixed key
+                        # but neither k8s:io.kubernetes.pod.namespace nor io.cilium.k8s.namespace.labels.*
                         if policy_kind == "CiliumNetworkPolicy":
                             if not isinstance(sel, dict):
                                 continue
                             keys = selector_keys(sel)
                             if not keys:
                                 continue
-                            has_ns = K8S_NS_KEY in keys
-                            has_ns_label = any(k.startswith(NS_LABELS_PREFIX) for k in keys)
-                            if not has_ns and not has_ns_label:
+                            has_ns = K8S_NS_KEY in keys or f"{NEGATION_PREFIX}{K8S_NS_KEY}" in keys
+                            has_ns_label = any(
+                                k.startswith(NS_LABELS_PREFIX) or k.startswith(f"{NEGATION_PREFIX}{NS_LABELS_PREFIX}")
+                                for k in keys
+                            )
+                            has_k8s_prefixed = any(
+                                k.removeprefix(NEGATION_PREFIX).startswith(K8S_PREFIX) for k in keys
+                            )
+                            if has_k8s_prefixed and not has_ns and not has_ns_label:
                                 warnings.append(
-                                    f"{path}: {policy_kind}/{policy_name} {direction}[{i}].{rule_key}[{j}] scope-trap: plain selector without k8s:io.kubernetes.pod.namespace or io.cilium.k8s.namespace.labels.* (keys={keys})"
+                                    f"{path}: {policy_kind}/{policy_name} {direction}[{i}].{rule_key}[{j}] scope-trap: k8s:-prefixed selector without k8s:io.kubernetes.pod.namespace or io.cilium.k8s.namespace.labels.* (still namespace-clamped, keys={keys})"
                                 )
                 else:
                     # Non-selector rule keys (toCIDRSet, toEntities, etc.) — no selector validation,
