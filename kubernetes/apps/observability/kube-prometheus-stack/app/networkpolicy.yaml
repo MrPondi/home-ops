@@ -17,6 +17,7 @@ spec:
             - port: "9090"
               protocol: TCP
   egress:
+    # cluster services/pods — Prometheus scrape targets (all ports)
     - toEntities:
         - cluster
     # node-local hostNetwork targets — node-exporter :9100 on node IP
@@ -45,6 +46,7 @@ spec:
               protocol: TCP
             - port: "9274"
               protocol: TCP
+    # envoy-internal gateway pods (network) — S3/MinIO :10080
     - toEndpoints:
         # envoy-internal pods (network ns)
         - matchLabels:
@@ -66,6 +68,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: alertmanager
   ingress:
+    # cluster — alertmanager :9093 (Prometheus, clients)
     - fromEntities:
         - cluster
       toPorts:
