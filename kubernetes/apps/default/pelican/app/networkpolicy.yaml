@@ -22,7 +22,7 @@ spec:
     # Homepage
     - fromEndpoints:
         - matchLabels:
-            k8s:app.kubernetes.io/name: homepage
+            app.kubernetes.io/name: homepage
       toPorts:
         - ports:
             - port: "80"
