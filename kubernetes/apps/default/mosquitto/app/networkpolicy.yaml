@@ -1,0 +1,26 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosquitto
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: mosquitto
+  ingress:
+    # MQTT clients via LoadBalancer LB/LAN (externalTrafficPolicy Local)
+    - fromEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "1883"
+              protocol: TCP
+    # MQTT clients from in-cluster (e.g. zwave-js-ui)
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "1883"
+              protocol: TCP

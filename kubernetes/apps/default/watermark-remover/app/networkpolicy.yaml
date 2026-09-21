@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: watermark-remover
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: watermark-remover
+  ingress:
+    # HTTPRoute watermark-remover.pondi.dev (envoy-external)
+    - fromEndpoints:
+        # envoy-external gateway pods (network)
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-external
+      toPorts:
+        - ports:
+            - port: "8765"
+              protocol: TCP

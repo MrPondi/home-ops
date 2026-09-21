@@ -8,21 +8,20 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: *name
-  egress:
-    - toEndpoints:
+  ingress:
+    # HTTPRoute pstream-proxy.pondi.dev (envoy-external)
+    - fromEndpoints:
+        # envoy-external gateway pods (network)
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: kube-system
-            k8s:k8s-app: kube-dns
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-external
       toPorts:
         - ports:
-            - port: "53"
-              protocol: UDP
-            - port: "53"
+            - port: "3000"
               protocol: TCP
-          rules:
-            dns:
-              - matchPattern: "*"
-
+  egress:
+    # Stream proxying (internet)
     - toCIDRSet:
         - cidr: "0.0.0.0/0"
           except:
@@ -32,7 +31,7 @@ spec:
             - "192.168.0.0/16"
       toPorts:
         - ports:
-            - port: "443"
-              protocol: TCP
             - port: "80"
+              protocol: TCP
+            - port: "443"
               protocol: TCP

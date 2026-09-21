@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: smtp-relay
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: smtp-relay
+  ingress:
+    # In-cluster clients (pelican, nextcloud, authentik) — shared-service pattern
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "25"
+              protocol: TCP
+  egress:
+    # Upstream SMTP provider (internet)
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "587"
+              protocol: TCP

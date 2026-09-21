@@ -1,0 +1,78 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: pelican
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: pelican
+  ingress:
+    # HTTPRoute gamepanel.pondi.dev (envoy-internal)
+    - fromEndpoints:
+        - matchLabels: # envoy-internal gateway pods (network)
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+  egress:
+    # MariaDB (database)
+    - toEndpoints:
+        - matchLabels: # MariaDB pods (database)
+            k8s:io.kubernetes.pod.namespace: database
+            k8s:app.kubernetes.io/name: mariadb
+      toPorts:
+        - ports:
+            - port: "3306"
+              protocol: TCP
+    # Dragonfly cache (default)
+    - toEndpoints:
+        - matchLabels: # pelican-dragonfly pods (default)
+            app: pelican-dragonfly
+      toPorts:
+        - ports:
+            - port: "6379"
+              protocol: TCP
+    # SMTP relay (default)
+    - toEndpoints:
+        - matchLabels: # smtp-relay pods (default)
+            app.kubernetes.io/name: smtp-relay
+      toPorts:
+        - ports:
+            - port: "25"
+              protocol: TCP
+    # S3 repository (s3.pondi.dev) — Cilium enforces egress on the DNAT-ed backend,
+    # so the rule targets the envoy-internal pods (s3.pondi.dev listener is 10080)
+    - toEndpoints:
+        - matchLabels: # envoy-internal gateway pods (network)
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10080"
+              protocol: TCP
+    # S3 repository fallback — direct VIP match (pre-NAT); toCIDR alone is NOT
+    # sufficient (verified: dial to 10.0.30.11:80 times out without the backend rule above)
+    - toCIDR:
+        - 10.0.30.11/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Cloudflare Turnstile (internet)
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
