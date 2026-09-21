@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: smtp-relay
   ingress:
-    # In-cluster clients (pelican, nextcloud, authentik) — shared-service pattern
+    # In-cluster clients
     - fromEntities:
         - cluster
       toPorts:

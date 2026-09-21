@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: grafana
   ingress:
-    # envoy UI grafana.pondi.dev + prometheus scrape — cluster-wide service port
+    # envoy UI grafana.pondi.dev + prometheus scrape
     - fromEntities:
         - cluster
       toPorts:
@@ -17,39 +17,36 @@ spec:
             - port: "3000"
               protocol: TCP
   egress:
-    # prometheus datasource, observability/same-ns
+    # prometheus datasource
     - toEndpoints:
-        # prometheus datasource, observability/same-ns
         - matchLabels:
             app.kubernetes.io/name: prometheus
       toPorts:
         - ports:
             - port: "9090"
               protocol: TCP
-    # alertmanager datasource, same-ns
+    # alertmanager datasource
     - toEndpoints:
-        # alertmanager datasource, same-ns
         - matchLabels:
             app.kubernetes.io/name: alertmanager
       toPorts:
         - ports:
             - port: "9093"
               protocol: TCP
-    # victoria-logs datasource, same-ns — verified live label app.kubernetes.io/name=victoria-logs-single
+    # victoria-logs datasource
     - toEndpoints:
-        # victoria-logs datasource, same-ns — verified live label app.kubernetes.io/name=victoria-logs-single
         - matchLabels:
             app.kubernetes.io/name: victoria-logs-single
       toPorts:
         - ports:
             - port: "9428"
               protocol: TCP
-    # authentik OIDC token/userinfo, security ns
+    # authentik OIDC token/userinfo (security)
     - toEndpoints:
-        # authentik OIDC token/userinfo, security ns
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: security
+            k8s:app.kubernetes.io/component: server
             k8s:app.kubernetes.io/name: authentik
+            k8s:io.kubernetes.pod.namespace: security
       toPorts:
         - ports:
             - port: "80"

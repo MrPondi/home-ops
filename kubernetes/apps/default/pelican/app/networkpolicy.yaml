@@ -11,7 +11,7 @@ spec:
   ingress:
     # HTTPRoute gamepanel.pondi.dev (envoy-internal)
     - fromEndpoints:
-        - matchLabels: # envoy-internal gateway pods (network)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
             k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
@@ -22,7 +22,7 @@ spec:
   egress:
     # MariaDB (database)
     - toEndpoints:
-        - matchLabels: # MariaDB pods (database)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: database
             k8s:app.kubernetes.io/name: mariadb
       toPorts:
@@ -31,7 +31,7 @@ spec:
               protocol: TCP
     # Dragonfly cache (default)
     - toEndpoints:
-        - matchLabels: # pelican-dragonfly pods (default)
+        - matchLabels:
             app: pelican-dragonfly
       toPorts:
         - ports:
@@ -39,30 +39,21 @@ spec:
               protocol: TCP
     # SMTP relay (default)
     - toEndpoints:
-        - matchLabels: # smtp-relay pods (default)
+        - matchLabels:
             app.kubernetes.io/name: smtp-relay
       toPorts:
         - ports:
             - port: "25"
               protocol: TCP
-    # S3 repository (s3.pondi.dev) — Cilium enforces egress on the DNAT-ed backend,
-    # so the rule targets the envoy-internal pods (s3.pondi.dev listener is 10080)
+    # S3 repository via envoy (s3.pondi.dev)
     - toEndpoints:
-        - matchLabels: # envoy-internal gateway pods (network)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
             k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
       toPorts:
         - ports:
             - port: "10080"
-              protocol: TCP
-    # S3 repository fallback — direct VIP match (pre-NAT); toCIDR alone is NOT
-    # sufficient (verified: dial to 10.0.30.11:80 times out without the backend rule above)
-    - toCIDR:
-        - 10.0.30.11/32
-      toPorts:
-        - ports:
-            - port: "80"
               protocol: TCP
     # Cloudflare Turnstile (internet)
     - toCIDRSet:

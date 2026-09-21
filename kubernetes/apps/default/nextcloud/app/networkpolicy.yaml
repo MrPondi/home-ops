@@ -11,7 +11,7 @@ spec:
   ingress:
     # HTTPRoute nextcloud.pondi.dev (envoy-internal)
     - fromEndpoints:
-        - matchLabels: # envoy-internal gateway pods (network)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
             k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
@@ -22,7 +22,7 @@ spec:
   egress:
     # MariaDB (database)
     - toEndpoints:
-        - matchLabels: # MariaDB pods (database)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: database
             k8s:app.kubernetes.io/name: mariadb
       toPorts:
@@ -31,7 +31,7 @@ spec:
               protocol: TCP
     # SMTP relay (default)
     - toEndpoints:
-        - matchLabels: # smtp-relay pods (default)
+        - matchLabels:
             app.kubernetes.io/name: smtp-relay
       toPorts:
         - ports:
@@ -44,10 +44,43 @@ spec:
         - ports:
             - port: "2049"
               protocol: TCP
-    # OIDC via auth.pondi.dev (internet)
+    # OIDC via auth.pondi.dev
     - toFQDNs:
         - matchName: auth.pondi.dev
+        - matchName: auth.pondi.dev.default.svc.cluster.local
       toPorts:
         - ports:
             - port: "443"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: nextcloud-collabora
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: collabora
+  ingress:
+    # HTTPRoute office.pondi.dev (envoy-internal)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "9980"
+              protocol: TCP
+  egress:
+    # WOPI callbacks to Nextcloud via envoy
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10443"
               protocol: TCP

@@ -8,6 +8,14 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: chaski
+  ingress:
+    # In-cluster webhook senders
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
   egress:
     # Pushover API (internet)
     - toCIDRSet:
