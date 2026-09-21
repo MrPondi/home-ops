@@ -19,6 +19,15 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
+    # Homepage status page
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: homepage
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
   egress:
     # TCP health checks to any cluster service port — no per-service touch-ups
     - toEntities:
