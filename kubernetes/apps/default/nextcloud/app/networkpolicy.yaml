@@ -86,3 +86,11 @@ spec:
         - ports:
             - port: "10443"
               protocol: TCP
+    # Collabora rating/telemetry (internet; wire name carries search suffix)
+    - toFQDNs:
+        - matchName: rating.collaboraonline.com
+        - matchName: rating.collaboraonline.com.default.svc.cluster.local
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

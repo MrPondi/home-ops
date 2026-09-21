@@ -75,3 +75,11 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
+    # Wings daemon wings0.pondi.dev (LAN; wire name carries search suffix)
+    - toFQDNs:
+        - matchName: wings0.pondi.dev
+        - matchName: wings0.pondi.dev.default.svc.cluster.local
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
