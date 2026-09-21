@@ -9,9 +9,46 @@ spec:
     matchLabels:
       app: grafana
   ingress:
-    # envoy UI grafana.pondi.dev + prometheus scrape
-    - fromEntities:
-        - cluster
+    # UI grafana.pondi.dev (envoy-internal)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    # operator dashboard/datasource provisioning (observability)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/name: grafana-operator
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    # gatus probes (observability)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/name: gatus-sidecar
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    # homepage widgets (default)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: homepage
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
+    # toolhive MCP gateway (ai)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            k8s:app.kubernetes.io/name: virtualmcpserver
       toPorts:
         - ports:
             - port: "3000"
