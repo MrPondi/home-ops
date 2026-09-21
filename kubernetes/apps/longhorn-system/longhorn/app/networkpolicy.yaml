@@ -3,9 +3,8 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: allow-to-longhorn-manager
+  name: longhorn-manager
 spec:
-  # Longhorn manager pods (longhorn-system)
   endpointSelector:
     matchLabels:
       app: longhorn-manager
@@ -19,7 +18,7 @@ spec:
         - ports:
             - port: "9500"
               protocol: TCP
-    # Longhorn MCP server workload (ai) - ToolHive pods (manager API, unauthenticated)
+    # Longhorn MCP server workload (ai)
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: ai
