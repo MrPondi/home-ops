@@ -22,7 +22,7 @@ spec:
     # operator dashboard/datasource provisioning (observability)
     - fromEndpoints:
         - matchLabels:
-            k8s:app.kubernetes.io/name: grafana-operator
+            app.kubernetes.io/name: grafana-operator
       toPorts:
         - ports:
             - port: "3000"
@@ -30,7 +30,7 @@ spec:
     # gatus probes (observability)
     - fromEndpoints:
         - matchLabels:
-            k8s:app.kubernetes.io/name: gatus-sidecar
+            app.kubernetes.io/name: gatus-sidecar
       toPorts:
         - ports:
             - port: "3000"

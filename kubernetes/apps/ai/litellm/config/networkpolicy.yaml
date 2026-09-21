@@ -61,7 +61,7 @@ spec:
     # All llmkube InferenceService runtime pods (ai) — operator-stamped label
     - toEndpoints:
         - matchExpressions:
-            - key: k8s:inference.llmkube.dev/model
+            - key: inference.llmkube.dev/model
               operator: Exists
       toPorts:
         - ports:
