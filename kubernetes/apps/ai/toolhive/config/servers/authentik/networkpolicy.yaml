@@ -14,8 +14,9 @@ spec:
     # Authentik server pods (security)
     - toEndpoints:
         - matchLabels:
-            k8s:io.kubernetes.pod.namespace: security
+            k8s:app.kubernetes.io/component: server
             k8s:app.kubernetes.io/name: authentik
+            k8s:io.kubernetes.pod.namespace: security
       toPorts:
         - ports:
             - port: "9000"

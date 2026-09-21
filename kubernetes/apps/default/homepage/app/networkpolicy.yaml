@@ -11,7 +11,7 @@ spec:
   ingress:
     # HTTPRoute homepage.pondi.dev (envoy-internal)
     - fromEndpoints:
-        - matchLabels: # envoy-internal gateway pods (network)
+        - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
             k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
@@ -32,25 +32,23 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # Unifi console, TrueNAS widgets (LAN)
+    # Truenas via envoy
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10443"
+              protocol: TCP
+    # Unifi console
     - toCIDR:
-        - 192.168.1.0/24
+        - 192.168.1.1/32
       toPorts:
         - ports:
             - port: "443"
               protocol: TCP
-    # In-cluster widget health checks
+    # In-cluster widget health checks (all ports)
     - toEntities:
         - cluster
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
-            - port: "443"
-              protocol: TCP
-            - port: "3000"
-              protocol: TCP
-            - port: "8080"
-              protocol: TCP
-            - port: "8081"
-              protocol: TCP

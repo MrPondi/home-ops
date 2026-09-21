@@ -11,7 +11,6 @@ spec:
   ingress:
     # HTTPRoute echo.pondi.dev (envoy-external)
     - fromEndpoints:
-        # envoy-external gateway pods (network)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
@@ -22,7 +21,6 @@ spec:
               protocol: TCP
     # Gatus HTTP health check
     - fromEndpoints:
-        # gatus-sidecar prober pods (observability)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: observability
             k8s:app.kubernetes.io/name: gatus-sidecar
@@ -32,7 +30,6 @@ spec:
               protocol: TCP
     # Prometheus metrics scrape
     - fromEndpoints:
-        # prometheus pods (observability)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: observability
             k8s:app.kubernetes.io/name: prometheus
@@ -43,7 +40,6 @@ spec:
   egress:
     # DNS resolution
     - toEndpoints:
-        # kube-dns pods (kube-system)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: kube-system
             k8s:k8s-app: kube-dns

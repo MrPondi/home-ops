@@ -11,7 +11,6 @@ spec:
   ingress:
     # HTTPRoute pstream-backend.pondi.dev (envoy-external)
     - fromEndpoints:
-        # envoy-external gateway pods (network)
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
             k8s:app.kubernetes.io/name: envoy
@@ -23,7 +22,6 @@ spec:
   egress:
     # PostgreSQL (pstream-backend cluster)
     - toEndpoints:
-        # pstream-backend cluster instance pods
         - matchLabels:
             cnpg.io/cluster: pstream-backend
       toPorts:

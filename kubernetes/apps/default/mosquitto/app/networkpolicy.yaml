@@ -17,7 +17,7 @@ spec:
         - ports:
             - port: "1883"
               protocol: TCP
-    # MQTT clients from in-cluster (e.g. zwave-js-ui)
+    # MQTT clients from in-cluster
     - fromEntities:
         - cluster
       toPorts:
