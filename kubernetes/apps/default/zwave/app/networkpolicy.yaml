@@ -28,3 +28,11 @@ spec:
         - ports:
             - port: "1883"
               protocol: TCP
+    # npm registry for add-on installs (internet; wire name carries search suffix)
+    - toFQDNs:
+        - matchName: registry.npmjs.org
+        - matchName: registry.npmjs.org.default.svc.cluster.local
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
