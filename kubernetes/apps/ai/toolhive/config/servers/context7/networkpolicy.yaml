@@ -10,13 +10,9 @@ spec:
       app.kubernetes.io/name: virtualmcpserver
   egress:
     # Internet (mcp.context7.com)
-    - toCIDRSet:
-        - cidr: 0.0.0.0/0
-          except:
-            - 10.0.0.0/8
-            - 169.254.0.0/16
-            - 172.16.0.0/12
-            - 192.168.0.0/16
+    - toFQDNs:
+        - matchName: mcp.context7.com
+        - matchName: mcp.context7.com.ai.svc.cluster.local
       toPorts:
         - ports:
             - port: "443"

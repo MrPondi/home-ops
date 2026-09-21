@@ -186,13 +186,6 @@ spec:
               limits:
                 memory: 1Gi
     defaultPodOptions:
-      # # ndots:1 → external names are resolved absolutely first (no search-suffix
-      # # lookups), so Cilium's FQDN rules see the plain names they match
-      # # (see cilium issue #20191)
-      # dnsConfig:
-      #   options:
-      #     - name: ndots
-      #       value: "1"
       securityContext:
         runAsNonRoot: true
         runAsUser: 10000
