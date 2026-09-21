@@ -11,14 +11,10 @@ spec:
       toolhive-name: *name
       app: *name
   egress:
-    # Internet (GitHub API)
-    - toCIDRSet:
-        - cidr: 0.0.0.0/0
-          except:
-            - 10.0.0.0/8
-            - 169.254.0.0/16
-            - 172.16.0.0/12
-            - 192.168.0.0/16
+    # Internet (api.github.com)
+    - toFQDNs:
+        - matchName: api.github.com
+        - matchName: api.github.com.ai.svc.cluster.local
       toPorts:
         - ports:
             - port: "443"

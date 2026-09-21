@@ -29,11 +29,15 @@ spec:
             - port: "8080"
               protocol: TCP
   egress:
-    # Model download from Hugging Face (init container)
-    - toCIDRSet:
-        - cidr: 0.0.0.0/0
-          except:
-            - 10.0.0.0/8
-            - 169.254.0.0/16
-            - 172.16.0.0/12
-            - 192.168.0.0/16
+    # HuggingFace (api + CDN; '**.' matches subdomains at any depth, incl. search-suffixed wire names)
+    - toFQDNs:
+        - matchName: huggingface.co
+        - matchName: huggingface.co.ai.svc.cluster.local
+        - matchPattern: "**.huggingface.co"
+        - matchPattern: "**.huggingface.co.ai.svc.cluster.local"
+        - matchPattern: "**.hf.co"
+        - matchPattern: "**.hf.co.ai.svc.cluster.local"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
