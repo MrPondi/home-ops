@@ -49,9 +49,6 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # In-cluster widget backends (all ports; CIDR rules don't cover cluster IPs)
+    # In-cluster widget backends (all ports)
     - toEntities:
         - cluster
-    # Wide open: LAN/cloud APIs on arbitrary ports
-    - toCIDRSet:
-        - cidr: 0.0.0.0/0
