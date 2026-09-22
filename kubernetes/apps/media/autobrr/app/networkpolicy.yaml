@@ -19,14 +19,43 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Cluster-wide clients on the service port (homepage widgets)
-    - fromEntities:
-        - cluster
+    # Homepage widgets (default)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: homepage
       toPorts:
         - ports:
             - port: "80"
               protocol: TCP
   egress:
+    # Release pushes to sonarr (media)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Release pushes to radarr (media)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: radarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Download client calls to qui (media)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: qui
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
     # IRC/RSS trackers (internet, all ports phase-1 — tighten per hubble)
     - toCIDRSet:
         - cidr: 0.0.0.0/0

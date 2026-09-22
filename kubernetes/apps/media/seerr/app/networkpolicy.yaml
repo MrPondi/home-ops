@@ -19,9 +19,22 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Cluster-wide clients on the service port (toolhive, homepage)
-    - fromEntities:
-        - cluster
+    # Homepage widgets (default)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: homepage
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # MCP calls from toolhive seerr server (ai)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            k8s:toolhive: "true"
+            k8s:toolhive-name: seerr
+            k8s:app: seerr
       toPorts:
         - ports:
             - port: "80"

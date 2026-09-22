@@ -19,9 +19,31 @@ spec:
         - ports:
             - port: "8096"
               protocol: TCP
-    # Cluster-wide clients on the service port (toolhive, homepage)
-    - fromEntities:
-        - cluster
+    # MCP calls from toolhive jellyfin server (ai)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            k8s:toolhive: "true"
+            k8s:toolhive-name: jellyfin
+            k8s:app: jellyfin
+      toPorts:
+        - ports:
+            - port: "8096"
+              protocol: TCP
+    # Homepage widgets (default)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: homepage
+      toPorts:
+        - ports:
+            - port: "8096"
+              protocol: TCP
+    # Media-server integration from seerr (media)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: seerr
       toPorts:
         - ports:
             - port: "8096"
