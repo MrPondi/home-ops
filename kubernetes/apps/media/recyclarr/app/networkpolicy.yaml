@@ -11,20 +11,11 @@ spec:
   # No ingress section: CronJob pod, no Service/route, nothing calls it.
   # (Omitting ingress: leaves ingress unrestricted, not denied — intended here.)
   egress:
-    # Config sync to sonarr (media)
+    # Servarr suite mesh (sonarr/radarr/prowlarr/bazarr)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: sonarr
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
-    # Config sync to radarr (media)
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: radarr
+            k8s:app.kubernetes.io/part-of: servarr
       toPorts:
         - ports:
             - port: "80"
