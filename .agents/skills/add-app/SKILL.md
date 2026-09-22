@@ -110,6 +110,7 @@ spec:
                             repository: <image-repository>
                             tag: <image-tag-or-digest>
                         env:
+                            TZ: Europe/Warsaw
                             <APP_PORT_ENV>: &port <port>
                         probes:
                             # dominant local pattern: custom probe WITH a full httpGet.
