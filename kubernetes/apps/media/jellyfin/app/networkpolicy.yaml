@@ -57,3 +57,12 @@ spec:
             - 169.254.0.0/16
             - 172.16.0.0/12
             - 192.168.0.0/16
+    # Authentik LDAP outpost (security)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: security
+            k8s:app.kubernetes.io/name: authentik-outpost-ldap
+      toPorts:
+        - ports:
+            - port: "6636"
+              protocol: TCP
