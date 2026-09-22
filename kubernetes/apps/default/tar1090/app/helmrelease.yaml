@@ -21,13 +21,13 @@ spec:
               tag: latest@sha256:b0d3bff06010eafc52f4cf001c3e7bc1e2a46402bc5b583893d99446afc831db
             env:
               TAR1090_NGINX_PORT: &port 80
-              BEASTHOST: 192.168.1.174
+              BEASTHOST: &host 192.168.1.174
               BEASTPORT: "30005"
-              MLATHOST: 192.168.1.174
+              MLATHOST: *host
               MLATPORT: "31005"
               UPDATE_TAR1090: "true"
-              TAR1090_PAGETITLE: PrestigeGarden
-              TAR1090_MESSAGERATEINTITLE: "true"
+              TAR1090_PAGETITLE: HomeLab ADS-B
+              TAR1090_MESSAGERATEINTITLE: "false"
               TAR1090_PLANECOUNTINTITLE: "true"
               TAR1090_ENABLE_AC_DB: "true"
               TAR1090_FLIGHTAWARELINKS: "true"
