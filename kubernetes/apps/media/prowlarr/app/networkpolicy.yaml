@@ -19,9 +19,40 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Cluster-wide clients on the service port (sonarr/radarr indexers, toolhive, homepage)
-    - fromEntities:
-        - cluster
+    # Indexer queries from sonarr (media)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Indexer queries from radarr (media)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: radarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # MCP calls from toolhive servarr server (ai)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            k8s:toolhive: "true"
+            k8s:toolhive-name: servarr
+            k8s:app: servarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Homepage widgets (default)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: homepage
       toPorts:
         - ports:
             - port: "80"

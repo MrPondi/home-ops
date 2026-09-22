@@ -48,6 +48,15 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
+    # Homepage widgets (default)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: default
+            k8s:app.kubernetes.io/name: homepage
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
   egress:
     # WebUI/API control-plane (internet) — torrent data flows via Multus VPN secondary iface, outside Cilium policy
     - toCIDRSet:
