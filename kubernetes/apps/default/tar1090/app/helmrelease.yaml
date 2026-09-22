@@ -72,6 +72,14 @@ spec:
               capabilities:
                 drop:
                   - ALL
+                # nginx master (root via s6) needs these to bind :80, chown
+                # cache dirs and setuid workers to www-data
+                add:
+                  - CHOWN
+                  - DAC_OVERRIDE
+                  - NET_BIND_SERVICE
+                  - SETGID
+                  - SETUID
               # s6-overlay + nginx need writable root paths; state lives in explicit mounts
               readOnlyRootFilesystem: false
             resources:
