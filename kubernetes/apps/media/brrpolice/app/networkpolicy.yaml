@@ -8,7 +8,6 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: brrpolice
-  # No ingress: metrics via namespace baseline; nothing else calls this Service.
   egress:
     # qBittorrent API polling (media)
     - toEndpoints:

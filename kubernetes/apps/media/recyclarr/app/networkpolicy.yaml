@@ -8,8 +8,6 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: recyclarr
-  # No ingress section: CronJob pod, no Service/route, nothing calls it.
-  # (Omitting ingress: leaves ingress unrestricted, not denied — intended here.)
   egress:
     # Servarr suite mesh (sonarr/radarr/prowlarr)
     - toEndpoints:
@@ -20,7 +18,7 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Trash-guides fetch (internet :443 only — widen per hubble if denied)
+    # Trash-guides fetch (internet)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
           except:

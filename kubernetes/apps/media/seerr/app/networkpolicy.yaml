@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app.kubernetes.io/name: seerr
   ingress:
-    # HTTPRoute seerr.pondi.dev + requests.pondi.dev (envoy-internal)
+    # HTTPRoute {seerr,requests}.pondi.dev (envoy-internal)
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
@@ -28,7 +28,7 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # MCP calls from toolhive seerr server (ai)
+    # MCP toolhive seerr server (ai)
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: ai
@@ -58,7 +58,7 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
-    # Media-server integration to jellyfin (media, hubble-observed)
+    # Media-server integration to jellyfin (media)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
@@ -67,7 +67,7 @@ spec:
         - ports:
             - port: "8096"
               protocol: TCP
-    # Metadata providers (TMDB) (internet, all ports phase-1 — tighten per hubble)
+    # Metadata providers (internet)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
           except:

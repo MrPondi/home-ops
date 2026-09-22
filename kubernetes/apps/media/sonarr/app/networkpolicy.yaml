@@ -45,7 +45,7 @@ spec:
         - ports:
             - port: "8080"
               protocol: TCP
-    # Download monitoring calls to qui (media, hubble-observed)
+    # Download client proxy (media)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
@@ -54,7 +54,7 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Metadata/indexer fallback (internet, all ports phase-1 — tighten per hubble)
+    # Metadata (internet)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
           except:

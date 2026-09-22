@@ -38,7 +38,7 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Download client calls to qui (media)
+    # Download client proxy (media)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
@@ -47,7 +47,7 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # IRC/RSS trackers (internet, all ports phase-1 — tighten per hubble)
+    # IRC/RSS trackers (internet)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
           except:

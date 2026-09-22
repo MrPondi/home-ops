@@ -19,7 +19,7 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Dashboard widget calls from qui (media)
+    # Homepage widget for qui (media)
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
@@ -37,7 +37,7 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # MCP management calls from toolhive qbittorrent server (ai) — mirrors ai-side egress selector
+    # MCP toolhive qbittorrent server (ai)
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: ai
@@ -58,7 +58,7 @@ spec:
             - port: "80"
               protocol: TCP
   egress:
-    # WebUI/API control-plane (internet) — torrent data flows via Multus VPN secondary iface, outside Cilium policy
+    # WebUI/API control-plane (internet)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
           except:
