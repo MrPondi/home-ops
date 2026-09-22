@@ -41,6 +41,24 @@ spec:
           rules:
             dns:
               - matchPattern: "*"
+    # Series/movies sync from sonarr (media)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Series/movies sync from radarr (media)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: radarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
     # Subtitle providers (internet, all ports phase-1 — tighten per hubble)
     - toCIDRSet:
         - cidr: 0.0.0.0/0

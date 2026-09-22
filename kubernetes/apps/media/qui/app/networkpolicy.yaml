@@ -28,6 +28,13 @@ spec:
         - ports:
             - port: "9074"
               protocol: TCP
+    # Cluster-wide clients on the service port (homepage widgets)
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
   egress:
     # DNS to kube-dns (open ns — no namespace baseline)
     - toEndpoints:
