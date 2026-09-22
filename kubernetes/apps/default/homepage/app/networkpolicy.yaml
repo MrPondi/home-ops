@@ -49,6 +49,6 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # In-cluster widget health checks (all ports)
+    # In-cluster widget backends (all ports)
     - toEntities:
         - cluster
