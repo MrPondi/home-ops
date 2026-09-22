@@ -19,9 +19,31 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Cluster-wide clients on the service port (brrpolice, qui, toolhive, homepage)
-    - fromEntities:
-        - cluster
+    # Dashboard widget calls from qui (media)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: qui
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Automation calls from brrpolice (media)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: brrpolice
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # MCP management calls from toolhive qbittorrent server (ai) — mirrors ai-side egress selector
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            k8s:toolhive: "true"
+            k8s:toolhive-name: qbittorrent
+            k8s:app: qbittorrent
       toPorts:
         - ports:
             - port: "80"
