@@ -31,6 +31,12 @@ spec:
       enabled: "true"
     news:
       news_feed_enabled: "false"
+    panels:
+      # allow Text-panel HTML iframes as-authored (tar1090 heatmap embed): Grafana otherwise
+      # strips <script> and forces sandbox="" which blocks the embedded JS app from booting.
+      # Trust boundary: any Grafana Editor can now run JS in viewers' browsers; Editors here
+      # are authentik-backed admins/editors only.
+      disable_sanitize_html: "true"
     plugins:
       plugin_admin_enabled: "false"
     security:
