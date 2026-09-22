@@ -25,25 +25,19 @@ spec:
               BEASTPORT: "30005"
               MLATHOST: *host
               MLATPORT: "31005"
-              UPDATE_TAR1090: "true"
+              UPDATE_TAR1090: "false"
               TAR1090_PAGETITLE: HomeLab ADS-B
-              TAR1090_MESSAGERATEINTITLE: "false"
               TAR1090_PLANECOUNTINTITLE: "true"
               TAR1090_ENABLE_AC_DB: "true"
               TAR1090_FLIGHTAWARELINKS: "true"
               TAR1090_SITESHOW: "true"
               TAR1090_RANGE_OUTLINE_COLORED_BY_ALTITUDE: "true"
               TAR1090_RANGE_OUTLINE_WIDTH: "2.0"
-              TAR1090_RANGERINGSDISTANCES: "50,100,150,200"
-              TAR1090_RANGERINGSCOLORS: "'#1A237E','#0D47A1','#42A5F5','#64B5F6'"
+              TAR1090_RANGERINGS: "false"
               TAR1090_USEROUTEAPI: "true"
               GRAPHS1090_DISABLE: "true"
               HEYWHATSTHAT_ALTS: "3000,10000,30000,40000"
-              READSB_MAX_RANGE: "450"
               MAX_GLOBE_HISTORY: "30"
-              # required for replay history + heatmap data (readsb only passes
-              # --write-globe-history when traces are on); pruned by MAX_GLOBE_HISTORY
-              READSB_ENABLE_TRACES: "true"
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
