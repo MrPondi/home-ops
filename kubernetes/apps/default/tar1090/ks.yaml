@@ -13,6 +13,9 @@ spec:
   postBuild:
     substitute:
       APP: tar1090
+      # vendored Grafana dashboard JSON uses ${DS_PROMETHEUS} placeholders;
+      # flux postBuild envsubst runs strict, so the var must be defined
+      DS_PROMETHEUS: prometheus
   prune: true
   sourceRef:
     kind: GitRepository
