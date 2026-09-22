@@ -1621,7 +1621,7 @@ spec:
                 "uid": "${DS_PROMETHEUS}"
               },
               "gridPos": {
-                "h": 20,
+                "h": 2,
                 "w": 24,
                 "x": 0,
                 "y": 99
@@ -1633,7 +1633,7 @@ spec:
                   "showLineNumbers": false,
                   "showMiniMap": false
                 },
-                "content": "\n\n<iframe src=\"https://air.pondi.dev?heatmap&realheat&hideSidebar&hideButtons&centerReceiver&zoom=7\" title=\"Heat Map\" sandbox=\"allow-scripts allow-same-origin allow-forms allow-popups\" style=\"width:100%;height:600px;padding:0;margin:0;border:none;display:block;\"></iframe>",
+                "content": "\n\n<a href=\"https://air.pondi.dev?heatmap&realheat&hideSidebar&hideButtons&centerReceiver&zoom=7\" title=\"Heat Map\" target=\"_blank\" rel=\"noopener\">Open live traffic heatmap (air.pondi.dev)</a>",
                 "mode": "html"
               },
               "pluginVersion": "9.5.2",
