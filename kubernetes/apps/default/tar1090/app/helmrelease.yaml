@@ -41,6 +41,9 @@ spec:
               HEYWHATSTHAT_ALTS: "3000,10000,30000,40000"
               READSB_MAX_RANGE: "450"
               MAX_GLOBE_HISTORY: "30"
+              # required for replay history + heatmap data (readsb only passes
+              # --write-globe-history when traces are on); pruned by MAX_GLOBE_HISTORY
+              READSB_ENABLE_TRACES: "true"
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
