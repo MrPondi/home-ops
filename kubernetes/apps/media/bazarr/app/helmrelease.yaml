@@ -14,9 +14,6 @@ spec:
       bazarr:
         annotations:
           reloader.stakater.com/auto: "true"
-        pod:
-          labels:
-            app.kubernetes.io/part-of: servarr
         containers:
           app:
             image:

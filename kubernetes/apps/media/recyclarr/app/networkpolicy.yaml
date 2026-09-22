@@ -11,7 +11,7 @@ spec:
   # No ingress section: CronJob pod, no Service/route, nothing calls it.
   # (Omitting ingress: leaves ingress unrestricted, not denied — intended here.)
   egress:
-    # Servarr suite mesh (sonarr/radarr/prowlarr/bazarr)
+    # Servarr suite mesh (sonarr/radarr/prowlarr)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
