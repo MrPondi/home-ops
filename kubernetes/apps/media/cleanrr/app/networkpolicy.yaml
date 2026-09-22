@@ -8,16 +8,7 @@ spec:
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: cleanrr
-  ingress:
-    # Prometheus scrape (observability)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: observability
-            k8s:app.kubernetes.io/name: prometheus
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
+  # No ingress: metrics via namespace baseline; nothing else calls this Service.
   egress:
     # Radarr API polling (media)
     - toEndpoints:
