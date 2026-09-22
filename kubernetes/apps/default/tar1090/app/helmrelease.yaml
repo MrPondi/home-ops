@@ -1,0 +1,100 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tar1090
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: tar1090
+  interval: 1h
+  values:
+    controllers:
+      tar1090:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/sdr-enthusiasts/docker-tar1090
+              tag: latest@sha256:b0d3bff06010eafc52f4cf001c3e7bc1e2a46402bc5b583893d99446afc831db
+            env:
+              TAR1090_NGINX_PORT: &port 80
+              BEASTHOST: 192.168.1.174
+              BEASTPORT: "30005"
+              MLATHOST: 192.168.1.174
+              MLATPORT: "31005"
+              UPDATE_TAR1090: "true"
+              TAR1090_PAGETITLE: PrestigeGarden
+              TAR1090_MESSAGERATEINTITLE: "true"
+              TAR1090_PLANECOUNTINTITLE: "true"
+              TAR1090_ENABLE_AC_DB: "true"
+              TAR1090_FLIGHTAWARELINKS: "true"
+              TAR1090_SITESHOW: "true"
+              TAR1090_RANGE_OUTLINE_COLORED_BY_ALTITUDE: "true"
+              TAR1090_RANGE_OUTLINE_WIDTH: "2.0"
+              TAR1090_RANGERINGSDISTANCES: "50,100,150,200"
+              TAR1090_RANGERINGSCOLORS: "'#1A237E','#0D47A1','#42A5F5','#64B5F6'"
+              TAR1090_USEROUTEAPI: "true"
+              GRAPHS1090_DARKMODE: "true"
+              GRAPHS1090_HIDE_SYSTEM: "yes"
+              HEYWHATSTHAT_ALTS: "3000,10000,30000,40000"
+              READSB_MAX_RANGE: "450"
+              MAX_GLOBE_HISTORY: "30"
+              TZ: Europe/Warsaw
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *port
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
+              # s6-overlay + nginx need writable root paths; state lives in explicit mounts
+              readOnlyRootFilesystem: false
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 1Gi
+        # sdr-enthusiasts s6-overlay image requires root at startup; no restricted pod securityContext found in repo for s6 images, so defaultPodOptions.securityContext is omitted
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        hostnames:
+          - "air.pondi.dev"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    persistence:
+      globe-history:
+        existingClaim: "{{ .Release.Name }}-globe-history"
+        globalMounts:
+          - path: /var/globe_history
