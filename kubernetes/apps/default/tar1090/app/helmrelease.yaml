@@ -38,6 +38,11 @@ spec:
               GRAPHS1090_DISABLE: "true"
               HEYWHATSTHAT_ALTS: "3000,10000,30000,40000"
               MAX_GLOBE_HISTORY: "30"
+              # KEEP ON: readsb only passes --write-globe-history when traces are
+              # enabled; without it no new replay/heatmap data is written and the
+              # heatmap goes stale within a day (heatDuration default 24h).
+              # Old data is pruned by MAX_GLOBE_HISTORY.
+              READSB_ENABLE_TRACES: "true"
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
