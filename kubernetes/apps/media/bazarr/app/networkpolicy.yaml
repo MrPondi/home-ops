@@ -29,20 +29,11 @@ spec:
             - port: "80"
               protocol: TCP
   egress:
-    # Series/movies sync from sonarr (media)
+    # Servarr suite mesh (sonarr/radarr/prowlarr/bazarr)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: sonarr
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
-    # Series/movies sync from radarr (media)
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: radarr
+            k8s:app.kubernetes.io/part-of: servarr
       toPorts:
         - ports:
             - port: "80"

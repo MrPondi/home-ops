@@ -19,20 +19,11 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
-    # Indexer queries from sonarr (media)
+    # Servarr suite mesh (sonarr/radarr/prowlarr/bazarr)
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: sonarr
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
-    # Indexer queries from radarr (media)
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: radarr
+            k8s:app.kubernetes.io/part-of: servarr
       toPorts:
         - ports:
             - port: "80"
@@ -58,20 +49,11 @@ spec:
             - port: "80"
               protocol: TCP
   egress:
-    # Indexer sync push to sonarr (media)
+    # Servarr suite mesh (sonarr/radarr/prowlarr/bazarr)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: sonarr
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
-    # Indexer sync push to radarr (media)
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: radarr
+            k8s:app.kubernetes.io/part-of: servarr
       toPorts:
         - ports:
             - port: "80"

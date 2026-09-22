@@ -10,20 +10,11 @@ spec:
       app.kubernetes.io/name: cleanrr
   # No ingress: metrics via namespace baseline; nothing else calls this Service.
   egress:
-    # Radarr API polling (media)
+    # Servarr suite mesh (sonarr/radarr/prowlarr/bazarr)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: radarr
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
-    # Sonarr API polling (media)
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: media
-            k8s:app.kubernetes.io/name: sonarr
+            k8s:app.kubernetes.io/part-of: servarr
       toPorts:
         - ports:
             - port: "80"
