@@ -38,8 +38,10 @@ spec:
               TAR1090_USEROUTEAPI: "true"
               GRAPHS1090_DARKMODE: "true"
               GRAPHS1090_HIDE_SYSTEM: "yes"
+              HEYWHATSTHAT_ALTS: "3000,10000,30000,40000"
               READSB_MAX_RANGE: "450"
               MAX_GLOBE_HISTORY: "30"
+              TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
