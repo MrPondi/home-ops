@@ -55,3 +55,13 @@ spec:
             - 169.254.0.0/16
             - 172.16.0.0/12
             - 192.168.0.0/16
+    # OIDC via auth.pondi.dev through envoy-internal
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10443"
+              protocol: TCP
