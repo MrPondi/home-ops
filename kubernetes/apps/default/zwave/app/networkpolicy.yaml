@@ -36,10 +36,3 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-    # Z-Wave JS firmware updates
-    - toFQDNs:
-        - matchName: firmware.zwave-js.io
-      toPorts:
-        - ports:
-            - port: "443"
-              protocol: TCP
