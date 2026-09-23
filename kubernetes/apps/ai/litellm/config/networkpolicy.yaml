@@ -27,7 +27,7 @@ spec:
         - ports:
             - port: "6379"
               protocol: TCP
-    # Authentik server (security) — SSO token/userinfo exchange.
+    # authentik OIDC token/userinfo (security)
     - toEndpoints:
         - matchLabels:
             k8s:app.kubernetes.io/component: server

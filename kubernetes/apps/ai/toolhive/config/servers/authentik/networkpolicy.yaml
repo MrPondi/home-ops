@@ -11,7 +11,7 @@ spec:
       toolhive-name: *name
       app: *name
   egress:
-    # Authentik server pods (security)
+    # authentik OIDC token/userinfo (security)
     - toEndpoints:
         - matchLabels:
             k8s:app.kubernetes.io/component: server
