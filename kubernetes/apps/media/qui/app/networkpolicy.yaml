@@ -46,3 +46,11 @@ spec:
         - ports:
             - port: "10443"
               protocol: TCP
+    # License verification via live.dodopayments.com
+    - toFQDNs:
+        - matchName: live.dodopayments.com
+        - matchName: live.dodopayments.com.media.svc.cluster.local
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
