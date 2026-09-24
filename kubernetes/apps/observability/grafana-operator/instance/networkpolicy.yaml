@@ -88,3 +88,11 @@ spec:
         - ports:
             - port: "9000"
               protocol: TCP
+    # Internet (widgets, APIs)
+    - toFQDNs:
+        - matchName: secure.gravatar.com
+        - matchName: secure.gravatar.com.observability.svc.cluster.local
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
