@@ -1,0 +1,138 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: netronome
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: netronome
+  interval: 1h
+  values:
+    controllers:
+      netronome:
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        replicas: 1
+        initContainers:
+          geoipupdate:
+            image:
+              repository: maxmindinc/geoipupdate
+              tag: v8.0.0@sha256:1e05ff9d6927f909253f3926c1a7cfd541dc75d7eec8ca3134e02c46def43721
+            env:
+              GEOIPUPDATE_DB_DIR: /geoip
+              GEOIPUPDATE_EDITION_IDS: GeoLite2-Country GeoLite2-ASN
+            envFrom:
+              - secretRef:
+                  name: netronome-maxmind-secret
+        containers:
+          app:
+            image:
+              repository: ghcr.io/autobrr/netronome
+              tag: v0.14.1@sha256:3d7cccb5221447864a68556d7bd7c73a3ba736f1ef5157cc0904011445593aca
+            env:
+              TZ: Europe/Warsaw
+              NETRONOME__CHECK_FOR_UPDATES: false
+              NETRONOME__MONITOR_ENABLED: false
+              NETRONOME__HOST: "0.0.0.0"
+              NETRONOME__PORT: &port 7575
+              NETRONOME__DB_TYPE: postgres
+              NETRONOME__DB_HOST:
+                valueFrom:
+                  secretKeyRef:
+                    name: netronome-app
+                    key: host
+              NETRONOME__DB_PORT:
+                valueFrom:
+                  secretKeyRef:
+                    name: netronome-app
+                    key: port
+              NETRONOME__DB_NAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: netronome-app
+                    key: dbname
+              NETRONOME__DB_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: netronome-app
+                    key: username
+              NETRONOME__DB_SSLMODE: require
+              NETRONOME__DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: netronome-app
+                    key: password
+              NETRONOME__GEOIP_COUNTRY_DATABASE_PATH: /geoip/GeoLite2-Country.mmdb
+              NETRONOME__GEOIP_ASN_DATABASE_PATH: /geoip/GeoLite2-ASN.mmdb
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                spec:
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+            resources:
+              requests:
+                cpu: 10m
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+    defaultPodOptions:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [{
+            "name": "vpn",
+            "namespace": "kube-system",
+            "ips": ["10.0.40.14/24"],
+            "mac": "32:5a:7c:9e:12:f4"
+          }]
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        annotations:
+          gethomepage.dev/enabled: "true"
+          gethomepage.dev/name: Netronome
+          gethomepage.dev/group: "Monitoring & Operations"
+          gethomepage.dev/icon: netronome.png
+          gethomepage.dev/description: "Network performance monitoring"
+        hostnames:
+          - speedtest.pondi.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+    persistence:
+      data:
+        enabled: true
+        storageClass: longhorn
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        globalMounts:
+          - path: /data
+      geoip:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /geoip

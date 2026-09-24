@@ -1,0 +1,60 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: netronome
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: netronome
+  ingress:
+    # speedtest.pondi.dev via envoy-internal
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "7575"
+              protocol: TCP
+  egress:
+    # OIDC via auth.pondi.dev through envoy-internal
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "10443"
+              protocol: TCP
+    # postgres cluster (same namespace)
+    - toEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: netronome
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # speed tests / notifications (internet)
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+    # ICMP packet-loss monitoring
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      icmps:
+        - fields:
+            - type: 8
+              family: IPv4
