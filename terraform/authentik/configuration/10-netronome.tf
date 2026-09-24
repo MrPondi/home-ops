@@ -41,7 +41,7 @@ resource "authentik_application" "netronome" {
   name              = "Netronome"
   slug              = "netronome"
   protocol_provider = authentik_provider_oauth2.netronome.id
-  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/netronome.svg"
+  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/netronome.png"
   meta_launch_url   = "https://speedtest.pondi.dev"
   open_in_new_tab   = true
 }
