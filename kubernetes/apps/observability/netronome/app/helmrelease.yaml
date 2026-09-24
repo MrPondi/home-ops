@@ -12,8 +12,28 @@ spec:
   values:
     controllers:
       netronome:
+        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
+        replicas: 1
+        initContainers:
+          geoipupdate:
+            image:
+              repository: maxmindinc/geoipupdate
+              tag: v8.0.0@sha256:1e05ff9d6927f909253f3926c1a7cfd541dc75d7eec8ca3134e02c46def43721
+            env:
+              GEOIPUPDATE_ACCOUNT_ID:
+                valueFrom:
+                  secretKeyRef:
+                    name: netronome-secret
+                    key: GEOIP_ACCOUNT_ID
+              GEOIPUPDATE_LICENSE_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: netronome-secret
+                    key: GEOIP_LICENSE_KEY
+              GEOIPUPDATE_EDITION_IDS: GeoLite2-Country GeoLite2-ASN
+              GEOIPUPDATE_DB_DIR: /geoip
         containers:
           app:
             image:
@@ -24,6 +44,19 @@ spec:
               NETRONOME__CHECK_FOR_UPDATES: false
               NETRONOME__HOST: "0.0.0.0"
               NETRONOME__PORT: &port 7575
+              NETRONOME__DB_TYPE: postgres
+              NETRONOME__DB_HOST: netronome-rw.observability.svc.cluster.local
+              NETRONOME__DB_PORT: 5432
+              NETRONOME__DB_NAME: netronome
+              NETRONOME__DB_USER: netronome
+              NETRONOME__DB_SSLMODE: require
+              NETRONOME__DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: netronome-app
+                    key: password
+              NETRONOME__GEOIP_COUNTRY_DATABASE_PATH: /geoip/GeoLite2-Country.mmdb
+              NETRONOME__GEOIP_ASN_DATABASE_PATH: /geoip/GeoLite2-ASN.mmdb
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -56,6 +89,14 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
     defaultPodOptions:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [{
+            "name": "vpn",
+            "namespace": "kube-system",
+            "ips": ["10.0.40.14/24"],
+            "mac": "32:5a:7c:9e:12:f4"
+          }]
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -88,3 +129,8 @@ spec:
         size: 5Gi
         globalMounts:
           - path: /data
+      geoip:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /geoip

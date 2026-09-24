@@ -30,6 +30,14 @@ spec:
         - ports:
             - port: "10443"
               protocol: TCP
+    # postgres cluster (same namespace)
+    - toEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: netronome
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
     # speed tests / notifications (internet)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
