@@ -46,3 +46,15 @@ spec:
             - 169.254.0.0/16
             - 172.16.0.0/12
             - 192.168.0.0/16
+    # ICMP packet-loss monitoring
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 169.254.0.0/16
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      icmps:
+        - fields:
+            - type: 8
+              family: IPv4
