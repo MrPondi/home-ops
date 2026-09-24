@@ -9,6 +9,7 @@ replacements:
 
 components:
   - ../../components/alerts
+  - ../../components/generators
 resources:
   - ./namespace.yaml
   - ./blackbox-exporter/ks.yaml
