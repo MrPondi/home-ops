@@ -19,6 +19,16 @@ spec:
         - ports:
             - port: "7575"
               protocol: TCP
+    # MTR/traceroute replies (TTL exceeded / unreachable) from intermediate hops
+    - fromCIDR:
+        - 0.0.0.0/0
+      icmps:
+        - fields:
+            - type: 11
+              family: IPv4
+        - fields:
+            - type: 3
+              family: IPv4
   egress:
     # OIDC via auth.pondi.dev through envoy-internal
     - toEndpoints:
