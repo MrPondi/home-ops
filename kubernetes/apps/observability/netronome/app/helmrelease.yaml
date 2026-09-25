@@ -155,3 +155,8 @@ spec:
         size: 1Gi
         globalMounts:
           - path: /geoip
+      tmp:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
