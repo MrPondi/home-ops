@@ -16,6 +16,15 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         replicas: 1
+        pod:
+          annotations:
+            k8s.v1.cni.cncf.io/networks: |-
+              [{
+                "name": "vpn",
+                "namespace": "kube-system",
+                "ips": ["10.0.40.14/24"],
+                "mac": "32:5a:7c:9e:12:f4"
+              }]
         containers:
           app:
             image:
@@ -106,14 +115,6 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
     defaultPodOptions:
-      annotations:
-        k8s.v1.cni.cncf.io/networks: |-
-          [{
-            "name": "vpn",
-            "namespace": "kube-system",
-            "ips": ["10.0.40.14/24"],
-            "mac": "32:5a:7c:9e:12:f4"
-          }]
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
