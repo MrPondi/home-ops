@@ -19,7 +19,7 @@ spec:
             image: &netronome-image
               repository: ghcr.io/autobrr/netronome
               tag: v0.14.1@sha256:3d7cccb5221447864a68556d7bd7c73a3ba736f1ef5157cc0904011445593aca
-            args: ["agent"]
+            args: ["agent", "--disable-system-metrics"]
             env:
               NETRONOME__AGENT_HOST: "0.0.0.0"
               NETRONOME__AGENT_PORT: &port 8200
@@ -58,11 +58,8 @@ spec:
               capabilities: { drop: ["ALL"] }
           vnstatd:
             image: *netronome-image
-            command: ["sh", "-c"]
-            args:
-              [
-                "vnstatd --initdb --noadd; vnstat --json -i net1 >/dev/null 2>&1 || vnstat --add -i net1; exec vnstatd -n --noadd --noremove",
-              ]
+            command: ["/usr/sbin/vnstatd"]
+            args: ["-n", "--alwaysadd", "--noremove"]
             env:
               TZ: Europe/Warsaw
             resources:
