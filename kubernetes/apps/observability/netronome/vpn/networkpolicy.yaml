@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: netronome-vpn
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: netronome-vpn
+  ingress:
+    # netronome server pods (observability)
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: netronome
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP
