@@ -38,6 +38,14 @@ spec:
         - ports:
             - port: "5432"
               protocol: TCP
+    # netronome-vpn agent (same namespace)
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: netronome-vpn
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP
     # speed tests / notifications (internet)
     - toCIDRSet:
         - cidr: 0.0.0.0/0
