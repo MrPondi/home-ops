@@ -12,10 +12,8 @@ spec:
   values:
     controllers:
       netronome-vpn:
-        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
-        replicas: 1
         containers:
           app:
             image:
@@ -23,10 +21,10 @@ spec:
               tag: v0.14.1@sha256:3d7cccb5221447864a68556d7bd7c73a3ba736f1ef5157cc0904011445593aca
             args: ["agent"]
             env:
-              TZ: Europe/Warsaw
               NETRONOME__AGENT_HOST: "0.0.0.0"
               NETRONOME__AGENT_PORT: &port 8200
               NETRONOME__AGENT_INTERFACE: ""
+              TZ: Europe/Warsaw
             envFrom:
               - secretRef:
                   name: netronome-vpn-secret
@@ -56,7 +54,7 @@ spec:
                 cpu: 10m
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false # vnstat must write its DB
+              readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
     defaultPodOptions:
       annotations:
@@ -85,4 +83,9 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-    # no persistence — vnstat DB ephemeral
+    persistence:
+      tmp:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
