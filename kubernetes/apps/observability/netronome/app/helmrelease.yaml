@@ -76,7 +76,12 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities:
+                drop:
+                  - ALL
+                # privileged ICMP (ping + mtr) needs raw sockets; fixes "listen ip4:icmp: socket: operation not permitted" and "MTR privileged mode failed"
+                add:
+                  - NET_RAW
       geoipupdate:
         type: cronjob
         cronjob:
