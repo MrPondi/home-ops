@@ -14,6 +14,21 @@ spec:
       netronome-vpn:
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          # Creates /var/lib/vnstat/vnstat.db on first start (idempotent no-op after).
+          vnstatd-init:
+            image:
+              repository: ghcr.io/autobrr/netronome
+              tag: v0.14.1@sha256:3d7cccb5221447864a68556d7bd7c73a3ba736f1ef5157cc0904011445593aca
+            command: ["/usr/sbin/vnstatd"]
+            args: ["--initdb"]
+            resources:
+              requests:
+                cpu: 10m
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
         containers:
           app:
             image:
@@ -23,7 +38,7 @@ spec:
             env:
               NETRONOME__AGENT_HOST: "0.0.0.0"
               NETRONOME__AGENT_PORT: &port 8200
-              NETRONOME__AGENT_INTERFACE: ""
+              NETRONOME__AGENT_INTERFACE: "net1"
               TZ: Europe/Warsaw
             envFrom:
               - secretRef:
@@ -54,7 +69,24 @@ spec:
                 cpu: 10m
             securityContext:
               allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+              readOnlyRootFilesystem: false
+              capabilities: { drop: ["ALL"] }
+          # Serves /var/lib/vnstat/vnstat.db: polls net1 counters, auto-adds
+          # interfaces as they appear, never drops them (history survives restarts).
+          vnstatd:
+            image:
+              repository: ghcr.io/autobrr/netronome
+              tag: v0.14.1@sha256:3d7cccb5221447864a68556d7bd7c73a3ba736f1ef5157cc0904011445593aca
+            command: ["/usr/sbin/vnstatd"]
+            args: ["-n", "--alwaysadd", "--noremove"]
+            env:
+              TZ: Europe/Warsaw
+            resources:
+              requests:
+                cpu: 10m
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
               capabilities: { drop: ["ALL"] }
     defaultPodOptions:
       annotations:
@@ -76,16 +108,10 @@ spec:
         ports:
           http:
             port: *port
-    route:
-      app:
-        hostnames:
-          - netronome-vpn.pondi.dev
-        parentRefs:
-          - name: envoy-internal
-            namespace: network
     persistence:
-      tmp:
-        enabled: true
-        type: emptyDir
+      vnstat:
+        storageClass: longhorn
+        accessMode: ReadWriteOnce
+        size: 1Gi
         globalMounts:
-          - path: /tmp
+          - path: /var/lib/vnstat
