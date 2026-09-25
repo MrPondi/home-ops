@@ -78,4 +78,11 @@ spec:
         ports:
           http:
             port: *port
+    route:
+      app:
+        hostnames:
+          - netronome-vpn.pondi.dev
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
     # no persistence — vnstat DB ephemeral

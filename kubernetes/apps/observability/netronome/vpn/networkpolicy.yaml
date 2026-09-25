@@ -9,6 +9,16 @@ spec:
     matchLabels:
       app.kubernetes.io/name: netronome-vpn
   ingress:
+    # netronome-vpn.pondi.dev via envoy-internal
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            k8s:app.kubernetes.io/name: envoy
+            k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP
     # netronome server pods (observability)
     - fromEndpoints:
         - matchLabels:
