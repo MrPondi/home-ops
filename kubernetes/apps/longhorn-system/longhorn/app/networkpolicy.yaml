@@ -27,3 +27,7 @@ spec:
         - ports:
             - port: "9500"
               protocol: TCP
+    # Instance-manager control traffic — same-namespace manager-spawned pods; ports dynamic (37516/38258 observed), selector is the boundary
+    - fromEndpoints:
+        - matchLabels:
+            longhorn.io/component: instance-manager
