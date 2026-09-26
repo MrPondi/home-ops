@@ -5,7 +5,7 @@ kind: MCPServer
 metadata:
   name: seerr
 spec:
-  image: ghcr.io/jhomen368/overseerr-mcp:2.3.0@sha256:53dc6c79701b91801309cbfe9108fcb8d7e7bd06f97e937d88c5eb50ab81c8cb
+  image: ghcr.io/jhomen368/overseerr-mcp:2.3.1@sha256:54c84625f2040654799ef55fc9864dd8b0d7c725b4e7eb2ea9e2ce8d71f8df1e
   transport: streamable-http
   mcpPort: 8085
   env:
