@@ -50,7 +50,7 @@ spec:
   resources:
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: ${POSTGRES_MEMORY:=256}Mi
     limits:
       memory: 1Gi
   storage:
