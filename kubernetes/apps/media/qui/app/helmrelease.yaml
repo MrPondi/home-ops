@@ -90,10 +90,9 @@ spec:
           gethomepage.dev/icon: qui.svg
           gethomepage.dev/description: qBittorrent web interface
           gethomepage.dev/weight: "30"
-          gethomepage.dev/widget.type: qbittorrent
-          gethomepage.dev/widget.url: http://qbittorrent.{{ .Release.Namespace }}.svc.cluster.local
-          gethomepage.dev/widget.username: ""
-          gethomepage.dev/widget.password: ""
+          gethomepage.dev/widget.type: qui
+          gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local
+          gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_QUI_TOKEN}}`}}"
         hostnames:
           - "{{ .Release.Name }}.pondi.dev"
         parentRefs:
