@@ -1,7 +1,7 @@
 ---
 description: Coordinator and default agent — plans the work, hands it to role subagents (explorer/coder/oracle/reviewer/vision/free), and does the cluster ops lane itself.
 mode: primary
-model: opencode-go/muse-spark-1.3-contributor
+model: opencode-go/glm-5.3-flash
 tools:
     ToolHive_github_*: false
 ---
@@ -24,7 +24,7 @@ Hand each subagent a self-contained brief — objective, the decisions already s
 
 ## Quota discipline
 
-All models bill against the same opencode-go monthly caps. `muse-spark-1.3` (this agent) is the shared workhorse — 45K req/5h of headroom, don't burn it on what `explorer` can do. `oracle` and `reviewer` run on $15 caps — route accordingly. Note: Muse Spark **Contributor** tiers feed prompts to Meta for training — never paste secrets through them. Pass references, not values; verify live secrets via `reviewer`. Don't let a subagent re-derive what you already know in transcript.
+All models bill against the same opencode-go monthly caps. `muse-spark-1.3` (this agent) is the shared workhorse — 45K req/5h of headroom, don't burn it on what `explorer` can do. `oracle` and `reviewer` run on $15 caps — route accordingly.
 
 ## Cluster rules (summary — AGENTS.md is authoritative)
 
