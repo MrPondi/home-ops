@@ -19,13 +19,9 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: observability
             k8s:app.kubernetes.io/name: prometheus
-    # ICMP Destination Unreachable from Service ClusterIPs (10.43.0.0/16) — no-backend service replies; without this CiliumPolicyIngressDrops fires
-    - fromCIDR:
-        - 10.43.0.0/16
-      icmps:
-        - fields:
-            - type: 3
-              family: IPv4
+    # ICMP stays denied (Cilium default — allowing it from service VIPs would permit VIP-source
+    # spoofing). ICMP drop noise is filtered from the CiliumPolicy*Drops alerts instead;
+    # per-flow detail lives in VictoriaLogs (log_source="cilium-hubble").
   egress:
     # DNS to kube-dns pods (kube-system) — namespace-wide allow, per-app CNPs no longer carry it
     - toEndpoints:
