@@ -15,7 +15,6 @@ spec:
         repository: ghcr.io/dragonflydb/operator
     grafanaDashboard:
       enabled: true
-      folder: Dragonfly
       grafanaOperator:
         enabled: true
         matchLabels:
