@@ -18,6 +18,7 @@ spec:
   postBuild:
     substitute:
       APP: authentik
+      POSTGRES_MEMORY: "512"
   prune: true
   sourceRef:
     kind: GitRepository
