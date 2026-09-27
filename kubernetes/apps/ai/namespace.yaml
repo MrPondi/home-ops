@@ -21,9 +21,6 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: observability
             k8s:app.kubernetes.io/name: prometheus
-    # ICMP stays denied (Cilium default — allowing it from service VIPs would permit VIP-source
-    # spoofing). ICMP drop noise is filtered from the CiliumPolicy*Drops alerts instead;
-    # per-flow detail lives in VictoriaLogs (log_source="cilium-hubble").
   egress:
     # DNS to kube-dns pods (kube-system) — namespace-wide allow, per-app CNPs no longer carry it
     - toEndpoints:
