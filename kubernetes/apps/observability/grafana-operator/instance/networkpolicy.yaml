@@ -53,6 +53,15 @@ spec:
         - ports:
             - port: "3000"
               protocol: TCP
+    # toolhive grafana MCP server (ai) — GRAFANA_URL grafana-service:3000
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            k8s:toolhive-name: grafana
+      toPorts:
+        - ports:
+            - port: "3000"
+              protocol: TCP
   egress:
     # prometheus datasource
     - toEndpoints:
