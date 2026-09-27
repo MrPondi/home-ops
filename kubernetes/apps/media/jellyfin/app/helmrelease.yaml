@@ -80,6 +80,7 @@ spec:
           gethomepage.dev/description: Media streaming server
           gethomepage.dev/weight: "0"
           gethomepage.dev/widget.type: jellyfin
+          gethomepage.dev/widget.version: "2"
           gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:8096
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_JELLYFIN_TOKEN}}`}}"
           gethomepage.dev/widget.fields: '["movies", "series", "episodes"]'
