@@ -44,20 +44,13 @@ spec:
         - ports:
             - port: "3000"
               protocol: TCP
-    # toolhive MCP gateway (ai)
+    # toolhive grafana MCP server (ai)
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: ai
-            k8s:app.kubernetes.io/name: virtualmcpserver
-      toPorts:
-        - ports:
-            - port: "3000"
-              protocol: TCP
-    # toolhive grafana MCP server (ai) — GRAFANA_URL grafana-service:3000
-    - fromEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: ai
+            k8s:toolhive: "true"
             k8s:toolhive-name: grafana
+            k8s:app: grafana
       toPorts:
         - ports:
             - port: "3000"

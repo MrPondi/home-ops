@@ -21,13 +21,6 @@ spec:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: observability
             k8s:app.kubernetes.io/name: prometheus
-    # ICMP Destination Unreachable from Service ClusterIPs (10.43.0.0/16) — no-backend service replies; without this CiliumPolicyIngressDrops fires
-    - fromCIDR:
-        - 10.43.0.0/16
-      icmps:
-        - fields:
-            - type: 3
-              family: IPv4
   egress:
     # DNS to kube-dns pods (kube-system) — namespace-wide allow, per-app CNPs no longer carry it
     - toEndpoints:

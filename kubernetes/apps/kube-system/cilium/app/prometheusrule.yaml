@@ -9,8 +9,10 @@ spec:
     - name: cilium.rules
       rules:
         - alert: CiliumPolicyEgressDrops
+          # ICMP denied-drops excluded: Cilium denies ICMP by default (VIP-spoof protection);
+          # per-flow ICMP detail lives in VictoriaLogs (log_source="cilium-hubble").
           expr: |-
-            sum by (source_namespace) (increase(hubble_drop_total{reason="POLICY_DENIED", source_namespace!=""}[10m])) > 0
+            sum by (source_namespace) (increase(hubble_drop_total{reason="POLICY_DENIED", source_namespace!="", protocol!~"ICMPv4|ICMPv6"}[10m])) > 0
           for: 5m
           annotations:
             summary: >-
@@ -19,8 +21,10 @@ spec:
             severity: critical
 
         - alert: CiliumPolicyIngressDrops
+          # ICMP denied-drops excluded: Cilium denies ICMP by default (VIP-spoof protection);
+          # per-flow ICMP detail lives in VictoriaLogs (log_source="cilium-hubble").
           expr: |-
-            sum by (destination_namespace) (increase(hubble_drop_total{reason="POLICY_DENIED", destination_namespace!="", source_namespace=""}[10m])) > 0
+            sum by (destination_namespace) (increase(hubble_drop_total{reason="POLICY_DENIED", destination_namespace!="", source_namespace="", protocol!~"ICMPv4|ICMPv6"}[10m])) > 0
           for: 5m
           annotations:
             summary: >-

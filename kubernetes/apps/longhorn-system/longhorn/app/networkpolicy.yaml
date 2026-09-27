@@ -22,7 +22,9 @@ spec:
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: ai
+            k8s:toolhive: "true"
             k8s:toolhive-name: longhorn
+            k8s:app: longhorn
       toPorts:
         - ports:
             - port: "9500"
