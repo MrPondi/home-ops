@@ -33,9 +33,13 @@ metadata:
 spec:
   endpointSelector: {} # all pods in namespace — namespace-wide scope is deliberate (upgrade Job labels are runtime-generated); narrow to live Job labels after observing a real upgrade via hubble
   egress:
-    # Talos API on node management network (10.0.30.0/24:50000)
-    - toCIDR:
-        - 10.0.30.0/24
+    # Talos API on node management network (:50000). Entity-based, not CIDR:
+    # pod -> local-node-IP traffic carries the `host` identity, which toCIDR
+    # rules never match (live-verified: SYN to 10.0.30.21:50000 denied as
+    # `identity <id>->host`). remote-node covers future multi-node planes.
+    - toEntities:
+        - host
+        - remote-node
       toPorts:
         - ports:
             - port: "50000"
