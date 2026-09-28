@@ -32,6 +32,16 @@ spec:
             - profile
             - email
             - offline_access
+    storage:
+      # Persist DCR clients + refresh grants so gateway pod restarts/bumps
+      # don't force MCP clients to re-authenticate (default is in-memory).
+      type: redis
+      redis:
+        addr: toolhive-dragonfly.ai.svc.cluster.local:6379
+        aclUserConfig:
+          passwordSecretRef:
+            name: ${APP}-dragonfly-secret
+            key: password
   config:
     aggregation:
       conflictResolution: prefix
