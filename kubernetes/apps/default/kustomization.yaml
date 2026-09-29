@@ -15,7 +15,7 @@ components:
 resources:
   - ./namespace.yaml
   - ./chaski/ks.yaml
-  # - ./college-timetable/ks.yaml
+  - ./college-timetable/ks.yaml
   # - ./fixly-bot/ks.yaml
   # - ./home-assistant/ks.yaml
   - ./homepage/ks.yaml
