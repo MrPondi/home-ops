@@ -25,11 +25,11 @@ spec:
             - port: "8081"
               protocol: TCP
   egress:
-    # Talos API on node management network (:50000)
-    - toEntities:
-        - host
-        - remote-node
+    # Talos image factory (installer image availability + schematic lookup);
+    # FQDN resolution rides the default-deny proxied DNS for this namespace
+    - toFQDNs:
+        - matchName: factory.talos.dev
       toPorts:
         - ports:
-            - port: "50000"
+            - port: "443"
               protocol: TCP
