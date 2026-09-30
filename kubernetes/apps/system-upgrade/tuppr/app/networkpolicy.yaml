@@ -34,9 +34,12 @@ spec:
             - port: "50000"
               protocol: TCP
     # Talos image factory (installer image availability + schematic lookup);
-    # FQDN resolution rides the default-deny proxied DNS for this namespace
+    # the expanded name matches the pod's ndots search-path resolution
+    # (convention: cf. grafana-operator, qui); resolution rides the
+    # default-deny proxied DNS for this namespace
     - toFQDNs:
         - matchName: factory.talos.dev
+        - matchName: factory.talos.dev.system-upgrade.svc.cluster.local
       toPorts:
         - ports:
             - port: "443"
