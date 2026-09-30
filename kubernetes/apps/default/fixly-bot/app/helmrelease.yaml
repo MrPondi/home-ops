@@ -53,7 +53,7 @@ spec:
             args:
               - |
                 cd /workspace
-                uv sync --locked --no-dev --compile-bytecode
+                uv sync --locked --no-dev
                 exec uv run --locked --no-dev fixlybot
             securityContext:
               allowPrivilegeEscalation: false
