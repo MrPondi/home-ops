@@ -42,8 +42,8 @@ spec:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
-              UV_CACHE_DIR: /uv-cache
-              UV_PROJECT_ENVIRONMENT: /venv
+              UV_CACHE_DIR: /uv-data/cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/venv
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -96,20 +96,15 @@ spec:
           subjects:
             - identifier: fixly-bot
     persistence:
-      uv-cache:
+      # longhorn pre-formats fresh PVs with lost+found/ - env + cache live in
+      # subdirectories so uv never validates the mount root as an environment
+      uv-data:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         storageClass: longhorn
-        size: 1Gi
+        size: 2Gi
         globalMounts:
-          - path: /uv-cache
-      venv:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        storageClass: longhorn
-        size: 1Gi
-        globalMounts:
-          - path: /venv
+          - path: /uv-data
       workspace:
         type: emptyDir
         globalMounts:

@@ -47,8 +47,8 @@ spec:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
-              UV_CACHE_DIR: /uv-cache
-              UV_PROJECT_ENVIRONMENT: /venv
+              UV_CACHE_DIR: /uv-data/cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/venv
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -107,8 +107,8 @@ spec:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
-              UV_CACHE_DIR: /uv-cache
-              UV_PROJECT_ENVIRONMENT: /venv
+              UV_CACHE_DIR: /uv-data/cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/venv
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
@@ -143,42 +143,26 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /data
-      uv-cache-timetable-sync:
+      # longhorn pre-formats fresh PVs with lost+found/ - env + cache live in
+      # subdirectories so uv never validates the mount root as an environment
+      uv-data-timetable-sync:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         storageClass: longhorn
-        size: 1Gi
+        size: 2Gi
         advancedMounts:
           timetable-sync:
             app:
-              - path: /uv-cache
-      uv-cache-update-lecturers:
+              - path: /uv-data
+      uv-data-update-lecturers:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         storageClass: longhorn
-        size: 1Gi
+        size: 2Gi
         advancedMounts:
           update-lecturers:
             app:
-              - path: /uv-cache
-      venv-timetable-sync:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        storageClass: longhorn
-        size: 1Gi
-        advancedMounts:
-          timetable-sync:
-            app:
-              - path: /venv
-      venv-update-lecturers:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        storageClass: longhorn
-        size: 1Gi
-        advancedMounts:
-          update-lecturers:
-            app:
-              - path: /venv
+              - path: /uv-data
       workspace:
         type: emptyDir
         globalMounts:
