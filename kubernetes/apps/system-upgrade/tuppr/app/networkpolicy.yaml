@@ -3,12 +3,12 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: tuppr
+  name: &name tuppr
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/name: tuppr
-      app.kubernetes.io/instance: tuppr
+      app.kubernetes.io/name: *name
+      app.kubernetes.io/instance: *name
   ingress:
     # Admission webhook from kube-apiserver (host-networked)
     - fromEntities:
@@ -25,7 +25,8 @@ spec:
             - port: "8081"
               protocol: TCP
   egress:
-    # Talos API on node management network (:50000)
+    # Talos API on node management network (:50000) — node version checks,
+    # installer image pre-pull and machine config install image sync
     - toEntities:
         - host
         - remote-node
@@ -43,4 +44,27 @@ spec:
       toPorts:
         - ports:
             - port: "443"
+              protocol: TCP
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tuppr-pods
+spec:
+  # Selects tuppr's ephemeral upgrade Job pods (talosctl driving the node
+  # upgrade). They carry app.kubernetes.io/part-of: tuppr and
+  # app.kubernetes.io/instance: <TalosUpgrade name>, so they never match the
+  # controller selector above.
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: tuppr
+  egress:
+    # Talos API on node management network (:50000) — talosctl upgrade
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "50000"
               protocol: TCP
