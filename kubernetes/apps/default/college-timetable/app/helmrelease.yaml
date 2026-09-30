@@ -38,6 +38,29 @@ spec:
                 chmod 600 ~/.netrc
                 git clone https://github.com/MrPondi/CollegeTimetable.git /workspace
                 rm -f ~/.netrc
+          uv-sync:
+            image:
+              repository: ghcr.io/astral-sh/uv
+              tag: python3.14-trixie@sha256:58dd3a4ffd84673134e0e4ec3006477218f7a62eb15d4f94ea1f134a6011974d
+            env:
+              HOME: /tmp
+              UV_CACHE_DIR: /uv-cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/populate/venv
+            command:
+              - uv
+            args:
+              - sync
+              - "--directory"
+              - /workspace
+              - "--locked"
+              - "--no-dev"
+              - "--compile-bytecode"
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                # bytecode compilation spikes memory during install+compile
+                memory: 512Mi
         containers:
           app:
             image:
@@ -47,19 +70,19 @@ spec:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
-              UV_CACHE_DIR: /uv-data/cache
-              UV_PROJECT_ENVIRONMENT: /uv-data/venv
+              UV_CACHE_DIR: /uv-cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/populate/venv
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - sh
-              - "-ec"
+              - uv
             args:
-              - |
-                cd /workspace
-                uv sync --locked --no-dev
-                exec uv run --locked --no-dev populate-lecturers
+              - run
+              - "--no-sync"
+              - "--directory"
+              - /workspace
+              - populate-lecturers
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -98,6 +121,29 @@ spec:
                 chmod 600 ~/.netrc
                 git clone https://github.com/MrPondi/CollegeTimetable.git /workspace
                 rm -f ~/.netrc
+          uv-sync:
+            image:
+              repository: ghcr.io/astral-sh/uv
+              tag: python3.14-trixie@sha256:58dd3a4ffd84673134e0e4ec3006477218f7a62eb15d4f94ea1f134a6011974d
+            env:
+              HOME: /tmp
+              UV_CACHE_DIR: /uv-cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/sync/venv
+            command:
+              - uv
+            args:
+              - sync
+              - "--directory"
+              - /workspace
+              - "--locked"
+              - "--no-dev"
+              - "--compile-bytecode"
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                # bytecode compilation spikes memory during install+compile
+                memory: 512Mi
         containers:
           app:
             image:
@@ -107,19 +153,19 @@ spec:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
-              UV_CACHE_DIR: /uv-data/cache
-              UV_PROJECT_ENVIRONMENT: /uv-data/venv
+              UV_CACHE_DIR: /uv-cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/sync/venv
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - sh
-              - "-ec"
+              - uv
             args:
-              - |
-                cd /workspace
-                uv sync --locked --no-dev
-                exec uv run --locked --no-dev college
+              - run
+              - "--no-sync"
+              - "--directory"
+              - /workspace
+              - college
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -143,8 +189,14 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /data
-      # longhorn pre-formats fresh PVs with lost+found/ - env + cache live in
-      # subdirectories so uv never validates the mount root as an environment
+      # longhorn pre-formats fresh PVs with lost+found/ - venv lives in a
+      # subdirectory so uv never validates the mount root as an environment.
+      # Separate claims per controller (RWO; longhorn has no RWX) so the
+      # overlapping Mon 00:00 schedules never race a shared volume
+      uv-cache:
+        type: emptyDir
+        globalMounts:
+          - path: /uv-cache
       uv-data-timetable-sync:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
@@ -154,6 +206,8 @@ spec:
           timetable-sync:
             app:
               - path: /uv-data
+            uv-sync:
+              - path: /uv-data
       uv-data-update-lecturers:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
@@ -162,6 +216,8 @@ spec:
         advancedMounts:
           update-lecturers:
             app:
+              - path: /uv-data
+            uv-sync:
               - path: /uv-data
       workspace:
         type: emptyDir
