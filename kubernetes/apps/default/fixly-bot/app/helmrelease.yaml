@@ -36,23 +36,25 @@ spec:
         containers:
           app:
             image:
-              repository: python
-              tag: 3.14-slim@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d
+              repository: ghcr.io/astral-sh/uv
+              tag: python3.14-trixie@sha256:58dd3a4ffd84673134e0e4ec3006477218f7a62eb15d4f94ea1f134a6011974d
             env:
+              HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
+              UV_CACHE_DIR: /tmp/uv-cache
+              UV_PROJECT_ENVIRONMENT: /venv
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - "sh"
-              - "-c"
+              - sh
+              - "-ec"
             args:
               - |
                 cd /workspace
-                python -m venv /venv
-                /venv/bin/pip install --no-cache-dir .
-                exec /venv/bin/fixlybot
+                uv sync --locked --no-dev --compile-bytecode
+                exec uv run --locked --no-dev fixlybot
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -98,11 +100,6 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /venv
-      # pip-cache:
-      #   existingClaim: "{{ .Release.Name }}-pip-cache"
-      #   globalMounts:
-      #     - path: /root/.cache/pip
-      # TODO: figure out how to create this PVC without an additional file
       workspace:
         type: emptyDir
         globalMounts:
