@@ -47,7 +47,7 @@ spec:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
-              UV_CACHE_DIR: /tmp/uv-cache
+              UV_CACHE_DIR: /uv-cache
               UV_PROJECT_ENVIRONMENT: /venv
             envFrom:
               - secretRef:
@@ -107,7 +107,7 @@ spec:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
-              UV_CACHE_DIR: /tmp/uv-cache
+              UV_CACHE_DIR: /uv-cache
               UV_PROJECT_ENVIRONMENT: /venv
             envFrom:
               - secretRef:
@@ -143,10 +143,42 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /data
-      venv:
-        type: emptyDir
-        globalMounts:
-          - path: /venv
+      uv-cache-timetable-sync:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        storageClass: longhorn
+        size: 1Gi
+        advancedMounts:
+          timetable-sync:
+            app:
+              - path: /uv-cache
+      uv-cache-update-lecturers:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        storageClass: longhorn
+        size: 1Gi
+        advancedMounts:
+          update-lecturers:
+            app:
+              - path: /uv-cache
+      venv-timetable-sync:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        storageClass: longhorn
+        size: 1Gi
+        advancedMounts:
+          timetable-sync:
+            app:
+              - path: /venv
+      venv-update-lecturers:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        storageClass: longhorn
+        size: 1Gi
+        advancedMounts:
+          update-lecturers:
+            app:
+              - path: /venv
       workspace:
         type: emptyDir
         globalMounts:
