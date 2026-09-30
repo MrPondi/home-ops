@@ -33,6 +33,29 @@ spec:
                 chmod 600 ~/.netrc
                 git clone https://github.com/MrPondi/FixlyBot.git /workspace
                 rm -f ~/.netrc
+          uv-sync:
+            image:
+              repository: ghcr.io/astral-sh/uv
+              tag: python3.14-trixie@sha256:58dd3a4ffd84673134e0e4ec3006477218f7a62eb15d4f94ea1f134a6011974d
+            env:
+              HOME: /tmp
+              UV_CACHE_DIR: /uv-cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/bot/venv
+            command:
+              - uv
+            args:
+              - sync
+              - "--directory"
+              - /workspace
+              - "--locked"
+              - "--no-dev"
+              - "--compile-bytecode"
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                # bytecode compilation spikes memory during install+compile
+                memory: 512Mi
         containers:
           app:
             image:
@@ -42,19 +65,19 @@ spec:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
               TZ: Europe/Warsaw
-              UV_CACHE_DIR: /uv-data/cache
-              UV_PROJECT_ENVIRONMENT: /uv-data/venv
+              UV_CACHE_DIR: /uv-cache
+              UV_PROJECT_ENVIRONMENT: /uv-data/bot/venv
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
             command:
-              - sh
-              - "-ec"
+              - uv
             args:
-              - |
-                cd /workspace
-                uv sync --locked --no-dev
-                exec uv run --locked --no-dev fixlybot
+              - run
+              - "--no-sync"
+              - "--directory"
+              - /workspace
+              - fixlybot
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -96,8 +119,12 @@ spec:
           subjects:
             - identifier: fixly-bot
     persistence:
-      # longhorn pre-formats fresh PVs with lost+found/ - env + cache live in
-      # subdirectories so uv never validates the mount root as an environment
+      # longhorn pre-formats fresh PVs with lost+found/ - venv lives in a
+      # subdirectory so uv never validates the mount root as an environment
+      uv-cache:
+        type: emptyDir
+        globalMounts:
+          - path: /uv-cache
       uv-data:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
