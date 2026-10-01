@@ -119,8 +119,6 @@ spec:
           subjects:
             - identifier: fixly-bot
     persistence:
-      # longhorn pre-formats fresh PVs with lost+found/ - venv lives in a
-      # subdirectory so uv never validates the mount root as an environment
       uv-cache:
         type: emptyDir
         globalMounts:

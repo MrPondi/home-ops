@@ -74,6 +74,7 @@ spec:
         annotations:
           gatus.home-operations.com/endpoint: |-
             group: media
+            path: /api/v1/status
           gethomepage.dev/enabled: "true"
           gethomepage.dev/name: Seerr
           gethomepage.dev/group: Media & Entertainment

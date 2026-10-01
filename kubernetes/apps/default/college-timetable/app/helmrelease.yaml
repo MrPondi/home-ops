@@ -189,10 +189,6 @@ spec:
         existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /data
-      # longhorn pre-formats fresh PVs with lost+found/ - venv lives in a
-      # subdirectory so uv never validates the mount root as an environment.
-      # Separate claims per controller (RWO; longhorn has no RWX) so the
-      # overlapping Mon 00:00 schedules never race a shared volume
       uv-cache:
         type: emptyDir
         globalMounts:
@@ -215,9 +211,9 @@ spec:
         size: 2Gi
         advancedMounts:
           update-lecturers:
-            app:
-              - path: /uv-data
             uv-sync:
+              - path: /uv-data
+            app:
               - path: /uv-data
       workspace:
         type: emptyDir
