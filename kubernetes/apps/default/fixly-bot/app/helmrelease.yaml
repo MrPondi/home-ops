@@ -36,7 +36,7 @@ spec:
           uv-sync:
             image:
               repository: ghcr.io/astral-sh/uv
-              tag: python3.14-trixie@sha256:58dd3a4ffd84673134e0e4ec3006477218f7a62eb15d4f94ea1f134a6011974d
+              tag: python3.14-trixie@sha256:44ce4cc61ca44486352239768fdc57ef75484595ae9f8bacf43b9f9f1b34c2e0
             env:
               HOME: /tmp
               UV_CACHE_DIR: /uv-cache
@@ -60,7 +60,7 @@ spec:
           app:
             image:
               repository: ghcr.io/astral-sh/uv
-              tag: python3.14-trixie@sha256:58dd3a4ffd84673134e0e4ec3006477218f7a62eb15d4f94ea1f134a6011974d
+              tag: python3.14-trixie@sha256:44ce4cc61ca44486352239768fdc57ef75484595ae9f8bacf43b9f9f1b34c2e0
             env:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
