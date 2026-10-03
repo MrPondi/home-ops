@@ -9,12 +9,6 @@ spec:
     kind: OCIRepository
     name: victoria-logs
   interval: 1h
-  # server.persistentVolume.size lands in the StatefulSet's volumeClaimTemplates,
-  # which is an immutable field — a size bump fails helm's patch (UpgradeFailed ->
-  # rollback -> Stalled). upgrade.force replaces the STS on that failure instead;
-  # the existing PVC persists and re-binds, so git stays the source of truth.
-  upgrade:
-    force: true
   values:
     global:
       image:
@@ -27,9 +21,13 @@ spec:
       fullnameOverride: victoria-logs
       persistentVolume:
         enabled: true
-        storageClassName: longhorn
-        size: 100Gi
-      retentionPeriod: 90d
+        # Mount the claim that was originally provisioned by this chart's
+        # volumeClaimTemplates (server-volume-victoria-logs-0, 100Gi). VCT is an
+        # immutable StatefulSet field, so mounting the existing claim by name
+        # instead keeps the STS patchable. Growth: kubectl patch pvc (Longhorn
+        # expands online) — the claim itself is not chart-managed.
+        existingClaim: server-volume-victoria-logs-0
+      retentionPeriod: 30d
       route:
         enabled: true
         annotations:
