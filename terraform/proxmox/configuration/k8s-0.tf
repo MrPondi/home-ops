@@ -29,7 +29,7 @@ resource "proxmox_virtual_environment_vm" "k8s-0" {
   }
 
   memory {
-    dedicated = 40*1024
+    dedicated = 48*1024
     floating  = 0
   }
 
