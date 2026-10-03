@@ -22,7 +22,7 @@ spec:
       persistentVolume:
         enabled: true
         storageClassName: longhorn
-        size: 100Gi
+        size: 50Gi
       retentionPeriod: 30d
       route:
         enabled: true
