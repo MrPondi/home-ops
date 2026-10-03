@@ -21,12 +21,8 @@ spec:
       fullnameOverride: victoria-logs
       persistentVolume:
         enabled: true
-        # Mount the claim that was originally provisioned by this chart's
-        # volumeClaimTemplates (server-volume-victoria-logs-0, 100Gi). VCT is an
-        # immutable StatefulSet field, so mounting the existing claim by name
-        # instead keeps the STS patchable. Growth: kubectl patch pvc (Longhorn
-        # expands online) — the claim itself is not chart-managed.
-        existingClaim: server-volume-victoria-logs-0
+        storageClassName: longhorn
+        size: 100Gi
       retentionPeriod: 30d
       route:
         enabled: true
