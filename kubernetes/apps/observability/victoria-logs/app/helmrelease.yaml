@@ -9,6 +9,12 @@ spec:
     kind: OCIRepository
     name: victoria-logs
   interval: 1h
+  # server.persistentVolume.size lands in the StatefulSet's volumeClaimTemplates,
+  # which is an immutable field — a size bump fails helm's patch (UpgradeFailed ->
+  # rollback -> Stalled). upgrade.force replaces the STS on that failure instead;
+  # the existing PVC persists and re-binds, so git stays the source of truth.
+  upgrade:
+    force: true
   values:
     global:
       image:
