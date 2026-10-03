@@ -22,11 +22,7 @@ spec:
       persistentVolume:
         enabled: true
         storageClassName: longhorn
-        # NOTE: the live PVC server-volume-victoria-logs-0 was manually expanded to
-        # 100Gi on 2026-10-03 (Longhorn online expansion). The STS volumeClaimTemplates
-        # field is immutable — bumping size here would fail the helm upgrade, so the
-        # template stays at 50Gi and the live PVC is the source of truth.
-        size: 50Gi
+        size: 100Gi
       retentionPeriod: 90d
       route:
         enabled: true
