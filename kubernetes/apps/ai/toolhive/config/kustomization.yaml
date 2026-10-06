@@ -11,4 +11,5 @@ resources:
   - ./mcptelemetry.yaml
   - ./networkpolicy.yaml
   - ./virtualmcpserver.yaml
+  - ./embed/
   - ./servers/
