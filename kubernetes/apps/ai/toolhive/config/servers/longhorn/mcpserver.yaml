@@ -5,7 +5,7 @@ kind: MCPServer
 metadata:
   name: longhorn
 spec:
-  image: ghcr.io/rafaelgaspar/longhorn-mcp:0.1.7@sha256:8116b3fa07ae5bb9506e439a92cdb49312d1a32d761bffd53a6bd523becdc5f8
+  image: ghcr.io/rafaelgaspar/longhorn-mcp:0.1.8@sha256:4278f77a49a956df3c5d8d4f1a70b4440df40a664411168fae02745e8ed99c20
   transport: streamable-http
   mcpPort: 3000
   env: []
