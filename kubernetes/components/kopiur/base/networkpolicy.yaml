@@ -26,7 +26,6 @@ spec:
             dns:
               - matchPattern: "*"
     # S3 repository (s3.pondi.dev) — Cilium enforces egress on the DNAT-ed backend,
-    # so the rule targets the envoy-internal pods (s3.pondi.dev listener is 10080)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: network
@@ -35,15 +34,6 @@ spec:
       toPorts:
         - ports:
             - port: "10080"
-              protocol: TCP
-    # S3 repository fallback — direct VIP match (pre-NAT); toCIDR alone is NOT
-    # sufficient (verified: mover dial to 10.0.30.11:80 times out without the
-    # backend rule above)
-    - toCIDR:
-        - 10.0.30.11/32
-      toPorts:
-        - ports:
-            - port: "80"
               protocol: TCP
     # Kubernetes API (progress/status)
     - toEntities:

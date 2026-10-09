@@ -11,8 +11,7 @@ spec:
       app.kubernetes.io/instance: kopiur
       app.kubernetes.io/component: controller
   egress:
-    # S3 repository (s3.pondi.dev) — Cilium enforces egress on the DNAT-ed backend,
-    # so the rule targets the envoy-internal pods (s3.pondi.dev listener is 10080)
+    # S3 repository (s3.pondi.dev)
     - toEndpoints:
         # envoy-internal pods (network)
         - matchLabels:
@@ -23,18 +22,8 @@ spec:
         - ports:
             - port: "10080"
               protocol: TCP
-    # S3 repository fallback — direct VIP match (pre-NAT); toCIDR alone is NOT
-    # sufficient (verified: mover dial to 10.0.30.11:80 times out without the
-    # backend rule above)
-    - toCIDR:
-        - 10.0.30.11/32
-      toPorts:
-        - ports:
-            - port: "80"
-              protocol: TCP
     # kopia-server pods (kopiur-system) — controller -> kopia-server status checks
     - toEndpoints:
-        # kopia-server pods (kopiur-system)
         - matchLabels:
             app.kubernetes.io/name: kopiur-server
             app.kubernetes.io/component: kopia-server
@@ -82,8 +71,7 @@ spec:
             - port: "51515"
               protocol: TCP
   egress:
-    # S3 repository (s3.pondi.dev) — Cilium enforces egress on the DNAT-ed backend,
-    # so the rule targets the envoy-internal pods (s3.pondi.dev listener is 10080)
+    # S3 repository (s3.pondi.dev)
     - toEndpoints:
         # envoy-internal pods (network)
         - matchLabels:
@@ -93,13 +81,4 @@ spec:
       toPorts:
         - ports:
             - port: "10080"
-              protocol: TCP
-    # S3 repository fallback — direct VIP match (pre-NAT); toCIDR alone is NOT
-    # sufficient (verified: mover dial to 10.0.30.11:80 times out without the
-    # backend rule above)
-    - toCIDR:
-        - 10.0.30.11/32
-      toPorts:
-        - ports:
-            - port: "80"
               protocol: TCP
