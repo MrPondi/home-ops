@@ -25,7 +25,7 @@ home-ops/
 
 ## Environment
 
-- **mise** (`.mise/config.toml`) pins every CLI (flux, kubectl, talosctl, flate, cilium, hubble, helm, uv, …) and exports `KUBECONFIG`, `TALOSCONFIG`, `FLATE_PATH`, `MINIJINJA_CONFIG_FILE`, `SOPS_AGE_KEY_FILE` and `.secrets.env`. In a shell without mise activation, prefix commands with `mise exec --`. `.mise/config.toml` is the version source of truth — versions quoted below are major.minor only.
+- **mise** (`.mise/config.toml`) pins every CLI (flux, kubectl, talosctl, flate, cilium, hubble, helm, uv, …) and exports `KUBECONFIG`, `TALOSCONFIG`, `FLATE_PATH`, `MINIJINJA_CONFIG_FILE`, `SOPS_AGE_KEY_FILE` and `.secrets.env`. In a shell without mise activation, prefix commands with `mise exec --`. `.mise/config.toml` is the source of truth for CLI versions.
 - **Never read, print or commit** `kubeconfig`, `talosconfig`, `age.key`, `.secrets.env` or decrypted SOPS files (all gitignored).
 - Scratch files go in a per-session directory (`mktemp -d`), not fixed `/tmp/<name>` paths — parallel sessions clobber each other.
 
@@ -33,7 +33,7 @@ home-ops/
 
 Single node on a Proxmox hypervisor:
 
-- **k8s-0** (`10.0.30.21`, Talos v1.14, Kubernetes v1.37) — kube API also on VIP `k8s.internal` (`10.0.30.10:6443`)
+- **k8s-0** (`10.0.30.21`, Talos + Kubernetes, versions per "Versions" below) — kube API also on VIP `k8s.internal` (`10.0.30.10:6443`)
 - Workloads and Longhorn block storage coexist on the same node; a separate TrueNAS server handles NFS/SMB shares, media storage, and backups
 
 | Device                                                 | OS               | Purpose                     |
@@ -43,6 +43,21 @@ Single node on a Proxmox hypervisor:
 | UniFi Cloud Gateway Fiber                              | UniFi OS         | Router                      |
 | UniFi Network Video Recorder                           | UniFi OS         | NVR (1×6TB HDD)             |
 | APC BX1600MI Back-UPS                                  | -                | Backup power                |
+
+### Versions
+
+Never hardcode or quote versions from memory — read them from the Renovate-managed source:
+
+| Component                         | Source of truth                                                                                    |
+| --------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Talos                             | `kubernetes/apps/system-upgrade/tuppr/upgrades/talosupgrade.yaml` (`spec.talos.version`)           |
+| Kubernetes                        | `kubernetes/apps/system-upgrade/tuppr/upgrades/kubernetesupgrade.yaml` (`spec.kubernetes.version`) |
+| Cilium                            | `kubernetes/apps/kube-system/cilium/app/ocirepository.yaml` (`ref.tag`)                            |
+| Flux                              | `kubernetes/apps/flux-system/flux-operator/` + `flux-instance/` (`ref.tag`)                        |
+| Any other chart                   | the app's `ocirepository.yaml` (`ref.tag`)                                                         |
+| CLIs (talosctl, flux, kubectl, …) | `.mise/config.toml`                                                                                |
+
+tuppr reconciles the cluster to the `TalosUpgrade`/`KubernetesUpgrade` versions; the `talos/*.yaml.j2` templates carry the same pins for (re)bootstrap and must be kept in sync when they are bumped.
 
 CIDR map:
 
@@ -162,10 +177,10 @@ Constraints: JSON6902 appends need the labeled KS to already carry `spec.compone
 
 ### Postbuild secrets (`app-postbuild`)
 
-Values that `postBuild` substitution needs from secrets come from a Secret listed in `spec.postBuild.substituteFrom`, itself created by an `ExternalSecret`. Two patterns:
+Values that `postBuild` substitution needs from secrets come from a Secret listed in `spec.postBuild.substituteFrom`. The Secret must exist **before** the consumer Kustomization builds, so it can't live in the app's own path:
 
-- **Shared per namespace** — `kubernetes/apps/<ns>/app-postbuild/` (a Kustomization named `app-postbuild`, `wait: true`) holds one `ExternalSecret` per consumer producing `<app>-postbuild-secret` (e.g. `media/app-postbuild/secrets/servarr.yaml` → radarr/sonarr/prowlarr). Consumers add `- name: app-postbuild` first in `dependsOn` and `substituteFrom: [{kind: Secret, name: <app>-postbuild-secret}]`. Prefer this when the namespace already has `app-postbuild`.
-- **Per-app** — a dedicated KS that creates the secret (see `toolhive`).
+- **`app-postbuild` (default)** — each namespace that needs it has `kubernetes/apps/<ns>/app-postbuild/` (a Kustomization named `app-postbuild`, `wait: true`) whose `secrets/` dir holds one `ExternalSecret` per consumer producing `<app>-postbuild-secret` (`ai`: hermes, open-webui, toolhive; `media`: `servarr.yaml` → radarr/sonarr/prowlarr). A consumer adds its ExternalSecret there, lists `- name: app-postbuild` first in `dependsOn`, and sets `substituteFrom: [{kind: Secret, name: <app>-postbuild-secret}]`. A new namespace gets its own `app-postbuild` overlay entry.
+- **Bootstrap-seeded** — secrets needed before external-secrets is running come from `bootstrap/kustomize/` (e.g. `cloudflare-tunnel-id-secret` for `network/cloudflare-tunnel`).
 
 ## Adding New Apps
 
@@ -209,7 +224,7 @@ main = cluster state; merge the PR **before** deep verification, not after (step
 
 When a change needs repeated apply→observe→fix cycles (e.g. CNP selector tuning), open an experiment window instead of fighting drift:
 
-1. `flux suspend kustomization <ks> -n <ns>` — pauses drift correction + deploys for that app only. A child suspend **is sticky** on flux 2.9 (SSA-based kustomize-controller): a forced parent `cluster-apps` reconcile does not clear it.
+1. `flux suspend kustomization <ks> -n <ns>` — pauses drift correction + deploys for that app only. A child suspend **is sticky** with the SSA-based kustomize-controller: a forced parent `cluster-apps` reconcile does not clear it.
 2. Iterate: edit files → `just kube apply-ks <ns> <ks>` → verify → repeat. `apply-ks` renders locally (flate) and SSA-applies under flux's own `kustomize-controller` field manager, so it converges cleanly once flux resumes.
 3. Commit the final change → PR → merge to `main`.
 4. `flux resume kustomization <ks> -n <ns>` — un-suspends and immediately reconciles the merged state.
@@ -231,7 +246,7 @@ When a change needs repeated apply→observe→fix cycles (e.g. CNP selector tun
 
 ## Networking & Policy (Cilium)
 
-Cilium 1.20 (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.0.0/16`). Namespace isolation model: see "Fail-closed namespaces".
+Cilium (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.0.0/16`). Namespace isolation model: see "Fail-closed namespaces".
 
 ### CiliumNetworkPolicy conventions
 
@@ -307,7 +322,7 @@ For major chart/app bumps, read the upstream release notes (context7 / GitHub re
 
 Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/apps/system-upgrade/tuppr/`). When a PR bumps the Kubernetes version (kubelet image, `KubernetesUpgrade` resource, or the `kubernetes` Renovate group), you MUST:
 
-1. Read the deployed Talos version from `talos/` machineconfig templates.
+1. Read the deployed Talos version from `kubernetes/apps/system-upgrade/tuppr/upgrades/talosupgrade.yaml` (see "Versions").
 2. Confirm the new Kubernetes version is supported on that Talos release against Talos's published support matrix — search the web for "talos `<version>` kubernetes support matrix" (docs live at `docs.siderolabs.com`).
 3. Cite the matrix in the review. Do not approve a Kubernetes bump on "patch release" reasoning without confirming Talos supports it.
 
@@ -336,9 +351,9 @@ Detail that is only needed for the specific task at hand.
 
 | Category   | Tool                                    | Purpose                                                                           |
 | ---------- | --------------------------------------- | --------------------------------------------------------------------------------- |
-| GitOps     | Flux 2.9                                | Deploys configs from Git to k8s                                                   |
+| GitOps     | Flux (flux-operator)                    | Deploys configs from Git to k8s                                                   |
 | CI         | Renovate + GitHub Actions               | Dependency updates, automation                                                    |
-| Networking | Cilium 1.20 (eBPF)                      | CNI, kubeProxyReplacement, native routing                                         |
+| Networking | Cilium (eBPF)                           | CNI, kubeProxyReplacement, native routing                                         |
 | Visibility | Hubble                                  | Network flow observation (`just kube hubble-*` recipes over a local port-forward) |
 | Ingress    | Envoy Gateway                           | L7 proxy (`envoy-internal` / `envoy-external` gateways)                           |
 | DNS        | external-dns ×2                         | Private records → UniFi, public records → Cloudflare                              |
