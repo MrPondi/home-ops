@@ -19,11 +19,6 @@ mod kube "kubernetes"
 [group('Talos')]
 mod talos "talos"
 
-[doc('Regenerate agent adapters (.claude/, .opencode/, .mcp.json) from .agents/')]
-[group('Agents')]
-agents-sync *args:
-    uv run scripts/sync_agents.py {{ args }}
-
 [private]
 log lvl msg *args:
     gum log -t rfc3339 -s -l "{{ lvl }}" "{{ msg }}" {{ args }}

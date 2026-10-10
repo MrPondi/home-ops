@@ -37,7 +37,7 @@ home-ops/
 
 This repo is harness-agnostic: `AGENTS.md` (this file; Claude Code reads it natively, `CLAUDE.md` only imports it) and `.agents/` are the single source of truth. Per-tool adapters are **generated** by `scripts/sync_agents.py` — never edit `.claude/`, `.mcp.json`, `.opencode/agent/` or `.opencode/opencode.json` by hand.
 
-- **Change a role / MCP server / skill**: edit `.agents/agents/<role>.md`, `.agents/config.yaml` or `.agents/skills/<name>/`, then `just agents-sync`. The lefthook pre-commit hook also regenerates and stages the adapters; `just agents-sync --check` exits 1 when they are stale.
+- **Change a role / MCP server / skill**: edit `.agents/agents/<role>.md`, `.agents/config.yaml` or `.agents/skills/<name>/`, and commit — the lefthook pre-commit hook regenerates and stages the adapters (`uv run scripts/sync_agents.py` to preview before committing; `--check` exits 1 when they are stale).
 - **Role frontmatter** is neutral: `mode` (primary/subagent), `access` (read/write), `bash`, `mcp` (`all`, `none` or a server allow-list), `mcpDeny` (per-server tool globs), `models` (one entry per harness). Prompts stay harness-neutral — no model names, quota numbers or tool-specific tool names in the body.
 - **Skills** use the Agent Skills format (`SKILL.md` + frontmatter) under `.agents/skills/`; opencode reads them there, Claude Code via generated `.claude/skills/<name>` symlinks.
 - **Adding a harness**: add a `render_<tool>()` to `scripts/sync_agents.py` (returns `{path: content}` + symlinks) and register it in `RENDERERS`; harness-only settings go in `.agents/adapters/`.

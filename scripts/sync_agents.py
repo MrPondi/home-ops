@@ -290,7 +290,7 @@ def main() -> int:
 
     if args.check:
         if stale:
-            print("agent adapters are stale — run `just agents-sync`:")
+            print("agent adapters are stale — run `uv run scripts/sync_agents.py`:")
             print("\n".join(f"  {s}" for s in stale))
             return 1
         print("agent adapters are up to date")
