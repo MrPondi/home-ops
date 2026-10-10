@@ -6,12 +6,16 @@ This is a **single-node homelab Kubernetes cluster monorepo** managed with GitOp
 
 ```
 home-ops/
-├── .agents/
+├── .agents/             # CANONICAL agent config (tool-agnostic) — see "Agent tooling"
+│   ├── agents/          # role definitions (coordinator + subagents)
+│   ├── adapters/        # per-tool-only settings (opencode lsp, Claude permissions)
+│   ├── config.yaml      # default agent, MCP servers, MCP tool denies, protected paths
 │   ├── instructions/    # sorting.instructions.md — YAML key-order rules (see Conventions)
 │   └── skills/          # AI skills (e.g. add-app scaffolder)
+├── .claude/ .mcp.json   # GENERATED Claude Code adapter (agents, skills symlinks, settings, MCP)
 ├── .github/             # GitHub Actions workflows (renovate, label-sync, image-pull)
 ├── .mise/               # Tool pins + env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env)
-├── .opencode/           # opencode agent roles + MCP wiring
+├── .opencode/           # GENERATED opencode adapter (agent/, opencode.json)
 ├── .justfile            # Task runner entrypoint (bootstrap / kube / talos modules)
 ├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mod.just
 ├── kubernetes/          # Kubernetes configurations (Flux-managed)
@@ -28,6 +32,16 @@ home-ops/
 - **mise** (`.mise/config.toml`) pins every CLI (flux, kubectl, talosctl, flate, cilium, hubble, helm, uv, …) and exports `KUBECONFIG`, `TALOSCONFIG`, `FLATE_PATH`, `MINIJINJA_CONFIG_FILE`, `SOPS_AGE_KEY_FILE` and `.secrets.env`. In a shell without mise activation, prefix commands with `mise exec --`. `.mise/config.toml` is the source of truth for CLI versions.
 - **Never read, print or commit** `kubeconfig`, `talosconfig`, `age.key`, `.secrets.env` or decrypted SOPS files (all gitignored).
 - Scratch files go in a per-session directory (`mktemp -d`), not fixed `/tmp/<name>` paths — parallel sessions clobber each other.
+
+## Agent tooling
+
+This repo is harness-agnostic: `AGENTS.md` (this file; Claude Code reads it natively, `CLAUDE.md` only imports it) and `.agents/` are the single source of truth. Per-tool adapters are **generated** by `scripts/sync_agents.py` — never edit `.claude/`, `.mcp.json`, `.opencode/agent/` or `.opencode/opencode.json` by hand.
+
+- **Change a role / MCP server / skill**: edit `.agents/agents/<role>.md`, `.agents/config.yaml` or `.agents/skills/<name>/`, then `just agents-sync`. The lefthook pre-commit hook also regenerates and stages the adapters; `just agents-sync --check` exits 1 when they are stale.
+- **Role frontmatter** is neutral: `mode` (primary/subagent), `access` (read/write), `bash`, `mcp` (`all`, `none` or a server allow-list), `mcpDeny` (per-server tool globs), `models` (one entry per harness). Prompts stay harness-neutral — no model names, quota numbers or tool-specific tool names in the body.
+- **Skills** use the Agent Skills format (`SKILL.md` + frontmatter) under `.agents/skills/`; opencode reads them there, Claude Code via generated `.claude/skills/<name>` symlinks.
+- **Adding a harness**: add a `render_<tool>()` to `scripts/sync_agents.py` (returns `{path: content}` + symlinks) and register it in `RENDERERS`; harness-only settings go in `.agents/adapters/`.
+- Roles: `homelab-k8s` (default coordinator), `github` (PRs/review), subagents `explorer`, `coder`, `oracle`, `reviewer`, `vision`. Claude Code starts in `homelab-k8s` (`agent` setting); switch with `claude --agent <role>`.
 
 ## Cluster Architecture
 
@@ -114,7 +128,7 @@ When live-applying a file manually you **must pass `-n <namespace>`** or it land
 
 ### MCP servers (ToolHive)
 
-The ToolHive gateway (`kubernetes/apps/ai/toolhive/config/servers/`) exposes:
+Servers are declared once in `.agents/config.yaml`. Tool names are harness-prefixed (`mcp__ToolHive__<tool>` in Claude Code, `ToolHive_<tool>` in opencode). The ToolHive gateway (`kubernetes/apps/ai/toolhive/config/servers/`) exposes:
 
 | Purpose        | Servers                                                |
 | -------------- | ------------------------------------------------------ |
@@ -129,7 +143,7 @@ Prefer MCP read tools for inspection and diagnosis (Flux status, pod logs, PromQ
 
 ### yayamlls
 
-`yayamlls` (workspace config `.yayamlls.yaml`, wired in `.opencode/opencode.json`) is the YAML language server: Kubernetes apiVersion+kind schema auto-detect + schemastore catalog (fed by the `$schema` headers), and the flate renderer (`path: kubernetes`) rendering HelmReleases/Kustomizations inline via code lens + diagnostics. Use its diagnostics before/alongside manual renders; do not swap it for the stock `yaml-ls`.
+`yayamlls` (workspace config `.yayamlls.yaml`; wired for opencode via `.agents/adapters/opencode.base.json`, run it as the YAML LSP in any editor/harness that supports one) is the YAML language server: Kubernetes apiVersion+kind schema auto-detect + schemastore catalog (fed by the `$schema` headers), and the flate renderer (`path: kubernetes`) rendering HelmReleases/Kustomizations inline via code lens + diagnostics. Use its diagnostics before/alongside manual renders; do not swap it for the stock `yaml-ls`.
 
 ## Conventions
 
@@ -331,6 +345,7 @@ Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/
 - Python scripts run through the **uv project at the repo root** (`pyproject.toml` + `uv.lock` + `.python-version`) — never install packages globally (no `pip install --user` / system pip). Add dependencies with `uv add <pkg>` (updates `pyproject.toml` and `uv.lock`, commit both), sync with `uv sync`, invoke as `uv run scripts/<script>.py`. Each script documents itself in its docstring and `--help`; audits default to `--path kubernetes` and exit 1 on violations.
 - `kustomization_order_audit.py` — `resources:` section ordering, `ks.yaml` key order, `dependsOn` chain order, `components` order (see Conventions).
 - `cnp_prefix_audit.py` — CNP/CCNP label-selector prefixes against the Selectors rules; also fails on unparseable YAML.
+- `sync_agents.py` — renders per-harness agent adapters from `.agents/` (see "Agent tooling"); `--check` for drift.
 - `jellyfin_actor_images.py` — triggers Jellyfin's metadata refresh for persons missing a primary image (needs `JELLYFIN_API_KEY` + `JELLYFIN_USER_ID`). Run after a cluster bootstrap (metadata lives on a non-restorable PVC).
 
 ## Documentation
@@ -339,6 +354,7 @@ Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/
 - `talos/README.md` — Talos machine config notes
 - `.agents/skills/add-app/SKILL.md` — app scaffolding workflow
 - `.agents/instructions/sorting.instructions.md` — YAML key-order rules
+- `.agents/config.yaml` + `.agents/agents/` — agent roles, MCP servers (see "Agent tooling")
 - Component-specific docs live with the component (`kubernetes/components/*/README.md`, `kubernetes/apps/**/README.md` when present)
 
 ---

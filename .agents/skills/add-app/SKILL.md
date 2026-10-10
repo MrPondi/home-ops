@@ -24,7 +24,7 @@ Repository-wide conventions live in `AGENTS.md` — read it first.
 
 ### Step 1: Collect application details
 
-Use the `question` tool to gather:
+Ask the user (via your harness's question tool, e.g. `question` / `AskUserQuestion`) to gather:
 
 1. App name
 2. Namespace/category, such as `default`, `media`, or `ai`

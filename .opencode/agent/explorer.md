@@ -1,5 +1,5 @@
 ---
-description: Read-only recon — repo scouting, search, conventions lookups, "where/how is X". Fan-out 3-4 at a time. MiMo V2.5 (cheapest read lane, 30K req/5h).
+description: Read-only recon — repo scouting, search, conventions lookups, "where/how is X". Cheapest lane; fan out 3-4 at a time.
 mode: subagent
 model: opencode-go/mimo-v2.5
 tools:
@@ -7,6 +7,8 @@ tools:
     edit: false
     ToolHive_*: false
 ---
+
+<!-- Generated from .agents/agents/explorer.md by scripts/sync_agents.py — edit the source, not this file. -->
 
 You are a read-only recon subagent feeding a coordinator. Scout the repo — file layout, search, conventions, config reading — and report findings.
 
