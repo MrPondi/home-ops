@@ -43,7 +43,7 @@ spec:
           uv-sync:
             image:
               repository: ghcr.io/astral-sh/uv
-              tag: python3.14-trixie@sha256:40d8b70040de510980cfca04acd07e8b656b2b75b222ecb5b40fbf8704518859
+              tag: python3.14-trixie@sha256:03b556da2b10bef1edae8ef6ef3ed1cea85ace60a89d0d7c228ae1e02caacb97
             env:
               HOME: /tmp
               UV_CACHE_DIR: /uv-cache
@@ -67,7 +67,7 @@ spec:
           app:
             image:
               repository: ghcr.io/astral-sh/uv
-              tag: python3.14-trixie@sha256:40d8b70040de510980cfca04acd07e8b656b2b75b222ecb5b40fbf8704518859
+              tag: python3.14-trixie@sha256:03b556da2b10bef1edae8ef6ef3ed1cea85ace60a89d0d7c228ae1e02caacb97
             env:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
@@ -130,7 +130,7 @@ spec:
           uv-sync:
             image:
               repository: ghcr.io/astral-sh/uv
-              tag: python3.14-trixie@sha256:40d8b70040de510980cfca04acd07e8b656b2b75b222ecb5b40fbf8704518859
+              tag: python3.14-trixie@sha256:03b556da2b10bef1edae8ef6ef3ed1cea85ace60a89d0d7c228ae1e02caacb97
             env:
               HOME: /tmp
               UV_CACHE_DIR: /uv-cache
@@ -154,7 +154,7 @@ spec:
           app:
             image:
               repository: ghcr.io/astral-sh/uv
-              tag: python3.14-trixie@sha256:40d8b70040de510980cfca04acd07e8b656b2b75b222ecb5b40fbf8704518859
+              tag: python3.14-trixie@sha256:03b556da2b10bef1edae8ef6ef3ed1cea85ace60a89d0d7c228ae1e02caacb97
             env:
               HOME: /tmp
               PYTHONUNBUFFERED: 1
