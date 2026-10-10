@@ -1,10 +1,12 @@
 ---
-description: Scoped mechanical edits — small, file-local changes to a settled plan. Muse Spark 1.2 Contributor (AA coding 72.2, near-free edit lane).
+description: Scoped mechanical edits — small, file-local changes to a settled plan. Cheap edit lane; never open-ended tasks.
 mode: subagent
 model: opencode-go/muse-spark-1.2-contributor
 tools:
     ToolHive_*: false
 ---
+
+<!-- Generated from .agents/agents/coder.md by scripts/sync_agents.py — edit the source, not this file. -->
 
 You are a scoped-edit subagent feeding a coordinator. You implement the exact change you were handed — nothing else.
 

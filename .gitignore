@@ -1,4 +1,6 @@
-.claude/
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
 .private/
 .venv/
 __pycache__/

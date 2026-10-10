@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(just kube render-local-ks *)",
+      "Bash(just kube hubble-status)",
+      "Bash(just --list*)",
+      "Bash(flate build *)",
+      "Bash(kubectl kustomize *)",
+      "Bash(kubectl get *)",
+      "Bash(kubectl describe *)",
+      "Bash(kubectl logs *)",
+      "Bash(kubectl events *)",
+      "Bash(kubectl kopiur status *)",
+      "Bash(flux get *)",
+      "Bash(flux tree *)",
+      "Bash(hubble observe *)",
+      "Bash(hubble status*)",
+      "Bash(talosctl get *)",
+      "Bash(talosctl version*)",
+      "Bash(uv run scripts/kustomization_order_audit.py*)",
+      "Bash(uv run scripts/cnp_prefix_audit.py*)",
+      "Bash(uv run scripts/sync_agents.py*)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr list*)"
+    ],
+    "ask": [
+      "Bash(kubectl get secret*)",
+      "Bash(kubectl get secrets*)",
+      "Bash(kubectl describe secret*)"
+    ],
+    "deny": [
+      "Bash(git push origin main*)",
+      "Bash(git push origin HEAD:main*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)"
+    ]
+  }
+}

@@ -15,7 +15,8 @@ Repository-wide conventions live in `AGENTS.md` — read it first.
 - The namespace overlay wires the `replacements` list (`kubernetes/components/replacements/ks.yaml`, via the overlay's top-level `replacements:` field) which stamps `spec.targetNamespace` onto every Kustomization from the overlay's Namespace object. The replacement is the default and the only mechanism — never set an explicit `targetNamespace` in `ks.yaml`
 - Every app declares its own per-app `OCIRepository` in `ocirepository.yaml`; `app-template` apps point `spec.chartRef.name` at that per-app repo (named after the app). There is no shared/injected chart source
 - Secrets use `external-secrets` with the `bitwarden-secretsmanager` `ClusterSecretStore`
-- Fail-closed namespaces (baseline `default-deny` CiliumNetworkPolicy folded into `namespace.yaml`, incl. the namespace-wide DNS egress allow): `ai`, `database`, `external-secrets`, `cert-manager`, `actions-runner-system`. **Apps in these namespaces must ship a `networkpolicy.yaml`** (ingress + app-specific egress only — do **not** re-declare the DNS egress rule, it is inherited from `default-deny`). In open namespaces (`default`, `media`, `observability`, `security`, `network`, ...) do **not** scaffold a CNP unless it is complete (a CNP isolates its pods immediately)
+- Fail-closed namespaces: see AGENTS.md › "Fail-closed namespaces" for the list and what the namespace `default-deny` already provides (DNS, kube-API egress, prometheus scrape ingress). A per-app `networkpolicy.yaml` is only needed for **app-specific routes** (envoy route ingress, cross-ns services, Postgres/Dragonfly, S3/internet/FQDN egress) and must **not** re-declare the inherited rules. In open namespaces (`network`, `kube-system`, `flux-system`, `longhorn-system`) do **not** scaffold a CNP unless it is complete (a CNP isolates its pods immediately)
+- Postgres and Dragonfly are attached by **labels** on the Flux Kustomization (`components.postgres/enabled: "true"`, `components.dragonfly/enabled: "true"`, see AGENTS.md › "Label-driven components") — never add `components/postgres` or `components/dragonfly` to `spec.components` by hand. A labeled `ks.yaml` must carry `spec.components`, `spec.dependsOn` and `spec.healthCheckExprs` as lists (`[]` allowed)
 - Kopiur backups: apps with a PVC to back up attach `../../../../components/kopiur/backup` via the Kustomization's `spec.components` (SnapshotPolicy + hourly SnapshotSchedule + Restore + PVC, all keyed on `${APP}`). Mover-job egress is handled namespace-wide by the overlay's `kopiur/base` component (the `kopiur-mover` CNP) — never hand-write mover rules; just confirm the overlay attaches `kopiur/base` and verify with `kubectl kopiur snapshot now -n <ns> --policy <app>` (hubble must show zero `POLICY_DENIED` from the mover pod)
 - The root `cluster-apps` Kustomization already patches HelmRelease defaults (crds `CreateReplace`, rollback/upgrade remediation) — do not add them to the app
 
@@ -23,7 +24,7 @@ Repository-wide conventions live in `AGENTS.md` — read it first.
 
 ### Step 1: Collect application details
 
-Use the `question` tool to gather:
+Ask the user (via your harness's question tool, e.g. `question` / `AskUserQuestion`) to gather:
 
 1. App name
 2. Namespace/category, such as `default`, `media`, or `ai`
@@ -35,6 +36,7 @@ Use the `question` tool to gather:
 8. Whether the app needs an ingress route (envoy-internal / envoy-external) — if yes, plan for gatus/homepage route annotations
 9. Flux `dependsOn` entries for the Kustomization (usually `external-secrets-store` in namespace `external-secrets`)
 10. Whether the app needs kopiur PVC backups (attach `components/kopiur/backup`; also confirm the namespace overlay attaches `kopiur/base`)
+11. Whether the app needs Postgres and/or Dragonfly (label-driven components — see Repository-specific assumptions)
 
 If the requested namespace does not exist under `kubernetes/apps/`, stop and ask the user how to proceed (new namespace = new overlay + `namespace.yaml`, possibly fail-closed).
 Always ask for confirmation before writing files.
@@ -65,7 +67,7 @@ containing at minimum:
 
 Optionally create (only when needed):
 
-- `networkpolicy.yaml` — **required** in a fail-closed namespace, otherwise omit (or make complete: route ingress + full egress)
+- `networkpolicy.yaml` — in a fail-closed namespace only when the app has app-specific routes (route ingress, Postgres/Dragonfly, cross-ns/S3/internet egress); in an open namespace omit it (or make it complete: route ingress + full egress)
 - `externalsecret.yaml`
 - other app-specific manifests such as `configmap.yaml` or `pvc.yaml`
 
@@ -83,7 +85,7 @@ resources:
     - ./ocirepository.yaml
 ```
 
-Add `./networkpolicy.yaml` (fail-closed namespaces), `./externalsecret.yaml`, and other resource files only when required. Follow the list ordering rules in AGENTS.md ("List ordering rules"): files in the kustomization's own directory come first (section 1, self-sorted), directory references last (section 4, self-sorted).
+Add `./networkpolicy.yaml` (when needed, see above), `./externalsecret.yaml`, and other resource files only when required. Follow the list ordering rules in AGENTS.md ("List ordering rules"): files in the kustomization's own directory come first (section 1, self-sorted), directory references last (section 4, self-sorted).
 
 #### `kubernetes/apps/<namespace>/<app>/app/helmrelease.yaml`
 
@@ -150,7 +152,9 @@ spec:
 
 Adjust the template to match local patterns in the same namespace. The `&port` anchor lives on the container's port `env` var so the probe and service stay in sync (see `bazarr`, `sonarr`). A `custom` probe is only valid **with a full `spec.httpGet`** (path + port) — when no health endpoint is known, drop `custom` and let the chart synthesize the probe. Add `route` (envoy parentRefs, `hostnames: ["{{ .Release.Name }}.pondi.dev"]`, gatus/homepage annotations), `persistence`, `envFrom`, or extra manifests only when needed.
 
-#### `kubernetes/apps/<namespace>/<app>/app/networkpolicy.yaml` (fail-closed namespaces only)
+#### `kubernetes/apps/<namespace>/<app>/app/networkpolicy.yaml` (fail-closed namespaces, app-specific routes only)
+
+Purely additive — DNS, kube-API egress and prometheus scrape ingress come from the namespace `default-deny` and must not be repeated. Example for a routed app (copy from `open-webui`):
 
 ```yaml
 ---
@@ -163,25 +167,21 @@ spec:
     endpointSelector:
         matchLabels:
             app.kubernetes.io/name: *name # copy from the rendered Deployment — do not guess
-    ingress: [] # add route ingress when the app is routed: copy the envoy-internal block from a same-namespace app (e.g. open-webui)
-    egress:
-        # DNS
-        - toEndpoints:
+    ingress:
+        # HTTPRoute <app>.pondi.dev (envoy-internal)
+        - fromEndpoints:
               - matchLabels:
-                    k8s:io.kubernetes.pod.namespace: kube-system
-                    k8s-app: kube-dns
+                    k8s:io.kubernetes.pod.namespace: network
+                    k8s:app.kubernetes.io/name: envoy
+                    k8s:gateway.envoyproxy.io/owning-gateway-name: envoy-internal
           toPorts:
               - ports:
-                    - port: "53"
-                      protocol: UDP
-                    - port: "53"
+                    - port: "<port>"
                       protocol: TCP
-                rules:
-                    dns:
-                        - matchPattern: "*"
+    # egress: add only app-specific targets (Postgres `cnpg.io/cluster: ${APP}` :5432, Dragonfly :6379, FQDN/internet)
 ```
 
-An incomplete CNP cuts the pod off. Copy each additional building block (route ingress, kube API, metrics ingress, CIDR/internet) from a neighboring app's `networkpolicy.yaml` in the same namespace rather than retyping it from memory.
+Copy each additional building block (Postgres/Dragonfly egress, FQDN pairs, CIDR/internet) from a neighboring app's `networkpolicy.yaml` rather than retyping it from memory, and comment every rule with what it matches.
 
 #### `kubernetes/apps/<namespace>/<app>/app/ocirepository.yaml`
 
@@ -263,7 +263,7 @@ spec:
     wait: false
 ```
 
-Drop `dependsOn` when the app has no secrets or external deps. Add `components` (pointing at `../../../../components/...`) and `healthCheckExprs` only when the app needs them. Follow nearby `ks.yaml` files in the same namespace for exact patterns. `spec.targetNamespace` is stamped by the overlay's `replacements` list from the Namespace object — never set it in `ks.yaml`.
+Drop `dependsOn` when the app has no secrets or external deps. For Postgres/Dragonfly add the `metadata.labels` entries (`components.postgres/enabled: "true"`, `components.dragonfly/enabled: "true"`) plus `components: []`/`healthCheckExprs: []` placeholders when absent — the root `cluster-apps` patch appends the component, operator `dependsOn` and health checks. Add other `components` (pointing at `../../../../components/...`) and `healthCheckExprs` only when the app needs them. Follow nearby `ks.yaml` files in the same namespace for exact patterns. `spec.targetNamespace` is stamped by the overlay's `replacements` list from the Namespace object — never set it in `ks.yaml`.
 
 ### Step 6: Update the namespace overlay
 
@@ -288,8 +288,8 @@ Verify that:
 2. The overlay kustomization lists `./<app>/ks.yaml` and the app's kustomization lists every created file.
 3. `ks.yaml` omits `targetNamespace` (stamped by the overlay replacement), sets `postBuild.substitute.APP`, and its `path` points at the right subdir.
 4. The app has its own `ocirepository.yaml` (named after the app), and the HelmRelease's `spec.chartRef.name` matches it.
-5. In a fail-closed namespace the CNP covers ingress + full egress; no CNP was added in an open namespace.
-6. Render cleanly: `just kube render-local-ks <ns> <app>` (or `kubectl kustomize <dir>` before the overlay entry is added).
+5. In a fail-closed namespace the CNP only adds app-specific routes (no DNS/kube-API/scrape rules); no partial CNP was added in an open namespace.
+6. Render cleanly: `just kube render-local-ks <ns> <app>` (or `kubectl kustomize <dir>` before the overlay entry is added), and `uv run scripts/kustomization_order_audit.py` + `uv run scripts/cnp_prefix_audit.py` pass.
 7. No plain-text secrets were introduced.
 8. If the app attaches `components/kopiur/backup`: the namespace overlay attaches `kopiur/base`, and a verification snapshot run (`kubectl kopiur snapshot now -n <ns> --policy <app>`) completed with zero `POLICY_DENIED` flows from the mover pod in hubble.
 

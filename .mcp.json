@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "ToolHive": {
+      "type": "http",
+      "url": "https://mcp.pondi.dev/mcp"
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      }
+    },
+    "dashboard-icons": {
+      "type": "http",
+      "url": "https://dashboardicons.com/api/mcp"
+    }
+  }
+}
