@@ -41,6 +41,9 @@ bitwarden-auth status:
 
     if [ "{{ status }}" != "locked" ]; then
         pkill -f "bw serve" || true
+        if [ "$(bw status 2>/dev/null | jq -r '.status' 2>/dev/null)" = "unauthenticated" ]; then
+            just log fatal "Bitwarden CLI is not logged in - run 'bw login' first, then retry" "stage" "{{ recipe_name() }}"
+        fi
         nohup bw serve < /dev/null > /dev/null 2>&1 &
         if ! curl -s --retry-connrefused --retry 5 --retry-delay 1 http://localhost:8087/status > /dev/null; then
             just log fatal "Bitwarden server failed to start" "stage" "{{ recipe_name() }}"
