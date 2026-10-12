@@ -1,3 +1,5 @@
+min_version = "2026.7.0"
+
 [env]
 _.file = ["{{config_root}}/.secrets.env"]
 FLATE_PATH = "{{config_root}}/kubernetes/flux/cluster"
@@ -10,6 +12,9 @@ HOMEBREW_NO_ENV_HINTS = "1"
 
 [hooks]
 postinstall = "lefthook install"
+
+[settings]
+lockfile_platforms = ["linux-x64", "linux-arm64", "macos-arm64"]
 
 [tools]
 "github:home-operations/flate" = "v0.6.5"
