@@ -5,7 +5,7 @@ kind: MCPServer
 metadata:
   name: jellyfin
 spec:
-  image: ghcr.io/jaredtrent/jellyfin-mcp:2026.924.1@sha256:47877d8cf5282a3dea35c2bfa4b8331ea4cb543093091a37a27aa834cbbab2a0
+  image: ghcr.io/jaredtrent/jellyfin-mcp:2026.1015.1@sha256:9b9c8ec91c5561d64176a88ce3933489c3903e669f4458e5f5cf3841fb822bb6
   transport: stdio
   proxyPort: 8080
   # Bare "--" ends flag parsing so the image CMD (--http ...) is replaced
