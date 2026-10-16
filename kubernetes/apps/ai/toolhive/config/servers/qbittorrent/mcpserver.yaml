@@ -5,7 +5,7 @@ kind: MCPServer
 metadata:
   name: qbittorrent
 spec:
-  image: ghcr.io/nicholaswilde/qbittorrent-mcp-rs:0.3.7@sha256:328b01cf0e731fde084c8b1fffb0d23aa206405127f03d7bbdfe4045a45c8934
+  image: ghcr.io/nicholaswilde/qbittorrent-mcp-rs:0.3.8@sha256:10f9ebb933736bbdc8b86640adb9eb7838a6a846b4d3f115c2a57cd59498f763
   transport: stdio
   proxyPort: 8080
   env:
