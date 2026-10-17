@@ -25,9 +25,161 @@ spec:
         url: "ssh://git@github.com/MrPondi/home-ops.git"
         pullSecret: github-deploy-key
         ref: "refs/heads/main"
-        path: kubernetes/flux/cluster
+        path: kubernetes/apps
       kustomize:
         patches:
+          - # Add Kustomization defaults for all child Kustomizations
+            patch: |-
+              apiVersion: kustomize.toolkit.fluxcd.io/v1
+              kind: Kustomization
+              metadata:
+                name: _
+              spec:
+                patches:
+                  - patch: |-
+                      apiVersion: helm.toolkit.fluxcd.io/v2
+                      kind: HelmRelease
+                      metadata:
+                        name: _
+                      spec:
+                        install:
+                          crds: CreateReplace
+                        rollback:
+                          cleanupOnFail: true
+                        upgrade:
+                          cleanupOnFail: true
+                          crds: CreateReplace
+                          strategy:
+                            name: RemediateOnFailure
+                          remediation:
+                            remediateLastFailure: true
+                            retries: 2
+                    target:
+                      group: helm.toolkit.fluxcd.io
+                      kind: HelmRelease
+            target:
+              group: kustomize.toolkit.fluxcd.io
+              kind: Kustomization
+          # Label UX registry: entries below keyed by labelSelector; JSON6902 appends to spec.components/spec.dependsOn/spec.healthCheckExprs require labeled KSs to carry that field as a list.
+          - 
+            # net-new CNPG cluster initdb; label components.postgres/cnpg=init
+            # Labeled KSs must not define their own spec.patches (strategic merge would replace them).
+            patch: |-
+              apiVersion: kustomize.toolkit.fluxcd.io/v1
+              kind: Kustomization
+              metadata:
+                name: _
+              spec:
+                patches:
+                  - patch: |-
+                      - op: replace
+                        path: /spec/bootstrap
+                        value:
+                          initdb:
+                            database: ${POSTGRES_USERNAME:=${APP}}
+                            owner: ${POSTGRES_USERNAME:=${APP}}
+                      - op: remove
+                        path: /spec/externalClusters
+                    target:
+                      group: postgresql.cnpg.io
+                      version: v1
+                      kind: Cluster
+            target:
+              group: kustomize.toolkit.fluxcd.io
+              kind: Kustomization
+              labelSelector: "components.postgres/cnpg=init"
+          - 
+            # Configure Dragonfly for ToolHive's Redis auth-storage Lua scripts.
+            # Replication remains enabled; standalone mode and undeclared-key access
+            # are required by ToolHive's scripts.
+            # Caveat: base component already sets allow-undeclared-keys (cluster.yaml args);
+            # first labeled consumer must reconcile args layout (remove shifts indices).
+            patch: |-
+              apiVersion: kustomize.toolkit.fluxcd.io/v1
+              kind: Kustomization
+              metadata:
+                name: not-used
+              spec:
+                patches:
+                  - target:
+                      group: dragonflydb.io
+                      version: v1alpha1
+                      kind: Dragonfly
+                    patch: |-
+                      - op: remove
+                        path: /spec/args/2
+                      - op: add
+                        path: /spec/args/-
+                        value: --default_lua_flags=allow-undeclared-keys
+            target:
+              group: kustomize.toolkit.fluxcd.io
+              kind: Kustomization
+              labelSelector: "components.dragonfly/cluster-mode=non-cluster"
+          - # Postgres consumers: component + operator dependsOn + CNPG health checks; label components.postgres/enabled=true
+            patch: |-
+              - op: add
+                path: /spec/dependsOn/-
+                value:
+                  name: external-secrets-store
+                  namespace: external-secrets
+              - op: add
+                path: /spec/components/-
+                value: ../../../../components/postgres
+              - op: add
+                path: /spec/dependsOn/-
+                value:
+                  name: barman-cloud
+                  namespace: database
+              - op: add
+                path: /spec/dependsOn/-
+                value:
+                  name: cloudnative-pg
+                  namespace: database
+              - op: add
+                path: /spec/healthCheckExprs/-
+                value:
+                  apiVersion: postgresql.cnpg.io/v1
+                  kind: Cluster
+                  failed: "status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')"
+                  current: "status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')"
+            target:
+              group: kustomize.toolkit.fluxcd.io
+              kind: Kustomization
+              labelSelector: "components.postgres/enabled=true"
+          - # Dragonfly consumers: component + operator dependsOn + Ready health check; label components.dragonfly/enabled=true
+            patch: |-
+              - op: add
+                path: /spec/components/-
+                value: ../../../../components/dragonfly
+              - op: add
+                path: /spec/dependsOn/-
+                value:
+                  name: dragonfly-operator
+                  namespace: database
+              - op: add
+                path: /spec/healthCheckExprs/-
+                value:
+                  apiVersion: dragonflydb.io/v1alpha1
+                  kind: Dragonfly
+                  current: "has(status.phase) && status.phase == 'Ready'"
+            target:
+              group: kustomize.toolkit.fluxcd.io
+              kind: Kustomization
+              labelSelector: "components.dragonfly/enabled=true"
+          - # Opt-in dragonfly auth sub-component; label components.dragonfly/authentication=true
+            patch: |-
+              - op: add
+                path: /spec/dependsOn/-
+                value:
+                  name: external-secrets-store
+                  namespace: external-secrets
+              - op: add
+                path: /spec/components/-
+                value: ../../../../components/dragonfly/authentication
+            target:
+              group: kustomize.toolkit.fluxcd.io
+              kind: Kustomization
+              labelSelector: "components.dragonfly/authentication=true"
           - # Increase the number of workers
             patch: |-
               - op: add
