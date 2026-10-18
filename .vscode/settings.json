@@ -88,7 +88,6 @@
     ".private": "archive",
     "bootstrap": "seeders",
     "bootstrap/helmfile": "helm",
-    "flux": "pipe",
     "talos": "linux",
     // namespaces
     "actions-runner-system": "github",

@@ -56,7 +56,7 @@ jobs:
         id: extract
         run: |
           echo 'images<<EOF' >> $GITHUB_OUTPUT
-          flate diff images --path ./kubernetes/flux/cluster --output json --allow-missing-secrets >> $GITHUB_OUTPUT
+          flate diff images --path ./kubernetes/apps --output json --allow-missing-secrets >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   pull:

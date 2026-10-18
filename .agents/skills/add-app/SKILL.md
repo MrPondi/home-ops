@@ -18,7 +18,7 @@ Repository-wide conventions live in `AGENTS.md` — read it first.
 - Fail-closed namespaces: see AGENTS.md › "Fail-closed namespaces" for the list and what the namespace `default-deny` already provides (DNS, kube-API egress, prometheus scrape ingress). A per-app `networkpolicy.yaml` is only needed for **app-specific routes** (envoy route ingress, cross-ns services, Postgres/Dragonfly, S3/internet/FQDN egress) and must **not** re-declare the inherited rules. In open namespaces (`network`, `kube-system`, `flux-system`, `longhorn-system`) do **not** scaffold a CNP unless it is complete (a CNP isolates its pods immediately)
 - Postgres and Dragonfly are attached by **labels** on the Flux Kustomization (`components.postgres/enabled: "true"`, `components.dragonfly/enabled: "true"`, see AGENTS.md › "Label-driven components") — never add `components/postgres` or `components/dragonfly` to `spec.components` by hand. A labeled `ks.yaml` must carry `spec.components`, `spec.dependsOn` and `spec.healthCheckExprs` as lists (`[]` allowed)
 - Kopiur backups: apps with a PVC to back up attach `../../../../components/kopiur/backup` via the Kustomization's `spec.components` (SnapshotPolicy + hourly SnapshotSchedule + Restore + PVC, all keyed on `${APP}`). Mover-job egress is handled namespace-wide by the overlay's `kopiur/base` component (the `kopiur-mover` CNP) — never hand-write mover rules; just confirm the overlay attaches `kopiur/base` and verify with `kubectl kopiur snapshot now -n <ns> --policy <app>` (hubble must show zero `POLICY_DENIED` from the mover pod)
-- The root `cluster-apps` Kustomization already patches HelmRelease defaults (crds `CreateReplace`, rollback/upgrade remediation) — do not add them to the app
+- The root `flux-system` Kustomization already patches HelmRelease defaults (crds `CreateReplace`, rollback/upgrade remediation) — do not add them to the app
 
 ## Workflow
 
@@ -263,7 +263,7 @@ spec:
     wait: false
 ```
 
-Drop `dependsOn` when the app has no secrets or external deps. For Postgres/Dragonfly add the `metadata.labels` entries (`components.postgres/enabled: "true"`, `components.dragonfly/enabled: "true"`) plus `components: []`/`healthCheckExprs: []` placeholders when absent — the root `cluster-apps` patch appends the component, operator `dependsOn` and health checks. Add other `components` (pointing at `../../../../components/...`) and `healthCheckExprs` only when the app needs them. Follow nearby `ks.yaml` files in the same namespace for exact patterns. `spec.targetNamespace` is stamped by the overlay's `replacements` list from the Namespace object — never set it in `ks.yaml`.
+Drop `dependsOn` when the app has no secrets or external deps. For Postgres/Dragonfly add the `metadata.labels` entries (`components.postgres/enabled: "true"`, `components.dragonfly/enabled: "true"`) plus `components: []`/`healthCheckExprs: []` placeholders when absent — the root `flux-system` patch appends the component, operator `dependsOn` and health checks. Add other `components` (pointing at `../../../../components/...`) and `healthCheckExprs` only when the app needs them. Follow nearby `ks.yaml` files in the same namespace for exact patterns. `spec.targetNamespace` is stamped by the overlay's `replacements` list from the Namespace object — never set it in `ks.yaml`.
 
 ### Step 6: Update the namespace overlay
 

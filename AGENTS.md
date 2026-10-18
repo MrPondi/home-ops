@@ -20,8 +20,7 @@ home-ops/
 ├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mod.just
 ├── kubernetes/          # Kubernetes configurations (Flux-managed)
 │   ├── apps/            # Applications grouped by namespace (namespace overlays)
-│   ├── components/      # Reusable kustomize components + replacements list
-│   └── flux/            # Flux system configuration (root cluster-apps Kustomization)
+│   └── components/      # Reusable kustomize components + replacements list
 ├── talos/               # Talos Linux machine config templates (minijinja) + mod.just
 ├── terraform/           # Terraform IaC (proxmox VMs, authentik configuration)
 └── scripts/             # Standalone maintenance/audit helper scripts (not cluster-deployed)
@@ -177,7 +176,7 @@ Components may use `${VAR:=default}` substitution fed by the Kustomization's `po
 
 ### Label-driven components
 
-The root `cluster-apps` Kustomization (`kubernetes/flux/cluster/ks.yaml`, "Label UX registry") patches child Kustomizations by `metadata.labels`. **Never** add `components/postgres` or `components/dragonfly` to `spec.components` by hand — set the label:
+The root `flux-system` Kustomization ("Label UX registry" in the FluxInstance `kustomize.patches`, `kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml`) patches child Kustomizations by `metadata.labels`. **Never** add `components/postgres` or `components/dragonfly` to `spec.components` by hand — set the label:
 
 | Label                                            | Injects                                                                                                                                              |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -238,7 +237,7 @@ main = cluster state; merge the PR **before** deep verification, not after (step
 
 When a change needs repeated apply→observe→fix cycles (e.g. CNP selector tuning), open an experiment window instead of fighting drift:
 
-1. `flux suspend kustomization <ks> -n <ns>` — pauses drift correction + deploys for that app only. A child suspend **is sticky** with the SSA-based kustomize-controller: a forced parent `cluster-apps` reconcile does not clear it.
+1. `flux suspend kustomization <ks> -n <ns>` — pauses drift correction + deploys for that app only. A child suspend **is sticky** with the SSA-based kustomize-controller: a forced parent `flux-system` reconcile does not clear it.
 2. Iterate: edit files → `just kube apply-ks <ns> <ks>` → verify → repeat. `apply-ks` renders locally (flate) and SSA-applies under flux's own `kustomize-controller` field manager, so it converges cleanly once flux resumes.
 3. Commit the final change → PR → merge to `main`.
 4. `flux resume kustomization <ks> -n <ns>` — un-suspends and immediately reconciles the merged state.
@@ -299,7 +298,7 @@ When reviewing PRs (including Renovate), enforce these criteria.
 ### HelmRelease requirements
 
 - Every application is a Flux `HelmRelease` with `spec.chartRef` pointing at the **per-app `OCIRepository`** (named after the app, in its own `ocirepository.yaml`) pinned by `ref.tag`, and a `spec.interval`.
-- `install`/`upgrade`/`rollback`/`remediation` defaults are patched globally by the root `cluster-apps` Kustomization — do not add them per-app, and do not flag their absence.
+- `install`/`upgrade`/`rollback`/`remediation` defaults are patched globally by the root `flux-system` Kustomization — do not add them per-app, and do not flag their absence.
 - `metadata.namespace` is **never** set inline on `HelmRelease`/`Kustomization` resources (see Conventions) — reviewers MUST NOT flag its absence.
 - Postgres/Dragonfly components arrive via labels (see "Label-driven components") — do not flag their absence from `spec.components`.
 
@@ -385,7 +384,7 @@ Detail that is only needed for the specific task at hand.
 | Validation | flate + yayamlls                        | Local Kustomization/HelmRelease rendering + YAML LSP                              |
 | Reviews    | konflate (via ToolHive MCP)             | Rendered-diff evidence for PR reviews                                             |
 
-GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `cluster-apps` (`kubernetes/flux/cluster/ks.yaml`), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
+GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `flux-system` (`kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml` (FluxInstance `kustomize.patches`)), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
 
 ## Kopiur backups (snapshot mover jobs)
 
