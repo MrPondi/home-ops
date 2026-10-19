@@ -12,10 +12,8 @@ home-ops/
 │   ├── config.yaml      # default agent, MCP servers, MCP tool denies, protected paths
 │   ├── instructions/    # sorting.instructions.md — YAML key-order rules (see Conventions)
 │   └── skills/          # AI skills (e.g. add-app scaffolder)
-├── .claude/ .mcp.json   # GENERATED + gitignored Claude Code adapter (agents, skills symlinks, settings, MCP)
 ├── .github/             # GitHub Actions workflows (renovate, label-sync, image-pull)
 ├── .mise/               # Env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env) + hooks; tools live in Brewfile
-├── .opencode/           # GENERATED + gitignored opencode adapter (agent/, opencode.json)
 ├── .justfile            # Task runner entrypoint (bootstrap / kube / talos modules)
 ├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mod.just
 ├── kubernetes/          # Kubernetes configurations (Flux-managed)
@@ -34,7 +32,7 @@ home-ops/
 
 ## Agent tooling
 
-This repo is harness-agnostic: `AGENTS.md` (this file; Claude Code reads it natively, `CLAUDE.md` only imports it) and `.agents/` are the single source of truth. Per-tool adapters are **generated** by `scripts/sync_agents.py` — never edit `.claude/`, `.mcp.json`, `.opencode/agent/` or `.opencode/opencode.json` by hand.
+This repo is harness-agnostic: `AGENTS.md` (this file; Claude Code reads it natively, `CLAUDE.md` only imports it) and `.agents/` are the single source of truth. Per-tool adapters are **generated** by `scripts/sync_agents.py` — never edit `.claude/`, `.opencode/` etc. by hand.
 
 - **Change a role / MCP server / skill**: edit `.agents/agents/<role>.md`, `.agents/config.yaml` or `.agents/skills/<name>/`, and commit. Adapters are gitignored (not committed): run `uv run scripts/sync_agents.py` after cloning or after changing `.agents/` to regenerate them locally.
 - **Role frontmatter** is neutral: `mode` (primary/subagent), `access` (read/write), `bash`, `mcp` (`all`, `none` or a server allow-list), `mcpDeny` (per-server tool globs), `models` (one entry per harness). Prompts stay harness-neutral — no model names, quota numbers or tool-specific tool names in the body.
