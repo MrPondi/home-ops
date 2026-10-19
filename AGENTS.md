@@ -14,7 +14,7 @@ home-ops/
 │   └── skills/          # AI skills (e.g. add-app scaffolder)
 ├── .claude/ .mcp.json   # GENERATED Claude Code adapter (agents, skills symlinks, settings, MCP)
 ├── .github/             # GitHub Actions workflows (renovate, label-sync, image-pull)
-├── .mise/               # Tool pins + env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env)
+├── .mise/               # Env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env) + hooks; tools live in Brewfile
 ├── .opencode/           # GENERATED opencode adapter (agent/, opencode.json)
 ├── .justfile            # Task runner entrypoint (bootstrap / kube / talos modules)
 ├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mod.just
@@ -28,7 +28,7 @@ home-ops/
 
 ## Environment
 
-- **mise** (`.mise/config.toml`) pins every CLI (flux, kubectl, talosctl, flate, cilium, hubble, helm, uv, …) and exports `KUBECONFIG`, `TALOSCONFIG`, `FLATE_PATH`, `MINIJINJA_CONFIG_FILE`, `SOPS_AGE_KEY_FILE` and `.secrets.env`. In a shell without mise activation, prefix commands with `mise exec --`. `.mise/config.toml` is the source of truth for CLI versions.
+- **Homebrew** (`Brewfile`, `brew bundle`) installs every CLI (flux, kubectl, talosctl, flate, cilium, hubble, helm, uv, …), unpinned. **mise** (`.mise/config.toml`, env + hooks only, no tools) exports `KUBECONFIG`, `TALOSCONFIG`, `FLATE_PATH`, `MINIJINJA_CONFIG_FILE`, `SOPS_AGE_KEY_FILE` and `.secrets.env`. In a shell without mise activation, prefix commands with `mise exec --`. CI installs its own tools via mise-action.
 - **Never read, print or commit** `kubeconfig`, `talosconfig`, `age.key`, `.secrets.env` or decrypted SOPS files (all gitignored).
 - Scratch files go in a per-session directory (`mktemp -d`), not fixed `/tmp/<name>` paths — parallel sessions clobber each other.
 
@@ -68,7 +68,7 @@ Never hardcode or quote versions from memory — read them from the Renovate-man
 | Cilium                            | `kubernetes/apps/kube-system/cilium/app/ocirepository.yaml` (`ref.tag`)                            |
 | Flux                              | `kubernetes/apps/flux-system/flux-operator/` + `flux-instance/` (`ref.tag`)                        |
 | Any other chart                   | the app's `ocirepository.yaml` (`ref.tag`)                                                         |
-| CLIs (talosctl, flux, kubectl, …) | `.mise/config.toml`                                                                                |
+| CLIs (talosctl, flux, kubectl, …) | `brew info <formula>` (unpinned)                                                                   |
 
 tuppr reconciles the cluster to the `TalosUpgrade`/`KubernetesUpgrade` versions; the `talos/*.yaml.j2` templates carry the same pins for (re)bootstrap and must be kept in sync when they are bumped.
 
