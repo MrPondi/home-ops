@@ -2,8 +2,3 @@
 git_url = "https://github.com/home-operations/.github"
 ref = "main"
 configs = ["lefthook.common.toml"]
-
-# Regenerate per-tool agent adapters (.claude/, .opencode/, .mcp.json) from .agents/.
-[pre-commit.commands.agents-sync]
-glob = [".agents/**", ".claude/**", ".opencode/agent/*", ".opencode/opencode.json", ".mcp.json", "scripts/sync_agents.py"]
-run = "uv run scripts/sync_agents.py && git add .mcp.json .claude .opencode/agent .opencode/opencode.json"
