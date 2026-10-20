@@ -12,6 +12,8 @@ spec:
   values:
     leaderElect: true
     bitwarden-sdk-server:
+      deploymentAnnotations:
+        reloader.stakater.com/auto: "true"
       enabled: true
     serviceMonitor:
       enabled: true
