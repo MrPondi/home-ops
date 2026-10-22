@@ -39,9 +39,11 @@ spec:
           value: "true"
       envFrom:
         - secretRef:
-            name: &secret crowdsec-secret
+            name: crowdsec-secret
+        - secretRef:
+            name: crowdsec-bouncer-secret
       metrics:
         serviceMonitor:
           enabled: true
       podAnnotations:
-        secret.reloader.stakater.com/reload: *secret
+        secret.reloader.stakater.com/reload: crowdsec-secret,crowdsec-bouncer-secret
