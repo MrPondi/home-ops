@@ -1,0 +1,47 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: crowdsec
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: crowdsec
+  install:
+    disableSchemaValidation: true # the chart schema rejects the kubernetes acquisition source
+  interval: 1h
+  upgrade:
+    disableSchemaValidation: true
+  values:
+    agent:
+      additionalAcquisition:
+        - source: kubernetes
+          labels:
+            type: envoy
+          namespace: network
+          selector: gateway.envoyproxy.io/owning-gateway-name=envoy-external
+      env:
+        - name: COLLECTIONS
+          value: yanis-kouidri/envoy
+      hostVarLog: false
+      isDeployment: true
+      metrics:
+        serviceMonitor:
+          enabled: true
+      serviceAccountName: crowdsec-agent
+    container_runtime: containerd # the default (docker) mounts /var/lib/docker/containers into the agent
+    image:
+      repository: mirror.gcr.io/crowdsecurity/crowdsec
+    lapi:
+      env:
+        - name: USE_WAL
+          value: "true"
+      envFrom:
+        - secretRef:
+            name: &secret crowdsec-secret
+      metrics:
+        serviceMonitor:
+          enabled: true
+      podAnnotations:
+        secret.reloader.stakater.com/reload: *secret
