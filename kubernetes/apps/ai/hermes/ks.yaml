@@ -8,7 +8,7 @@ spec:
   components:
     - ../../../../components/kopiur/backup
   dependsOn:
-    - name: ai-app-postbuild
+    - name: app-postbuild
     - name: external-secrets-store
       namespace: external-secrets
     - name: searxng
