@@ -10,7 +10,7 @@ spec:
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   dependsOn:
-    - name: app-postbuild
+    - name: media-postbuild
     - name: external-secrets-store
       namespace: external-secrets
   interval: 1h

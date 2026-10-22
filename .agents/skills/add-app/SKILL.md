@@ -263,6 +263,8 @@ spec:
     wait: false
 ```
 
+If the app needs `postBuild.substituteFrom` secrets, add `- name: <namespace>-postbuild` (e.g. `ai-postbuild`) first in `dependsOn` and its ExternalSecret under `kubernetes/apps/<namespace>/app-postbuild/secrets/` (see AGENTS.md › "Postbuild secrets"); the Kustomization name is namespace-prefixed because flate drops same-named Kustomizations across namespaces.
+
 Drop `dependsOn` when the app has no secrets or external deps. For Postgres/Dragonfly add the `metadata.labels` entries (`components.postgres/enabled: "true"`, `components.dragonfly/enabled: "true"`) plus `components: []`/`healthCheckExprs: []` placeholders when absent — the root `flux-system` patch appends the component, operator `dependsOn` and health checks. Add other `components` (pointing at `../../../../components/...`) and `healthCheckExprs` only when the app needs them. Follow nearby `ks.yaml` files in the same namespace for exact patterns. `spec.targetNamespace` is stamped by the overlay's `replacements` list from the Namespace object — never set it in `ks.yaml`.
 
 ### Step 6: Update the namespace overlay
