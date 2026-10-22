@@ -1,0 +1,67 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/batch/cronjob_v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: etcd-defrag
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: etcd-defrag
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - name: defrag
+              image: ghcr.io/siderolabs/talosctl:v1.14.4@sha256:b3233234327350f20ed194f3fad83d90a64344c1940f839c7b0c0abef50c8c33
+              args:
+                - --endpoints
+                - $(NODE)
+                - --nodes
+                - $(NODE)
+                - etcd
+                - defrag
+              env:
+                - name: HOME
+                  value: /tmp
+                - name: NODE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: status.hostIP
+                - name: TALOSCONFIG
+                  value: /var/run/secrets/talos.dev/config
+                - name: TZ
+                  value: Europe/Warsaw
+              resources:
+                requests:
+                  cpu: 10m
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+                readOnlyRootFilesystem: true
+              volumeMounts:
+                - mountPath: /tmp
+                  name: tmp
+                - mountPath: /var/run/secrets/talos.dev
+                  name: talos
+                  readOnly: true
+          restartPolicy: OnFailure
+          securityContext:
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+          volumes:
+            - name: talos
+              secret:
+                secretName: etcd-defrag
+            - emptyDir: {}
+              name: tmp
+  schedule: 0 4 * * 0
+  successfulJobsHistoryLimit: 1
+  timeZone: Europe/Warsaw

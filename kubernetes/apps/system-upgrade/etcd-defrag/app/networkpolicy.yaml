@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: etcd-defrag
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: etcd-defrag
+  egress:
+    # Talos API on node management network (:50000)
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "50000"
+              protocol: TCP

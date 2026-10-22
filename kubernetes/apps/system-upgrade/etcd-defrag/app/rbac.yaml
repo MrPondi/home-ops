@@ -1,0 +1,10 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/talos.dev/serviceaccount_v1alpha1.json
+apiVersion: talos.dev/v1alpha1
+kind: ServiceAccount
+metadata:
+  name: etcd-defrag
+spec:
+  roles:
+    # etcd defrag is not covered by os:etcd:backup
+    - os:admin

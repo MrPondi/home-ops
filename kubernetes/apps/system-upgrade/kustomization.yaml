@@ -12,4 +12,5 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./etcd-defrag/ks.yaml
   - ./tuppr/ks.yaml
