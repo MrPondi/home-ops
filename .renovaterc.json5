@@ -128,10 +128,10 @@
       groupSlug: "mise-tools",
     },
     {
-      // Unites the factory installer image and the tuppr upgrade version
+      // Unites the factory installer image, the tuppr upgrade version and the etcd-defrag talosctl image
       description: "Talos Group",
       groupName: "talos",
-      matchPackageNames: ["siderolabs/talos"],
+      matchPackageNames: ["siderolabs/talos", "ghcr.io/siderolabs/talosctl"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },

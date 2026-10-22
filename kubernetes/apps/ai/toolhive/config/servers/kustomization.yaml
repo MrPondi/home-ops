@@ -15,8 +15,8 @@ resources:
   - ./konflate/
   - ./kubernetes/
   - ./longhorn/
-  - ./proxmox/
   - ./prometheus/
+  - ./proxmox/
   - ./qbittorrent/
   # - ./seerr/
   # - ./servarr/
