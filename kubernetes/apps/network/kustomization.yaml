@@ -9,11 +9,13 @@ replacements:
 
 components:
   - ../../components/alerts
+  - ../../components/generators
 
 resources:
   - ./namespace.yaml
   - ./certificates/ks.yaml
   - ./cloudflare-tunnel/ks.yaml
+  - ./crowdsec/ks.yaml
   - ./echo/ks.yaml
   - ./envoy-gateway/ks.yaml
   - ./external-dns/ks.yaml
