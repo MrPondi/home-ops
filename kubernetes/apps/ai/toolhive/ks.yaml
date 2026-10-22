@@ -45,7 +45,7 @@ spec:
   components: []
   dependsOn:
     - name: toolhive-operator
-    - name: app-postbuild
+    - name: ai-app-postbuild
     - name: external-secrets-store
       namespace: external-secrets
     - name: litellm
