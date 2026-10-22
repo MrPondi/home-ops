@@ -40,7 +40,7 @@ spec:
           app:
             image:
               repository: ghcr.io/pelican/panel
-              tag: v1.0.0-beta38@sha256:46f356f3fda423b1d43f0dc3c71efc056cd8b9bec365d1d7817306a17ee5694a
+              tag: v1.0.0-rc.1@sha256:6cdbd674c14221b760da980cbeecab1982cdd1d38746ae204306fe156b19239d
             env:
               FILAMENT_UPLOADABLE_AVATARS: "true"
               REDIS_PASSWORD:
