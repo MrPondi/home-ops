@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubernetes-mcp-config
+data:
+  config.toml: |
+    port = "8080"
+    read_only = true
+    stateless = true
+
+    [[denied_resources]]
+    group = ""
+    version = "v1"
+    kind = "Secret"
