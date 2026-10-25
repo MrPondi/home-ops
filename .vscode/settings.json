@@ -56,6 +56,12 @@
       "base": "lib",
       "color": "#FC6E4F",
       "fileNames": ["networkpolicy.yaml"]
+    },
+    {
+      "name": "litellmkey",
+      "base": "key",
+      "color": "#90A4AE",
+      "fileNames": ["litellmkey.yaml"]
     }
   ],
   "material-icon-theme.files.associations": {
