@@ -88,6 +88,3 @@ spec:
             subPath: limiter.toml
       tmp:
         type: emptyDir
-        globalMounts:
-          - path: /tmp
-            subPath: tmp
