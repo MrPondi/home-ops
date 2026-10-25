@@ -63,7 +63,7 @@ This Git repository contains the following directories under [Kubernetes](./kube
 
 ### Cluster layout
 
-Here's how Flux orchestrates application deployments with dependencies. Most applications are deployed as `HelmRelease` resources that depend on other `HelmRelease`'s, while some `Kustomization`'s depend on other `Kustomization`'s. Occasionally, an application may have dependencies on both types. The diagram below illustrates this: `atuin` won't deploy or upgrade until `k8s-0` is successfully installed and healthy.
+Here's how Flux orchestrates application deployments with dependencies. Most applications are deployed as `HelmRelease` resources that depend on other `HelmRelease`'s, while some `Kustomization`'s depend on other `Kustomization`'s. Occasionally, an application may have dependencies on both types. The diagram below illustrates this: `nextcloud` won't deploy or upgrade until the `mariadb-cluster` Kustomization has applied and its database is healthy, and that in turn waits on the `mariadb-operator`.
 
 <details>
   <summary>Click to see a high-level architecture diagram</summary>
@@ -73,12 +73,12 @@ graph LR
     classDef kustom fill:#43A047,stroke:#2E7D32,stroke-width:3px,color:#fff,font-weight:bold,rx:10,ry:10
     classDef helm fill:#1976D2,stroke:#0D47A1,stroke-width:3px,color:#fff,font-weight:bold,rx:10,ry:10
 
-    A["📦 Kustomization<br/>longhorn"]:::kustom
-    B["📦 Kustomization<br/>longhorn-config"]:::kustom
-    C["🎯 HelmRelease<br/>longhorn"]:::helm
-    D["💾 Node<br/>k8s-0"]:::helm
-    E["📦 Kustomization<br/>atuin"]:::kustom
-    F["🎯 HelmRelease<br/>atuin"]:::helm
+    A["📦 Kustomization<br/>mariadb-operator"]:::kustom
+    B["📦 Kustomization<br/>mariadb-cluster"]:::kustom
+    C["🎯 HelmRelease<br/>mariadb-operator"]:::helm
+    D["💾 MariaDB<br/>mariadb"]:::helm
+    E["📦 Kustomization<br/>nextcloud"]:::kustom
+    F["🎯 HelmRelease<br/>nextcloud"]:::helm
 
     A -->|Creates| C
     B -->|Creates| D
