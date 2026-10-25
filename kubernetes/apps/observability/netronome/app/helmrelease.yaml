@@ -80,12 +80,7 @@ spec:
         cronjob:
           schedule: "0 3 * * *"
           backoffLimit: 0
-          concurrencyPolicy: Forbid
-          successfulJobsHistory: 1
-          failedJobsHistory: 1
           ttlSecondsAfterFinished: 86400
-        pod:
-          restartPolicy: Never
         containers:
           geoipupdate:
             image:
@@ -130,17 +125,9 @@ spec:
     persistence:
       data:
         storageClass: longhorn
-        accessMode: ReadWriteOnce
         size: 5Gi
-        globalMounts:
-          - path: /data
       geoip:
         storageClass: longhorn
-        accessMode: ReadWriteOnce
         size: 1Gi
-        globalMounts:
-          - path: /geoip
       tmp:
         type: emptyDir
-        globalMounts:
-          - path: /tmp

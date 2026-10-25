@@ -109,5 +109,4 @@ spec:
         server: qnap.internal
         path: /mnt/terra/Media
         globalMounts:
-          - path: /media
-            subPath: media
+          - subPath: media

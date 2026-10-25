@@ -16,9 +16,6 @@ spec:
         cronjob:
           schedule: 0 0 * * 1
           backoffLimit: 0
-          concurrencyPolicy: Forbid
-          successfulJobsHistory: 1
-          failedJobsHistory: 1
           ttlSecondsAfterFinished: 86400
         initContainers:
           clone:
@@ -103,9 +100,6 @@ spec:
         cronjob:
           schedule: 0 * * * *
           backoffLimit: 0
-          concurrencyPolicy: Forbid
-          successfulJobsHistory: 1
-          failedJobsHistory: 1
           ttlSecondsAfterFinished: 86400
         initContainers:
           clone:
@@ -199,8 +193,6 @@ spec:
           - path: /data
       uv-cache:
         type: emptyDir
-        globalMounts:
-          - path: /uv-cache
       uv-data-timetable-sync:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
@@ -225,7 +217,5 @@ spec:
               - path: /uv-data
       workspace:
         type: emptyDir
-        globalMounts:
-          - path: /workspace
       tmp:
         type: emptyDir

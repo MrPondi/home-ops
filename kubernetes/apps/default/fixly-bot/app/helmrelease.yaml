@@ -121,18 +121,12 @@ spec:
     persistence:
       uv-cache:
         type: emptyDir
-        globalMounts:
-          - path: /uv-cache
       uv-data:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         storageClass: longhorn
         size: 2Gi
-        globalMounts:
-          - path: /uv-data
       workspace:
         type: emptyDir
-        globalMounts:
-          - path: /workspace
       tmp:
         type: emptyDir

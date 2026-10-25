@@ -46,7 +46,6 @@ spec:
       max_connections: "300"
       shared_buffers: 128MB
       work_mem: 64MB
-  primaryUpdateStrategy: unsupervised
   resources:
     requests:
       cpu: 100m

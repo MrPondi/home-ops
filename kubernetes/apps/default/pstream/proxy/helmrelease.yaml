@@ -103,8 +103,6 @@ spec:
     persistence:
       workspace:
         type: emptyDir
-        globalMounts:
-          - path: /workspace
       node-npm:
         type: emptyDir
         globalMounts:

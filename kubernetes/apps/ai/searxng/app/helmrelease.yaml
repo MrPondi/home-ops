@@ -89,5 +89,4 @@ spec:
       tmp:
         type: emptyDir
         globalMounts:
-          - path: /tmp
-            subPath: tmp
+          - subPath: tmp
