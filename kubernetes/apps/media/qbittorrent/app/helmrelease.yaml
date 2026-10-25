@@ -37,7 +37,6 @@ spec:
                   httpGet:
                     path: /api/v2/app/version
                     port: *port
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             securityContext:
@@ -81,7 +80,6 @@ spec:
       #   ports:
       #     bittorrent-tcp:
       #       port: *torrentPort
-      #       protocol: TCP
     route:
       app:
         annotations:
@@ -104,7 +102,6 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *port
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
@@ -113,7 +110,6 @@ spec:
         server: qnap.internal
         path: /mnt/terra/Media
         globalMounts:
-          - path: /media
-            subPath: media
+          - subPath: media
       tmp:
         type: emptyDir

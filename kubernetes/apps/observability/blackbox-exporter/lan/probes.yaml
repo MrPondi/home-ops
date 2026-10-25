@@ -12,6 +12,9 @@ spec:
     staticConfig:
       static:
         - qnap.internal
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter-lan
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
 apiVersion: monitoring.coreos.com/v1
@@ -27,3 +30,6 @@ spec:
     staticConfig:
       static:
         - qnap.internal:2049
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter-lan

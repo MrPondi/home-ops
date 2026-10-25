@@ -43,7 +43,6 @@ spec:
                 custom: true
                 spec:
                   httpGet: *httpGet
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             securityContext:
@@ -89,6 +88,3 @@ spec:
             subPath: limiter.toml
       tmp:
         type: emptyDir
-        globalMounts:
-          - path: /tmp
-            subPath: tmp

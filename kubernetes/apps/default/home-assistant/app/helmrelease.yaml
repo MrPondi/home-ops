@@ -40,7 +40,6 @@ spec:
                 custom: true
                 spec:
                   httpGet: *httpGet
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             securityContext:
@@ -81,7 +80,6 @@ spec:
           gethomepage.dev/widget.url: http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local:8123
           gethomepage.dev/widget.key: "{{`{{HOMEPAGE_VAR_HOMEASSISTANT_TOKEN}}`}}"
         hostnames:
-          # - "{{ .Release.Name }}.pondi.dev"
           - "hass.pondi.dev"
         parentRefs:
           - name: envoy-external
@@ -89,8 +87,6 @@ spec:
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /config
       config-file:
         type: secret
         name: "{{ .Release.Name }}-config"

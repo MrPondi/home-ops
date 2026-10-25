@@ -128,7 +128,6 @@ spec:
                     httpHeaders:
                       - name: Authorization
                         value: "Bearer ${PROBE_API_KEY}"
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             securityContext:
@@ -172,7 +171,6 @@ spec:
                 custom: true
                 spec:
                   httpGet: *httpGet
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             securityContext:
@@ -237,7 +235,6 @@ spec:
       #           port: whatsapp
       #       matches:
       #         - path:
-      #             type: PathPrefix
       #             value: /whatsapp/webhook
     persistence:
       data:

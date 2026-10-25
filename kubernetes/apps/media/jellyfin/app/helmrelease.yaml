@@ -37,7 +37,6 @@ spec:
                 custom: true
                 spec:
                   httpGet: *httpGet
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             securityContext:
@@ -104,8 +103,7 @@ spec:
         server: qnap.internal
         path: /mnt/terra/Media
         globalMounts:
-          - path: /media
-            subPath: media
+          - subPath: media
       tmpfs:
         type: emptyDir
         advancedMounts:

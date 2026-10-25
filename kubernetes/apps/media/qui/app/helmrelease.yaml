@@ -49,7 +49,6 @@ spec:
                   httpGet:
                     path: /healthz/readiness
                     port: *port
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             resources:
@@ -98,10 +97,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
@@ -110,5 +105,4 @@ spec:
         server: qnap.internal
         path: /mnt/terra/Media
         globalMounts:
-          - path: /media
-            subPath: media
+          - subPath: media

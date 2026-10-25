@@ -24,7 +24,7 @@ spec:
     # bgpControlPlane:
     #   enabled: true
     cgroup:
-      automount:
+      autoMount:
         enabled: false
       hostRoot: /sys/fs/cgroup
     # NOTE: devices might need to be set if you have more than one active NIC on your hosts
@@ -98,7 +98,6 @@ spec:
       replicas: 1
       rollOutPods: true
     prometheus:
-      enabled: true
       serviceMonitor:
         enabled: true
         trustCRDsExist: true
