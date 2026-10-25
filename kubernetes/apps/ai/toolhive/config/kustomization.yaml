@@ -6,6 +6,7 @@ resources:
   - ./certificate.yaml
   - ./externalsecret.yaml
   - ./httproute.yaml
+  - ./litellmkey.yaml
   - ./mcpgroup.yaml
   - ./mcpoidc.yaml
   - ./mcptelemetry.yaml

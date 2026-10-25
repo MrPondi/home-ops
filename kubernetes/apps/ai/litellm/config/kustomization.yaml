@@ -7,5 +7,4 @@ resources:
   - ./networkpolicy.yaml
   - ./proxy.yaml
   - ./servicemonitor.yaml
-  - ./keys/
   - ./models/
