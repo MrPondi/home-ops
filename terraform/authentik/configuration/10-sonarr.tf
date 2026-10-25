@@ -1,6 +1,5 @@
 data "bitwarden-secrets_secret" "sonarr" {
-  # TODO: replace with the Bitwarden secret id of the `sonarr` item (needs SONARR_OIDC_CLIENT_ID / _CLIENT_SECRET / _OIDC_USER)
-  id = "00000000-0000-0000-0000-000000000000"
+  id = "96354bf7-c337-49e1-815f-b3dc00d03359"
 }
 
 resource "authentik_provider_oauth2" "sonarr" {

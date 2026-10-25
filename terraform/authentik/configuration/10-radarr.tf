@@ -1,6 +1,5 @@
 data "bitwarden-secrets_secret" "radarr" {
-  # TODO: replace with the Bitwarden secret id of the `radarr` item (needs RADARR_OIDC_CLIENT_ID / _CLIENT_SECRET / _OIDC_USER)
-  id = "00000000-0000-0000-0000-000000000000"
+  id = "58d07efd-1dab-4827-a5a9-b3dc00cfb086"
 }
 
 resource "authentik_provider_oauth2" "radarr" {
