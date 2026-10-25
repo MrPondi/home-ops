@@ -81,7 +81,6 @@ spec:
       #   ports:
       #     bittorrent-tcp:
       #       port: *torrentPort
-      #       protocol: TCP
     route:
       app:
         annotations:
@@ -104,7 +103,6 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *port
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
@@ -112,8 +110,5 @@ spec:
         type: nfs
         server: qnap.internal
         path: /mnt/terra/Media
-        globalMounts:
-          - path: /media
-            subPath: media
       tmp:
         type: emptyDir

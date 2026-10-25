@@ -15,13 +15,7 @@ spec:
     instance:
       cluster:
         networkPolicy: false
-      components:
-        - source-controller
-        - kustomize-controller
-        - helm-controller
-        - notification-controller
       sync:
-        kind: GitRepository
         url: "ssh://git@github.com/MrPondi/home-ops.git"
         pullSecret: github-deploy-key
         ref: "refs/heads/main"
@@ -58,7 +52,7 @@ spec:
                       group: helm.toolkit.fluxcd.io
                       kind: HelmRelease
                   # Label UX registry: entries below keyed by labelSelector; JSON6902 appends to spec.components/spec.dependsOn/spec.healthCheckExprs require labeled KSs to carry that field as a list.
-                  - 
+                  -
                     # net-new CNPG cluster initdb; label components.postgres/cnpg=init
                     # Labeled KSs must not define their own spec.patches (strategic merge would replace them).
                     patch: |-
@@ -85,7 +79,7 @@ spec:
                       group: kustomize.toolkit.fluxcd.io
                       kind: Kustomization
                       labelSelector: "components.postgres/cnpg=init"
-                  - 
+                  -
                     # Configure Dragonfly for ToolHive's Redis auth-storage Lua scripts.
                     # Replication remains enabled; standalone mode and undeclared-key access
                     # are required by ToolHive's scripts.

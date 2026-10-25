@@ -237,7 +237,6 @@ spec:
       #           port: whatsapp
       #       matches:
       #         - path:
-      #             type: PathPrefix
       #             value: /whatsapp/webhook
     persistence:
       data:

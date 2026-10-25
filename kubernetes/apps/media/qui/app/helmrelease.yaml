@@ -98,10 +98,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
@@ -109,6 +105,3 @@ spec:
         type: nfs
         server: qnap.internal
         path: /mnt/terra/Media
-        globalMounts:
-          - path: /media
-            subPath: media

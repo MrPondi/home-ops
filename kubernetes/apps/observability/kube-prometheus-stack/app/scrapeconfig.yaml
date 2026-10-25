@@ -11,10 +11,8 @@ spec:
         - pve.internal:9100
         - wings0.pondi.dev:9100
         - hetzner.external:9100
-  metricsPath: /metrics
   relabelings:
-    - action: replace
-      targetLabel: job
+    - targetLabel: job
       replacement: node-exporter
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
@@ -26,10 +24,8 @@ spec:
   staticConfigs:
     - targets:
         - qnap.internal:9633
-  metricsPath: /metrics
   relabelings:
-    - action: replace
-      targetLabel: job
+    - targetLabel: job
       replacement: smartctl-exporter
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/scrapeconfig_v1alpha1.json
@@ -43,6 +39,5 @@ spec:
         - s3.pondi.dev
   metricsPath: /minio/metrics/v3
   relabelings:
-    - action: replace
-      targetLabel: job
+    - targetLabel: job
       replacement: minio
