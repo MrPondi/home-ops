@@ -42,6 +42,8 @@ spec:
                   secretKeyRef:
                     name: litellm-key-open-webui
                     key: api-key
+              # $(VAR) only expands vars defined earlier; app-template sorts env keys alphabetically,
+              # so every var referenced here must sort before OPENAI_API_KEYS
               OPENAI_API_KEYS: $(LITELLM_OPEN_WEBUI_KEY);$(HERMES_API_SERVER_KEY)
               REDIS_URL: redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379/0
               SEARXNG_QUERY_URL: "http://searxng.ai.svc.cluster.local:8080/search?q=<query>"
