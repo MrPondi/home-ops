@@ -32,6 +32,17 @@ spec:
               ENABLE_VERSION_UPDATE_CHECK: "false"
               ENABLE_WEB_SEARCH: True
               ENABLE_WEBSOCKET_SUPPORT: true
+              HERMES_API_SERVER_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: open-webui-secret
+                    key: HERMES_API_SERVER_KEY
+              LITELLM_OPEN_WEBUI_KEY:
+                valueFrom:
+                  secretKeyRef:
+                    name: litellm-key-open-webui
+                    key: api-key
+              OPENAI_API_KEYS: $(LITELLM_OPEN_WEBUI_KEY);$(HERMES_API_SERVER_KEY)
               REDIS_URL: redis://{{ .Release.Name }}-dragonfly.ai.svc.cluster.local:6379/0
               SEARXNG_QUERY_URL: "http://searxng.ai.svc.cluster.local:8080/search?q=<query>"
               TOOL_SERVER_CONNECTIONS: '[{"type":"mcp","url":"http://vmcp-mcp-gateway-internal.ai.svc.cluster.local:4483/mcp","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"mcp-gateway","name":"MCP Gateway","description":""}}]'

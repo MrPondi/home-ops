@@ -13,6 +13,8 @@ spec:
   dependsOn:
     - name: external-secrets-store
       namespace: external-secrets
+    - name: litellm
+      namespace: ai
     - name: searxng
       namespace: ai
   healthCheckExprs: []

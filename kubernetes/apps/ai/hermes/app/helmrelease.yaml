@@ -26,6 +26,7 @@ spec:
                 set -euo pipefail
 
                 cp /tmp/config.yaml /opt/data/config.yaml
+                sed -i "s|LITELLM_API_KEY_PLACEHOLDER|$LITELLM_API_KEY|" /opt/data/config.yaml
 
                 mkdir -p /opt/data/.local/bin
 
@@ -65,6 +66,11 @@ spec:
                   secretKeyRef:
                     name: "{{ .Release.Name }}-secret"
                     key: API_SERVER_KEY
+              - name: LITELLM_API_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: litellm-key-hermes
+                    key: api-key
           2-install-tools:
             image: &image
               repository: docker.io/nousresearch/hermes-agent
@@ -242,8 +248,8 @@ spec:
         globalMounts:
           - path: /opt/data
       config:
-        type: secret
-        name: "{{ .Release.Name }}-config-secret"
+        type: configMap
+        name: "{{ .Release.Name }}-config"
         defaultMode: 0755
         advancedMounts:
           hermes:

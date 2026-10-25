@@ -11,6 +11,8 @@ spec:
     - name: ai-postbuild
     - name: external-secrets-store
       namespace: external-secrets
+    - name: litellm
+      namespace: ai
     - name: searxng
       namespace: ai
   interval: 1h
