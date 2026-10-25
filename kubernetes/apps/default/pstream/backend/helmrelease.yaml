@@ -62,7 +62,6 @@ spec:
                   httpGet:
                     path: /meta
                     port: &port 3000
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             securityContext:

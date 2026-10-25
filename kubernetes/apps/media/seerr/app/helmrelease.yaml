@@ -44,7 +44,6 @@ spec:
                   httpGet:
                     path: /api/v1/settings/public
                     port: *port
-                  periodSeconds: 10
                   timeoutSeconds: 5
                   failureThreshold: 5
             securityContext:
