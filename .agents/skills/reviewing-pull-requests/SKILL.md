@@ -1,6 +1,6 @@
 ---
 name: reviewing-pull-requests
-description: Use when reviewing a pull request or Renovate update in this Flux repository, or checking what a change under kubernetes/ affects. Covers finding a dependency's upstream, breaking changes, Renovate's rules here, searching what depends on a change, and what a check proves. references/registry.md reads images and OCI charts with crane; references/rendering.md renders and diffs HelmReleases with flate.
+description: Use when reviewing a pull request or Renovate update in this Flux repository, or checking what a change under kubernetes/ affects. Covers finding a dependency's upstream, breaking changes, Renovate's rules here, searching what depends on a change, and what a check proves. references/registry.md reads images and OCI charts with crane; references/rendering.md renders and diffs HelmReleases with flate. references/policy.md holds this repository's review policy: HelmRelease, secrets, image digests, breaking changes and Kubernetes/Talos compatibility.
 ---
 
 # Reviewing pull requests in home-ops
@@ -144,6 +144,10 @@ wrong edit that gets applied is worse than none.
 
 A finding anchors to the changed line in the diff; name the dependent
 file and line in its explanation.
+
+## Repository policy
+
+Read `references/policy.md` for what this repository requires of a change: HelmRelease shape, secret handling, image and digest pinning, what counts as breaking, and the Kubernetes/Talos compatibility check for a Kubernetes bump.
 
 ## What a check proves
 

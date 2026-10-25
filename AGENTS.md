@@ -288,29 +288,7 @@ Cilium (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.0.0/1
 2. Live flows: `mise run //kubernetes:hubble-drops <ns>` (interactive follow) or `mise run //kubernetes:hubble-capture <ns> 60` (bounded capture; the output file is auto-named under `/tmp` and its path printed). Zero `POLICY_DENIED` drops in the touched namespaces = good. For anything older than a few seconds, query the persistent drop history in VictoriaLogs (see "Hubble").
 3. Event-driven paths (webhooks, backups, cert renewals) do not show up in short captures — trigger them (e.g. CNPG `Backup` CR / `mise run //kubernetes:pg-initial-backup`, ExternalSecret `force-sync` annotation, `kubectl kopiur snapshot now -n <ns> --policy <app>`, re-apply a CR) or wait.
 
-## PR Review Standards
-
-When reviewing PRs (including Renovate), enforce these criteria.
-
-### HelmRelease requirements
-
-- Every application is a Flux `HelmRelease` with `spec.chartRef` pointing at the **per-app `OCIRepository`** (named after the app, in its own `ocirepository.yaml`) pinned by `ref.tag`, and a `spec.interval`.
-- `install`/`upgrade`/`rollback`/`remediation` defaults are patched globally by the root `flux-system` Kustomization — do not add them per-app, and do not flag their absence.
-- `metadata.namespace` is **never** set inline on `HelmRelease`/`Kustomization` resources (see Conventions) — reviewers MUST NOT flag its absence.
-- Postgres/Dragonfly components arrive via labels (see "Label-driven components") — do not flag their absence from `spec.components`.
-
-### Secret management rules
-
-- **NEVER** commit plain-text secrets, tokens or keys in Git — all secrets go through `external-secrets` with the `bitwarden-secretsmanager` `ClusterSecretStore`; templated values via `substituteFrom` Secrets created from ExternalSecrets.
-- Talos (`talos/*.yaml.j2` + `vals`/bw-serve) and Terraform (`.sops.yaml` + `age.key`) resolve secrets at render time — this is the intended pattern; do not convert them to external-secrets.
-
-### Image & digest policy
-
-- Container images: prefer `@sha256:` digests over version tags for reproducibility.
-- OCI chart artifacts pulled via `OCIRepository` are **exempt**: pin by tag/version.
-- Reject updates from untrusted registries; prefer GHCR.io and registry.k8s.io, Docker Hub only as fallback (avoid it for critical infrastructure components).
-
-### Konflate rendered-diff (MCP)
+## PR Evidence (konflate)
 
 Konflate renders Helm charts and Kustomizations into their final Kubernetes manifests, so its rendered diff shows the actual cluster impact of a PR — not just the raw git changes. It also runs as a required PR check.
 
@@ -318,23 +296,7 @@ Konflate renders Helm charts and Kustomizations into their final Kubernetes mani
 - `get_pr_diff` (pass the PR number): the full rendered manifest diff (PR head vs merge-base). Use it when the raw git diff hides the real change — e.g. a HelmRelease version bump or a one-line `values` change that fans out across many resources.
 - Surface cautions as caveats or blockers by severity; **treat render failures as blockers** (the manifests may not apply cleanly). Keep digest-only bump reviews compact.
 
-### Breaking change detection
-
-Request changes if:
-
-- API version changes (e.g. `apps/v1beta1` → `apps/v1`), deprecated field usage, or major version bumps without justification
-- CRD changes or custom resource modifications
-- Network policy or security context relaxations
-
-For major chart/app bumps, read the upstream release notes (context7 / GitHub releases) and cite the relevant breaking changes.
-
-### Kubernetes ↔ Talos compatibility
-
-Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/apps/system-upgrade/tuppr/`). When a PR bumps the Kubernetes version (kubelet image, `KubernetesUpgrade` resource, or the `kubernetes` Renovate group), you MUST:
-
-1. Read the deployed Talos version from `kubernetes/apps/system-upgrade/tuppr/upgrades/talosupgrade.yaml` (see "Versions").
-2. Confirm the new Kubernetes version is supported on that Talos release against Talos's published support matrix — search the web for "talos `<version>` kubernetes support matrix" (docs live at `docs.siderolabs.com`).
-3. Cite the matrix in the review. Do not approve a Kubernetes bump on "patch release" reasoning without confirming Talos supports it.
+PR review criteria (HelmRelease, secrets, image/digest policy, breaking changes, Kubernetes ↔ Talos compatibility) live in the `reviewing-pull-requests` skill (`.agents/skills/reviewing-pull-requests/references/policy.md`); load it when reviewing a PR, including Renovate.
 
 ## Python tooling & scripts
 
@@ -348,6 +310,7 @@ Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/
 - `README.md` — hardware, DNS split, GitOps overview
 - `talos/README.md` — Talos machine config notes
 - `.agents/skills/add-app/SKILL.md` — app scaffolding workflow
+- `.agents/skills/reviewing-pull-requests/` — PR/Renovate review workflow and policy
 - `.agents/instructions/sorting.instructions.md` — YAML key-order rules
 - `.agents/config.yaml` + `.agents/agents/` — agent roles, MCP servers (see "Agent tooling")
 - Component-specific docs live with the component (`kubernetes/components/*/README.md`, `kubernetes/apps/**/README.md` when present)
