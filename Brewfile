@@ -1,4 +1,4 @@
-tap "hashicorp/tap"
+tap "hashicorp/tap", trusted: true
 tap "home-operations/tap", trusted: true
 tap "terror/tap", trusted: true
 # Handy way to save and run project-specific commands
