@@ -6,7 +6,6 @@ metadata:
   name: sonarr
 spec:
   components:
-    - ../../../../components/auth-proxy
     - ../../../../components/kopiur/backup
     - ../../../../components/zeroscaler
   dependsOn:
