@@ -11,7 +11,7 @@ spec:
     model: openrouter/nvidia/nemotron-3-ultra-550b-a55b:free
     apiKey: os.environ/OPENROUTER_API_KEY
     additional:
-      order: 1
+      order: 7
   info:
     mode: chat
     maxInputTokens: 1000000
@@ -33,7 +33,7 @@ spec:
     model: openrouter/nvidia/nemotron-3.5-super-vl:free
     apiKey: os.environ/OPENROUTER_API_KEY
     additional:
-      order: 2
+      order: 8
   info:
     mode: chat
     maxInputTokens: 1000000
@@ -56,7 +56,7 @@ spec:
     model: openrouter/nvidia/nemotron-3-super-120b-a12b:free
     apiKey: os.environ/OPENROUTER_API_KEY
     additional:
-      order: 3
+      order: 9
   info:
     mode: chat
     maxInputTokens: 262144
@@ -78,7 +78,7 @@ spec:
     model: openrouter/google/gemma-4-31b-it:free
     apiKey: os.environ/OPENROUTER_API_KEY
     additional:
-      order: 4
+      order: 10
   info:
     mode: chat
     maxInputTokens: 262144
@@ -101,7 +101,7 @@ spec:
     model: openrouter/cohere/north-mini-code:free
     apiKey: os.environ/OPENROUTER_API_KEY
     additional:
-      order: 5
+      order: 11
   info:
     mode: chat
     maxInputTokens: 256000
@@ -123,7 +123,7 @@ spec:
     model: openrouter/nvidia/nemotron-3.5-lightning:free
     apiKey: os.environ/OPENROUTER_API_KEY
     additional:
-      order: 6
+      order: 12
   info:
     mode: chat
     maxInputTokens: 1000000
@@ -145,7 +145,7 @@ spec:
     model: openrouter/poolside/laguna-s-2.1:free
     apiKey: os.environ/OPENROUTER_API_KEY
     additional:
-      order: 7
+      order: 13
   info:
     mode: chat
     maxInputTokens: 262144
@@ -167,7 +167,7 @@ spec:
     model: openrouter/openrouter/free
     apiKey: os.environ/OPENROUTER_API_KEY
     additional:
-      order: 8
+      order: 14
   info:
     mode: chat
     maxInputTokens: 200000
