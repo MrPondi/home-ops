@@ -2,11 +2,11 @@
 apiVersion: litellm.home-operations.com/v1alpha1
 kind: LiteLLMModel
 metadata:
-  name: &name gemini-3.1-flash-lite
+  name: &name gemini-3.7-flash
 spec:
   modelName: *name
   params:
-    model: gemini/gemini-3.1-flash-lite
+    model: gemini/gemini-3.7-flash
     apiKeyRef:
       name: litellm-secret
       key: GEMINI_API_KEY
