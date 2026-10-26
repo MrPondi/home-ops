@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: free-pool-groq-gpt-oss-120b
+spec:
+  modelName: free-pool
+  proxyRef: litellm
+  params:
+    model: groq/openai/gpt-oss-120b
+    apiKey: os.environ/GROQ_API_KEY
+    additional:
+      order: 4
+  info:
+    mode: chat
+    maxInputTokens: 131072
+    maxOutputTokens: 65536
+    supportsFunctionCalling: true
+    extra:
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: free-pool-groq-qwen3-8-27b
+spec:
+  modelName: free-pool
+  proxyRef: litellm
+  params:
+    model: groq/qwen/qwen3.8-27b
+    apiKey: os.environ/GROQ_API_KEY
+    additional:
+      order: 6
+  info:
+    mode: chat
+    maxInputTokens: 131072
+    maxOutputTokens: 16384
+    supportsFunctionCalling: true
+    extra:
+      input_cost_per_token: 0
+      output_cost_per_token: 0

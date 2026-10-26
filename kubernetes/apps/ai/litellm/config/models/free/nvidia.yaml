@@ -1,0 +1,66 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: free-pool-nvidia-nemotron-ultra
+spec:
+  modelName: free-pool
+  proxyRef: litellm
+  params:
+    model: nvidia_nim/nvidia/nemotron-3-ultra-550b-a55b
+    apiKey: os.environ/NVIDIA_API_KEY
+    additional:
+      order: 1
+  info:
+    mode: chat
+    maxInputTokens: 131072
+    maxOutputTokens: 16384
+    supportsFunctionCalling: true
+    extra:
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: free-pool-nvidia-glm-5-3
+spec:
+  modelName: free-pool
+  proxyRef: litellm
+  params:
+    model: nvidia_nim/z-ai/glm-5.3
+    apiKey: os.environ/NVIDIA_API_KEY
+    additional:
+      order: 2
+  info:
+    mode: chat
+    maxInputTokens: 131072
+    maxOutputTokens: 16384
+    supportsFunctionCalling: true
+    extra:
+      input_cost_per_token: 0
+      output_cost_per_token: 0
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmmodel_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMModel
+metadata:
+  name: free-pool-nvidia-deepseek-v4-1-flash
+spec:
+  modelName: free-pool
+  proxyRef: litellm
+  params:
+    model: nvidia_nim/deepseek-ai/deepseek-v4.1-flash
+    apiKey: os.environ/NVIDIA_API_KEY
+    additional:
+      order: 3
+  info:
+    mode: chat
+    maxInputTokens: 131072
+    maxOutputTokens: 16384
+    supportsFunctionCalling: true
+    extra:
+      input_cost_per_token: 0
+      output_cost_per_token: 0
