@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/sdr-enthusiasts/docker-tar1090
-              tag: latest@sha256:7f681379111cceb28e50f0a29c23e3a576430637ee9c3d1e722e5cd1de4d2c20
+              tag: latest@sha256:9d91002a1dffac2ed3a254114132ac942c7ae54fa376e126908d797976bc936b
             env:
               TAR1090_NGINX_PORT: &port 80
               BEASTHOST: &host 192.168.1.174
