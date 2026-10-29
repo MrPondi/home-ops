@@ -46,6 +46,9 @@ spec:
               resources:
                 requests:
                   storage: 1Gi
+    defaultRules:
+      disabled:
+        etcdDatabaseHighFragmentationRatio: true # replaced by etcd-rules (floor on reclaimable bytes)
     kubeEtcd:
       service:
         selector:
@@ -117,6 +120,27 @@ spec:
                 expr: count(time() - container_last_seen{image=~"(docker.io).*",container!=""} < 30) > 100
                 labels:
                   severity: critical
+      etcd-rules:
+        groups:
+          - name: etcd-fragmentation
+            rules:
+              - alert: EtcdDatabaseHighFragmentationRatio
+                annotations:
+                  description: etcd {{ $labels.instance }} database size in use is only {{ $value | humanizePercentage }} of the allocated file, with over 256MiB reclaimable. Run `talosctl etcd defrag`.
+                  summary: etcd database is over 50% fragmented and the reclaimable space exceeds 256MiB.
+                expr: |-
+                  (
+                    last_over_time(etcd_mvcc_db_total_size_in_use_in_bytes{job=~".*etcd.*"}[5m])
+                    / last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m])
+                  ) < 0.5
+                  and
+                  (
+                    last_over_time(etcd_mvcc_db_total_size_in_bytes{job=~".*etcd.*"}[5m])
+                    - last_over_time(etcd_mvcc_db_total_size_in_use_in_bytes{job=~".*etcd.*"}[5m])
+                  ) > 268435456
+                for: 10m
+                labels:
+                  severity: warning
       oom-rules:
         groups:
           - name: oom
