@@ -6,7 +6,7 @@ metadata:
   name: kubernetes
 spec:
   env: []
-  image: ghcr.io/containers/kubernetes-mcp-server:v0.1.2@sha256:e3bf21b5488aedb02d1e686de162785a82fa99a6ada12388aef157c2fdd5dc68
+  image: ghcr.io/containers/kubernetes-mcp-server:v0.1.2@sha256:c289505b06079d7f265a6fef977ce1abbfbbb4271772db17db5b58edbf44c255
   transport: streamable-http
   mcpPort: 8080
   serviceAccount: kubernetes-mcp
