@@ -76,7 +76,7 @@ spec:
             - port: "9093"
               protocol: TCP
   egress:
-    # pushover (443) + buddy heartbeat webhooks (8123 buddy-heartbeat), internet HTTPS
+    # pushover (443) + buddy heartbeat webhooks (8080 buddy-heartbeat), internet HTTPS
     - toCIDRSet:
         - cidr: 0.0.0.0/0
           except:
@@ -88,7 +88,7 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
-            - port: "8123"
+            - port: "8080"
               protocol: TCP
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json

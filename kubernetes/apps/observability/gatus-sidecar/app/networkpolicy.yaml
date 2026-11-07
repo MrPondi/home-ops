@@ -37,7 +37,7 @@ spec:
             - port: "1"
               endPort: 65535
               protocol: TCP
-    # TCP health checks + ntfy alerting + external DNS resolver tcp://1.1.1.1:53 — any internet port
+    # TCP health checks + external DNS resolver tcp://1.1.1.1:53 — any internet port
     - toEntities:
         - world
       toPorts:

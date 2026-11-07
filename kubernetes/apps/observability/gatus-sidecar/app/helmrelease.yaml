@@ -49,8 +49,8 @@ spec:
       items:
         - key: config.yaml
           path: config.yaml
-        - key: business.yaml
-          path: business.yaml
+        # - key: business.yaml
+        #   path: business.yaml
         # - key: buddy.yaml
         #   path: buddy.yaml
     persistence:
