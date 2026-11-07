@@ -108,6 +108,8 @@ def to_json(data: dict) -> str:
 def render_claude(config: dict, roles: list[dict], skills: list[str]) -> tuple[dict, dict]:
     files: dict[str, str] = {}
 
+    files["CLAUDE.md"] = "@AGENTS.md"
+
     servers = {}
     for name, srv in enabled_servers(config).items():
         if "url" in srv:
