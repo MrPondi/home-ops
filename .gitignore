@@ -2,16 +2,17 @@
 .claude/
 .mcp.json
 CLAUDE.local.md
-.private/
-.venv/
+CLAUDE.md
+
+.DS_Store
+Thumbs.db
 __pycache__/
+.venv/
 *.crt
 *.env
 *.iso
 *.key
 .decrypted~*
-.DS_Store
-Thumbs.db
 kubeconfig
 talosconfig
 
