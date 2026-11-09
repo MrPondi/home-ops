@@ -56,6 +56,7 @@ spec:
                   httpGet:
                     path: /?destination=https://postman-echo.com/get
                     port: *port
+                  periodSeconds: 600
                   timeoutSeconds: 5
                   failureThreshold: 5
             command:
