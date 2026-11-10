@@ -36,6 +36,33 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
+    # Sonarr (media namespace)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Radarr (media namespace)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: radarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # Prowlarr (media namespace)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: prowlarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
     # OIDC via auth.pondi.dev through envoy-internal
     - toEndpoints:
         - matchLabels:
