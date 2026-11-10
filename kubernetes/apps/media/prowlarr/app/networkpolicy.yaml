@@ -48,8 +48,17 @@ spec:
         - ports:
             - port: "80"
               protocol: TCP
+    # Qui (media)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: media
+            k8s:app.kubernetes.io/name: qui
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
   egress:
-    # Servarr suite mesh (sonarr/radarr/prowlarr)
+    # Servarr suite mesh (sonarr/radarr)
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: media
