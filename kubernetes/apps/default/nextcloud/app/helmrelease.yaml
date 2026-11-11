@@ -218,29 +218,7 @@ spec:
         dashboards:
           enabled: true
       route:
-        enabled: true
-        annotations:
-          gatus.home-operations.com/endpoint: |-
-            name: collabora
-        hostnames:
-          - "office.pondi.dev"
-        parentRefs:
-          - name: envoy-internal
-            namespace: network
-        rules:
-          - name: collabora-admin
-            matches:
-              - path:
-                  value: /browser/dist/admin
-            timeouts:
-              backendRequest: 3600s
-
-          - name: collabora-general
-            matches:
-              - path:
-                  value: /
-            timeouts:
-              backendRequest: 3600s
+        enabled: false
     cronjob:
       enabled: true
       type: cronjob

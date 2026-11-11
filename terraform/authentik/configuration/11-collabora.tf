@@ -23,8 +23,8 @@ resource "authentik_application" "collabora" {
   name              = "Nextcloud Collabora"
   slug              = "collabora"
   protocol_provider = authentik_provider_proxy.collabora.id
-  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/collabora.svg"
-  meta_launch_url   = "https://office.pondi.dev"
+  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/collabora-office.png"
+  meta_launch_url   = "https://office.pondi.dev/browser/dist/admin/admin.html"
   open_in_new_tab   = true
 }
 

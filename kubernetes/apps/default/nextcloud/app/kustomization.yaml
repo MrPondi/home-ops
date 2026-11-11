@@ -9,3 +9,4 @@ resources:
   - ./ocirepository.yaml
   - ./pvc.yaml
   - ./securitypolicy.yaml
+  - ./httproute.yaml
