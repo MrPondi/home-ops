@@ -17,10 +17,18 @@ spec:
         - ports:
             - port: "3000"
               protocol: TCP
-    # Grafana.com API — plugins/dashboards (operator binary; wire name carries search suffix)
+    # Grafana.com API — plugins/dashboards
     - toFQDNs:
         - matchName: grafana.com
         - matchName: grafana.com.observability.svc.cluster.local
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # Github API — dashboards
+    - toFQDNs:
+        - matchName: raw.githubusercontent.com
+        - matchName: raw.githubusercontent.com.observability.svc.cluster.local
       toPorts:
         - ports:
             - port: "443"
