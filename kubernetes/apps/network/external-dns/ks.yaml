@@ -24,6 +24,7 @@ metadata:
   name: unifi-dns
 spec:
   dependsOn:
+    - name: cloudflare-dns
     - name: external-secrets-store
       namespace: external-secrets
   interval: 1h
