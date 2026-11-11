@@ -22,6 +22,8 @@ spec:
       matches:
         - path:
             value: /browser/dist/admin
+        - path:
+            value: /outpost.goauthentik.io
 
     - name: collabora-general
       backendRefs:
