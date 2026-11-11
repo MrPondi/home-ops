@@ -8,3 +8,4 @@ resources:
   - ./networkpolicy.yaml
   - ./ocirepository.yaml
   - ./pvc.yaml
+  - ./securitypolicy.yaml

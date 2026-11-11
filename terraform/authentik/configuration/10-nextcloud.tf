@@ -84,6 +84,11 @@ resource "authentik_group" "nextcloud-users" {
 resource "authentik_group" "nextcloud-admins" {
   name         = "Nextcloud Admins"
   parents      = [authentik_group.nextcloud-users.id]
+
+  attributes = jsonencode({
+    "COLLABORA_ADMIN_USERNAME": jsondecode(data.bitwarden-secrets_secret.nextcloud.value)["COLLABORA_ADMIN_USERNAME"],
+    "COLLABORA_ADMIN_PASSWORD": jsondecode(data.bitwarden-secrets_secret.nextcloud.value)["COLLABORA_ADMIN_PASSWORD"]
+  })
 }
 
 resource "authentik_application_entitlement" "nextcloud-admins" {

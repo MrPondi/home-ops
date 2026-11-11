@@ -228,7 +228,15 @@ spec:
           - name: envoy-internal
             namespace: network
         rules:
-          - matches:
+          - name: collabora-admin
+            matches:
+              - path:
+                  value: /browser/dist/admin
+            timeouts:
+              backendRequest: 3600s
+
+          - name: collabora-general
+            matches:
               - path:
                   value: /
             timeouts:
