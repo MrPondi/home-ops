@@ -3,12 +3,12 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name victoria-logs
+  name: victoria-logs-mcp
 spec:
   endpointSelector:
     matchLabels:
       toolhive: "true"
-      toolhive-name: *name
+      toolhive-name: &name victoria-logs
       app: *name
   ingress:
     # Proxy runner -> server

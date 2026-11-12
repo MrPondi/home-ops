@@ -3,12 +3,12 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name proxmox
+  name: proxmox-mcp
 spec:
   endpointSelector:
     matchLabels:
       toolhive: "true"
-      toolhive-name: *name
+      toolhive-name: &name proxmox
       app: *name
   egress:
     # Proxmox VE API (pve.internal via proxmox-backend EndpointSlice 10.0.10.10)

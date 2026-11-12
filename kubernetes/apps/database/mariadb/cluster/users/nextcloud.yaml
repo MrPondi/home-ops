@@ -3,13 +3,13 @@
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: nextcloud
+  name: nextcloud-mariadb
 spec:
   secretStoreRef:
     kind: ClusterSecretStore
     name: bitwarden-secretsmanager
   target:
-    name: nextcloud-secret
+    name: nextcloud-mariadb-secret
     template:
       data:
         password: "{{ .NEXTCLOUD_MARIADB_PASSWORD }}"
@@ -27,7 +27,7 @@ spec:
   mariaDbRef:
     name: mariadb
   passwordSecretKeyRef:
-    name: nextcloud-secret
+    name: nextcloud-mariadb-secret
     key: password
   host: "%"
   maxUserConnections: 20

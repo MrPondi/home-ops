@@ -3,12 +3,12 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name grafana
+  name: grafana-mcp
 spec:
   endpointSelector:
     matchLabels:
       toolhive: "true"
-      toolhive-name: *name
+      toolhive-name: &name grafana
       app: *name
   ingress:
     # Proxy runner -> server

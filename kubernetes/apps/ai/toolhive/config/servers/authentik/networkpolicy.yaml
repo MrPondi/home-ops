@@ -3,12 +3,12 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name authentik
+  name: authentik-mcp
 spec:
   endpointSelector:
     matchLabels:
       toolhive: "true"
-      toolhive-name: *name
+      toolhive-name: &name authentik
       app: *name
   egress:
     # authentik OIDC token/userinfo (security)

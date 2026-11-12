@@ -3,7 +3,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name cloudflare
+  name: cloudflare-mcp
 spec:
   endpointSelector:
     matchLabels:

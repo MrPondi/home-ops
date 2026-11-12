@@ -3,7 +3,7 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name context7
+  name: context7-mcp
 spec:
   endpointSelector:
     matchLabels:

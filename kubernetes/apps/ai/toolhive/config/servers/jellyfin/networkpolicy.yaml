@@ -3,12 +3,12 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: &name jellyfin
+  name: jellyfin-mcp
 spec:
   endpointSelector:
     matchLabels:
       toolhive: "true"
-      toolhive-name: *name
+      toolhive-name: &name jellyfin
       app: *name
   egress:
     # Jellyfin (media)
