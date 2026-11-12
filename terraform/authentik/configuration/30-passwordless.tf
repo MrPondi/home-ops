@@ -11,9 +11,14 @@ resource "authentik_stage_authenticator_validate" "passwordless-webauthn" {
   device_classes        = ["webauthn"]
   not_configured_action = "configure"
   webauthn_user_verification = "required"
-  configuration_stages = [
+  configuration_stages  = [
     data.authentik_stage.default-authenticator-webauthn-setup.id,
-    ]
+  ]
+  webauthn_hints        = [
+    "hybrid",
+    "client-device",
+    "security-key",
+  ]
 }
 
 resource "authentik_flow_stage_binding" "passwordless-webauthn" {

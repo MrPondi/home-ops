@@ -39,6 +39,8 @@ spec:
             secretKeyRef:
               name: authentik-app
               key: password
+        - name: AUTHENTIK_WEB__BASE_URL
+          value: https://auth.pondi.dev
       volumeMounts:
         - name: data
           mountPath: /data
