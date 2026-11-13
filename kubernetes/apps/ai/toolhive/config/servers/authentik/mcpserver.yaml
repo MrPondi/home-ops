@@ -5,7 +5,7 @@ kind: MCPServer
 metadata:
   name: authentik
 spec:
-  image: ghcr.io/samik081/mcp-authentik:0.8.1@sha256:9c684ef1e1499fad143cca527378eebadcde0598ee2756d5e1c82f635688a9b6
+  image: ghcr.io/samik081/mcp-authentik:0.9.0@sha256:d85b49670d7f619b1c37c6bc8b149784c3171fc37a9e1bf3a5837eb3e547434c
   transport: stdio
   proxyPort: 8080
   env:
