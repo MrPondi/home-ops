@@ -57,9 +57,6 @@ spec:
         gethomepage.dev/description: Storage cluster management interface
         gethomepage.dev/weight: "15"
         gethomepage.dev/app: longhorn
-    monitoring:
-      enabled: true
-      createPrometheusRules: true
     metrics:
       serviceMonitor:
         enabled: true
