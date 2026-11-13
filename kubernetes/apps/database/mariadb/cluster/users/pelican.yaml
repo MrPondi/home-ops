@@ -3,13 +3,13 @@
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: pelican
+  name: pelican-mariadb
 spec:
   secretStoreRef:
     kind: ClusterSecretStore
     name: bitwarden-secretsmanager
   target:
-    name: pelican-secret
+    name: pelican-mariadb-secret
     template:
       data:
         password: "{{ .PELICAN_MARIADB_PASSWORD }}"
@@ -27,7 +27,7 @@ spec:
   mariaDbRef:
     name: mariadb
   passwordSecretKeyRef:
-    name: pelican-secret
+    name: pelican-mariadb-secret
     key: password
   host: "%"
   maxUserConnections: 20
