@@ -13,7 +13,7 @@ spec:
   postBuild:
     substitute:
       APP: jellyfin
-      KOPIUR_CAPACITY: 10Gi
+      KOPIUR_CAPACITY: 20Gi
   prune: true
   sourceRef:
     kind: GitRepository

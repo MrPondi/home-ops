@@ -94,10 +94,6 @@ spec:
     persistence:
       config:
         existingClaim: "{{ .Release.Name }}"
-      config-metadata:
-        existingClaim: "{{ .Release.Name }}-metadata"
-        globalMounts:
-          - path: /config/metadata
       media:
         type: nfs
         server: qnap.internal
