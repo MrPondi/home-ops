@@ -15,15 +15,15 @@ components:
 resources:
   - ./namespace.yaml
   - ./chaski/ks.yaml
-  - ./college-timetable/ks.yaml
+  # - ./college-timetable/ks.yaml
   # - ./fixly-bot/ks.yaml
   # - ./home-assistant/ks.yaml
   - ./homepage/ks.yaml
-  - ./mosquitto/ks.yaml
+  # - ./mosquitto/ks.yaml
   - ./nextcloud/ks.yaml
   - ./pelican/ks.yaml
   - ./pstream/ks.yaml
   - ./smtp-relay/ks.yaml
   - ./tar1090/ks.yaml
-  - ./watermark-remover/ks.yaml
-  - ./zwave/ks.yaml
+  # - ./watermark-remover/ks.yaml
+  # - ./zwave/ks.yaml
