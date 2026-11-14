@@ -343,7 +343,7 @@ Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/
 - `kustomization_order_audit.py` — `resources:` section ordering, `ks.yaml` key order, `dependsOn` chain order, `components` order (see Conventions).
 - `cnp_prefix_audit.py` — CNP/CCNP label-selector prefixes against the Selectors rules; also fails on unparseable YAML.
 - `sync_agents.py` — renders per-harness agent adapters from `.agents/` (see "Agent tooling"); `--check` for drift.
-- `jellyfin_actor_images.py` — triggers Jellyfin's metadata refresh for persons missing a primary image (needs `JELLYFIN_API_KEY` + `JELLYFIN_USER_ID`). Run after a cluster bootstrap (metadata lives on a non-restorable PVC).
+- `jellyfin_actor_images.py` — triggers Jellyfin's metadata refresh for persons missing a primary image (needs `JELLYFIN_API_KEY` + `JELLYFIN_USER_ID`). Metadata lives on the kopiur-backed config PVC and is restored with it; only needed to fill gaps (e.g. persons that never got an image).
 
 ## Documentation
 
