@@ -20,7 +20,7 @@ brew "actionlint"
 # Language server for just
 brew "terror/tap/just-lsp"
 # Render and diff Flux GitOps repositories offline, without a cluster
-cask "home-operations/tap/flate"
+# cask "home-operations/tap/flate"
 # YAML language server with pluggable rendering for Flux sources.
 cask "home-operations/tap/yayamlls"
 # Open and extensible continuous delivery solution for Kubernetes

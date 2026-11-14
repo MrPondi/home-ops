@@ -12,3 +12,6 @@ HOMEBREW_NO_ENV_HINTS = "1"
 
 [hooks]
 postinstall = "lefthook install"
+
+[tools]
+"github:home-operations/flate" = "v0.6.5"
