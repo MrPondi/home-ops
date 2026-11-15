@@ -1,0 +1,49 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: kritika-postgres
+spec:
+  # Net-new database. Disaster recovery = swap to bootstrap.recovery from the
+  # barman ObjectStore (see kubernetes/components/postgres/cluster.yaml).
+  bootstrap:
+    initdb:
+      database: kritika
+      owner: kritika
+      secret:
+        name: kritika-postgres-credentials
+  enablePDB: false # Not for single node clusters
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ImageCatalog
+    major: 18
+    name: kritika-postgres
+  instances: 1
+  managed:
+    services:
+      disabledDefaultServices:
+        - "r"
+        - "ro"
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      enabled: true
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: kritika-postgres
+        serverName: kritika-postgres
+  postgresql:
+    extensions:
+      - name: vchord
+    shared_preload_libraries:
+      - vchord
+  primaryUpdateStrategy: unsupervised
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 2Gi
+  storage:
+    size: 10Gi
+    storageClass: miroir-slow-local

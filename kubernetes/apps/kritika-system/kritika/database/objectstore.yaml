@@ -1,0 +1,29 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/barmancloud.cnpg.io/objectstore_v1.json
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: kritika-postgres
+spec:
+  configuration:
+    data:
+      compression: bzip2
+    destinationPath: s3://backups/cloudnative-pg
+    endpointURL: http://qnap.internal:9000
+    s3Credentials:
+      accessKeyId:
+        key: MINIO_ACCESS_KEY
+        name: kritika-postgres-s3
+      secretAccessKey:
+        key: MINIO_SECRET_KEY
+        name: kritika-postgres-s3
+    wal:
+      compression: bzip2
+      maxParallel: 4
+  instanceSidecarConfiguration:
+    resources:
+      requests:
+        cpu: 50m
+      limits:
+        memory: 300Mi
+  retentionPolicy: 7d

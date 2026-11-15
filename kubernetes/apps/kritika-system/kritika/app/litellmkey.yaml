@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/litellm.home-operations.com/litellmvirtualkey_v1alpha1.json
+apiVersion: litellm.home-operations.com/v1alpha1
+kind: LiteLLMVirtualKey
+metadata:
+  name: kritika
+spec:
+  keyAlias: Kritika
+  models:
+    - deepseek-v4-flash
+    - embed
+    - free-pool
+    - glm-5.3-flash
+  proxyNamespace: ai
+  proxyRef: litellm
+  secretKey: KRITIKA_LITELLM_API_KEY
+  secretName: litellm-key-kritika
