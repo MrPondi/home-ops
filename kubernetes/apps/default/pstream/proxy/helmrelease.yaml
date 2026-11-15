@@ -66,9 +66,7 @@ spec:
                   httpGet:
                     path: /healthcheck
                     port: *port
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 60
+                  failureThreshold: 30
             command:
               - "sh"
               - "-c"
