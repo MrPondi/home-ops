@@ -7,10 +7,8 @@ metadata:
 spec:
   keyAlias: Kritika
   models:
-    - deepseek-v4-flash
     - embed
     - free-pool
-    - glm-5.3-flash
   proxyNamespace: ai
   proxyRef: litellm
   secretKey: KRITIKA_LITELLM_API_KEY

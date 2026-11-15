@@ -21,7 +21,7 @@ spec:
         admin:
           password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
       confidence:
-        model: litellm/glm-5.3-flash
+        model: litellm/free-pool
       # Runner traffic through the gateway proxy; serve's own model/S3 calls are not filtered here
       egress:
         allow: ["*"]
@@ -36,11 +36,13 @@ spec:
         litellm:
           apiKey: { env: KRITIKA_LITELLM_API_KEY }
           baseUrl: http://litellm.ai.svc.cluster.local:4000/v1
+          # free-pool is a LiteLLM load-balanced group of free-tier models: a retried
+          # step (429/5xx/timeout) is routed to another member
+          retries: 3
           type: openai
       review:
         approve: true
-        fallback: litellm/free-pool
-        model: litellm/deepseek-v4-flash
+        model: litellm/free-pool
       trigger:
         exclude:
           - { expr: pr.fork, name: forks }
