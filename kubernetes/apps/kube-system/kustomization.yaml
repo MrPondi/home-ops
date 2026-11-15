@@ -16,6 +16,7 @@ resources:
   - ./coredns/ks.yaml
   - ./drm-exporter/ks.yaml
   - ./gpu-resource-driver/ks.yaml
+  - ./gvisor/ks.yaml
   - ./metrics-server/ks.yaml
   - ./multus/ks.yaml
   - ./reloader/ks.yaml
