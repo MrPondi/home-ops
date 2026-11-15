@@ -16,10 +16,24 @@ spec:
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster
       current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Database
+      current: has(status.applied) && status.applied == true
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: DatabaseRole
+      current: has(status.applied) && status.applied == true
   healthChecks:
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster
       name: kritika-postgres
+      namespace: kritika-system
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Database
+      name: kritika
+      namespace: kritika-system
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: DatabaseRole
+      name: kritika-app
       namespace: kritika-system
   interval: 1h
   path: ./kubernetes/apps/kritika-system/kritika/database

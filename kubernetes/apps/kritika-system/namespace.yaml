@@ -12,7 +12,12 @@ kind: CiliumNetworkPolicy
 metadata:
   name: default-deny
 spec:
-  endpointSelector: {} # all pods in the namespace
+  # All pods except kritika runners: their chart policy limits DNS to in-cluster
+  # names and grants no kube-API; this baseline's DNS "*" rule would widen that
+  endpointSelector:
+    matchExpressions:
+      - key: kritika.home-operations.com/role
+        operator: DoesNotExist
   ingress:
     # Prometheus scrape (PodMonitor/ServiceMonitor) — namespace-wide, all ports; per-app CNPs must not re-declare it
     - fromEndpoints:
