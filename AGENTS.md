@@ -76,11 +76,11 @@ CIDR map:
 - LAN `192.168.1.0/24`, VPN `10.0.199.0/24`
 - QNAP `10.0.25.25` (MinIO S3 on `9000`; also fronted as `s3.pondi.dev` → envoy-internal `10.0.30.11:80`)
 
-Namespaces mirror `kubernetes/apps/` (network, observability, database, media, ai, default, security, external-secrets, cert-manager, kube-system, flux-system, kopiur-system, miroir-system, longhorn-system, system-upgrade, actions-runner-system). Live extras `cilium-secrets` and `openebs-system` are empty and not Flux-managed — leave them alone. An app exists in the cluster only if its `./<app>/ks.yaml` is listed (not commented out) in the namespace overlay.
+Namespaces mirror `kubernetes/apps/` (network, observability, database, media, ai, default, security, external-secrets, cert-manager, kube-system, flux-system, kopiur-system, kritika-system, miroir-system, longhorn-system, system-upgrade, actions-runner-system). Live extras `cilium-secrets` and `openebs-system` are empty and not Flux-managed — leave them alone. An app exists in the cluster only if its `./<app>/ks.yaml` is listed (not commented out) in the namespace overlay.
 
 ### Fail-closed namespaces
 
-`ai`, `actions-runner-system`, `cert-manager`, `database`, `default`, `external-secrets`, `kopiur-system`, `media`, `miroir-system`, `observability`, `security`, `system-upgrade`.
+`ai`, `actions-runner-system`, `cert-manager`, `database`, `default`, `external-secrets`, `kopiur-system`, `kritika-system`, `media`, `miroir-system`, `observability`, `security`, `system-upgrade`.
 
 Each carries a baseline `default-deny` CiliumNetworkPolicy folded into `<ns>/namespace.yaml`: deny-all ingress + egress, plus three namespace-wide allows:
 
@@ -271,7 +271,7 @@ Cilium (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.0.0/1
     - **Scope trap**: a CNP selector with only plain/prefixed pod labels — _no_ explicit namespace key — is implicitly clamped to the CNP's own namespace (confirmed via realized-policy selectors, dragonfly-operator 2026-09). "Pods with label X in any namespace" is not expressible in a CNP → use a `CiliumClusterwideNetworkPolicy` with prefixed pod-label selectors (see `dragonfly-operator/app/networkpolicy.yaml`).
     - **Never guess chart labels** — render with flate and copy the real ones, then cross-check live endpoints (`cilium-dbg endpoint list -o json` → `status.labels["security-relevant"]`).
 - Every rule (`fromEndpoints`/`toEndpoints`/`toCIDRSet`/`toFQDNs` entries) carries a short comment stating what it matches — e.g. `# envoy-internal gateway pods (network)`. Comment the rule, not the inner `matchLabels`. A selector that compiles but matches nothing is silent; the comment makes the intent reviewable against rendered/live labels.
-- **Fail-closed namespaces**: per-app CNPs are additive only (see "Fail-closed namespaces") — no DNS, kube-API or prometheus-scrape rules; only ports with different semantics (e.g. litellm :4000) or app-specific routes. DNS rules appear only in shared components (`kopiur/base`, `dragonfly`) and in complete policies in open namespaces.
+- **Fail-closed namespaces**: per-app CNPs are additive only (see "Fail-closed namespaces") — no DNS, kube-API or prometheus-scrape rules; only ports with different semantics (e.g. litellm :4000) or app-specific routes. DNS rules appear only in shared components (`kopiur/base`, `dragonfly`), in complete policies in open namespaces, and in chart-generated policies (kritika's `networkPolicy.type: cilium`, which confines its runner pods to the egress gateway). `kritika-system`'s baseline therefore excludes runner pods (`kritika.home-operations.com/role` DoesNotExist) — its DNS `*` rule would otherwise union with the runner's in-cluster-only DNS filter.
 - **Open namespaces**: do **not** add a partial CNP — a CiliumNetworkPolicy isolates its selected pods immediately, and an incomplete policy (e.g. DNS-egress-only) breaks the app. Omit it, or write a complete policy (route ingress + DNS + kube-API + full egress).
 - **FQDN egress** (`toFQDNs`): every FQDN rule must declare **both** the bare name and its search-expanded twin — `matchName: <fqdn>` **and** `matchName: <fqdn>.<namespace>.svc.cluster.local`. Pods resolve via ndots:5 search-path expansion, so the DNS query Cilium's FQDN cache records is the **expanded** name; a bare-name-only `matchName` never matches and the dial stays `POLICY_DENIED` — the app looks locked up even though the rule "exists" (verified: tuppr `factory.talos.dev` upgrade lockup, 2026-09). Wildcarded target sets need the `matchPattern` pair too (`**.<fqdn>` + `**.<fqdn>.<ns>.svc.cluster.local`, see `llmkube`). FQDN rules only resolve where a proxied `:53` DNS rule exists (fail-closed `default-deny` provides it). Reference CNPs: `grafana-operator`, `qui`, `tuppr`.
 - **Shared services in fail-closed namespaces**: stateful services exposing to the whole cluster (databases, message stores, searxng/litellm-class services) declare ingress as a single `fromEntities: [cluster]` rule scoped to their service port (see `database/mariadb/cluster/networkpolicy.yaml`, `kubernetes/components/postgres/networkpolicy.yaml`, `ai/litellm/config`, `ai/searxng/app`). **Do not write per-client `fromEndpoints` allow-lists** — a new consumer only edits its own egress CNP. Non-cluster routes (LB/LAN CIDR, operator instance-manager ports, webhooks) and untrusted targets (e.g. toolhive MCP servers) stay explicit per-app.
@@ -288,29 +288,7 @@ Cilium (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.0.0/1
 2. Live flows: `mise run //kubernetes:hubble-drops <ns>` (interactive follow) or `mise run //kubernetes:hubble-capture <ns> 60` (bounded capture; the output file is auto-named under `/tmp` and its path printed). Zero `POLICY_DENIED` drops in the touched namespaces = good. For anything older than a few seconds, query the persistent drop history in VictoriaLogs (see "Hubble").
 3. Event-driven paths (webhooks, backups, cert renewals) do not show up in short captures — trigger them (e.g. CNPG `Backup` CR / `mise run //kubernetes:pg-initial-backup`, ExternalSecret `force-sync` annotation, `kubectl kopiur snapshot now -n <ns> --policy <app>`, re-apply a CR) or wait.
 
-## PR Review Standards
-
-When reviewing PRs (including Renovate), enforce these criteria.
-
-### HelmRelease requirements
-
-- Every application is a Flux `HelmRelease` with `spec.chartRef` pointing at the **per-app `OCIRepository`** (named after the app, in its own `ocirepository.yaml`) pinned by `ref.tag`, and a `spec.interval`.
-- `install`/`upgrade`/`rollback`/`remediation` defaults are patched globally by the root `flux-system` Kustomization — do not add them per-app, and do not flag their absence.
-- `metadata.namespace` is **never** set inline on `HelmRelease`/`Kustomization` resources (see Conventions) — reviewers MUST NOT flag its absence.
-- Postgres/Dragonfly components arrive via labels (see "Label-driven components") — do not flag their absence from `spec.components`.
-
-### Secret management rules
-
-- **NEVER** commit plain-text secrets, tokens or keys in Git — all secrets go through `external-secrets` with the `bitwarden-secretsmanager` `ClusterSecretStore`; templated values via `substituteFrom` Secrets created from ExternalSecrets.
-- Talos (`talos/*.yaml.j2` + `vals`/bw-serve) and Terraform (`.sops.yaml` + `age.key`) resolve secrets at render time — this is the intended pattern; do not convert them to external-secrets.
-
-### Image & digest policy
-
-- Container images: prefer `@sha256:` digests over version tags for reproducibility.
-- OCI chart artifacts pulled via `OCIRepository` are **exempt**: pin by tag/version.
-- Reject updates from untrusted registries; prefer GHCR.io and registry.k8s.io, Docker Hub only as fallback (avoid it for critical infrastructure components).
-
-### Konflate rendered-diff (MCP)
+## PR Evidence (konflate)
 
 Konflate renders Helm charts and Kustomizations into their final Kubernetes manifests, so its rendered diff shows the actual cluster impact of a PR — not just the raw git changes. It also runs as a required PR check.
 
@@ -318,23 +296,7 @@ Konflate renders Helm charts and Kustomizations into their final Kubernetes mani
 - `get_pr_diff` (pass the PR number): the full rendered manifest diff (PR head vs merge-base). Use it when the raw git diff hides the real change — e.g. a HelmRelease version bump or a one-line `values` change that fans out across many resources.
 - Surface cautions as caveats or blockers by severity; **treat render failures as blockers** (the manifests may not apply cleanly). Keep digest-only bump reviews compact.
 
-### Breaking change detection
-
-Request changes if:
-
-- API version changes (e.g. `apps/v1beta1` → `apps/v1`), deprecated field usage, or major version bumps without justification
-- CRD changes or custom resource modifications
-- Network policy or security context relaxations
-
-For major chart/app bumps, read the upstream release notes (context7 / GitHub releases) and cite the relevant breaking changes.
-
-### Kubernetes ↔ Talos compatibility
-
-Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/apps/system-upgrade/tuppr/`). When a PR bumps the Kubernetes version (kubelet image, `KubernetesUpgrade` resource, or the `kubernetes` Renovate group), you MUST:
-
-1. Read the deployed Talos version from `kubernetes/apps/system-upgrade/tuppr/upgrades/talosupgrade.yaml` (see "Versions").
-2. Confirm the new Kubernetes version is supported on that Talos release against Talos's published support matrix — search the web for "talos `<version>` kubernetes support matrix" (docs live at `docs.siderolabs.com`).
-3. Cite the matrix in the review. Do not approve a Kubernetes bump on "patch release" reasoning without confirming Talos supports it.
+PR review criteria (HelmRelease, secrets, image/digest policy, breaking changes, Kubernetes ↔ Talos compatibility) live in the `reviewing-pull-requests` skill (`.agents/skills/reviewing-pull-requests/references/policy.md`); load it when reviewing a PR, including Renovate.
 
 ## Python tooling & scripts
 
@@ -348,6 +310,7 @@ Talos pins the node OS and kubelet together; tuppr drives upgrades (`kubernetes/
 - `README.md` — hardware, DNS split, GitOps overview
 - `talos/README.md` — Talos machine config notes
 - `.agents/skills/add-app/SKILL.md` — app scaffolding workflow
+- `.agents/skills/reviewing-pull-requests/` — PR/Renovate review workflow and policy
 - `.agents/instructions/sorting.instructions.md` — YAML key-order rules
 - `.agents/config.yaml` + `.agents/agents/` — agent roles, MCP servers (see "Agent tooling")
 - Component-specific docs live with the component (`kubernetes/components/*/README.md`, `kubernetes/apps/**/README.md` when present)

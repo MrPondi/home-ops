@@ -1,0 +1,133 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kritika
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kritika
+  interval: 1h
+  values:
+    config:
+      apps:
+        github:
+          accounts: [MrPondi]
+          clientId: { env: KRITIKA_GITHUB_CLIENT_ID }
+          privateKey: { env: KRITIKA_GITHUB_PRIVATE_KEY }
+          webhookSecret: { env: KRITIKA_GITHUB_WEBHOOK_SECRET }
+      auth:
+        admin:
+          password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
+      confidence:
+        model: litellm/free-pool
+      # Runner traffic through the gateway proxy; serve's own model/S3 calls are not filtered here
+      egress:
+        allow: ["*"]
+        deny: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, "*.internal"]
+      # Qwen3-Embedding-0.6B (llmkube `embed` InferenceService in ai, routed via LiteLLM)
+      embedding:
+        dims: 1024
+        model: litellm/embed
+        queryPrompt: "Instruct: Given a code change, retrieve code that implements similar logic\nQuery:"
+        similarFloor: 0.3
+      providers:
+        litellm:
+          apiKey: { env: KRITIKA_LITELLM_API_KEY }
+          baseUrl: http://litellm.ai.svc.cluster.local:4000/v1
+          # free-pool is a LiteLLM load-balanced group of free-tier models: a retried
+          # step (429/5xx/timeout) is routed to another member
+          retries: 3
+          type: openai
+      review:
+        approve: true
+        model: litellm/free-pool
+      trigger:
+        exclude:
+          - { expr: pr.fork, name: forks }
+      webUrl: https://{{ .Release.Name }}.pondi.dev
+    database:
+      app:
+        existingSecret: kritika-postgres-app
+      owner:
+        existingSecret: kritika-postgres-credentials
+    deploymentAnnotations:
+      secret.reloader.stakater.com/auto: "true"
+    envFrom:
+      - secretRef:
+          name: kritika-secret
+      - secretRef:
+          name: litellm-key-kritika
+    gatewayCache:
+      enabled: true
+      storage:
+        bucket: kritika-cache
+        endpoint: http://qnap.internal:9000
+        existingSecret: kritika-cache
+        forcePathStyle: true
+        region: us-east-1
+        type: s3
+    httpRoute:
+      annotations:
+        gatus.home-operations.com/endpoint: |-
+          conditions: ["[STATUS] == 200"]
+          path: /api/v1/meta
+      enabled: true
+      hostnames:
+        - "{{ .Release.Name }}.pondi.dev"
+      parentRefs:
+        - name: envoy-external
+          namespace: network
+    monitoring:
+      dashboards:
+        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana
+      prometheusRule:
+        enabled: true
+      serviceMonitor:
+        enabled: true
+    networkPolicy:
+      # NetworkPolicy syntax, rendered as its own policy for the serve pods; pod ports, not Service ports
+      extraEgress:
+        # LiteLLM proxy pods (ai)
+        - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: ai
+              podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: litellm
+          ports:
+            - port: 4000
+              protocol: TCP
+        # QNAP MinIO (gateway download cache)
+        - to:
+            - ipBlock:
+                cidr: 10.0.25.25/32
+          ports:
+            - port: 9000
+              protocol: TCP
+      postgres:
+        podSelector:
+          cnpg.io/cluster: kritika-postgres
+      # explicit: `auto` reads cluster capabilities, which offline flate renders do not see
+      type: cilium
+    replicas: 1
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+    runner:
+      podTemplate:
+        spec:
+          resources:
+            limits:
+              memory: 2Gi
+            requests:
+              cpu: 10m
+              memory: 512Mi
+          runtimeClassName: gvisor

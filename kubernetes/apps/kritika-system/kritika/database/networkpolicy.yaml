@@ -1,0 +1,48 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: kritika-postgres
+spec:
+  # CNPG instance pods (kritika-postgres cluster)
+  endpointSelector:
+    matchLabels:
+      cnpg.io/cluster: kritika-postgres
+  ingress:
+    # kritika serve pods (runners carry component=runner and never reach Postgres)
+    - fromEndpoints:
+        - matchLabels:
+            app.kubernetes.io/component: server
+            app.kubernetes.io/instance: kritika
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # Cluster peers (streaming replication for future replicas)
+    - fromEndpoints:
+        - matchLabels:
+            cnpg.io/cluster: kritika-postgres
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+    # cloudnative-pg operator (database) — instance manager API + psql
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: database
+            k8s:app.kubernetes.io/name: cloudnative-pg
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
+            - port: "8000"
+              protocol: TCP
+  egress:
+    # QNAP MinIO (WAL archiving + barman backups, direct)
+    - toCIDR:
+        - 10.0.25.25/32
+      toPorts:
+        - ports:
+            - port: "9000"
+              protocol: TCP
