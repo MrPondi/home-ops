@@ -9,6 +9,10 @@ spec:
     # renovate: datasource=custom.talos-factory depName=siderolabs/talos
     version: v1.14.6
   policy:
+    # Single node: a drain cannot reschedule anything, it only cordons the node and
+    # evicts every pod into Pending; CNPG's 1800s stop grace then outlasts the drain
+    # timeout and the upgrade aborts without rebooting, leaving the node cordoned
+    nodrain: true
     rebootMode: powercycle
   healthChecks:
     - apiVersion: kopiur.home-operations.com/v1alpha1
