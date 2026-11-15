@@ -1,13 +1,13 @@
-min_version = "2026.7.0"
+min_version = "2026.11.3"
+monorepo_root = true
 
 [env]
 _.file = ["{{config_root}}/.secrets.env"]
 FLATE_PATH = "{{config_root}}/kubernetes/apps"
 KUBECONFIG = "{{config_root}}/kubeconfig"
-TALOSCONFIG = "{{config_root}}/talosconfig"
 MINIJINJA_CONFIG_FILE = "{{config_root}}/.minijinja.toml"
+TALOSCONFIG = "{{config_root}}/talosconfig"
 SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
-JUST_UNSTABLE = "1"
 HOMEBREW_NO_ENV_HINTS = "1"
 
 [hooks]
@@ -15,3 +15,72 @@ postinstall = "lefthook install"
 
 [tools]
 "github:home-operations/flate" = "v0.6.5"
+
+# Shell completion runs this outside the task environment, from the caller's directory.
+[task_templates.node]
+usage = '''
+complete "node" run="find \"$(git rev-parse --show-toplevel)/talos/nodes\" -name '*.yaml.j2' ! -name '*.schematic.yaml.j2' -exec basename {} .yaml.j2 \\; | sort"
+'''
+
+[tasks.log]
+hide = true
+run = "gum log -t rfc3339 -s -l"
+
+# Ensure a local `bw serve` is running and unlocked (vals resolves bw refs through it on :8087).
+[tasks.bitwarden]
+hide = true
+interactive = true
+run = '''
+status="$(curl -s -f http://localhost:8087/status | jq -r '.data.template.status' 2>/dev/null || echo "no_service")"
+if [[ "$status" == "unlocked" ]]; then
+    exit 0
+fi
+
+BW_PASSWORD="$(gum input --password --placeholder="..." --prompt="Master password: " --header="Bitwarden CLI Login (${status})" --cursor.foreground="81")"
+
+if [[ "$status" != "locked" ]]; then
+    # Anchored: the task script itself contains the text "bw serve", which a loose -f pattern would match.
+    pkill -f '(^|/)bw serve$' || true
+    if [[ "$(bw status 2>/dev/null | jq -r '.status' 2>/dev/null)" == "unauthenticated" ]]; then
+        mise run //:log fatal "Bitwarden CLI is not logged in - run 'bw login' first, then retry" stage "$MISE_TASK_NAME"
+    fi
+    nohup bw serve </dev/null >/dev/null 2>&1 &
+    if ! curl -s --retry-connrefused --retry 5 --retry-delay 1 http://localhost:8087/status >/dev/null; then
+        mise run //:log fatal "Bitwarden server failed to start" stage "$MISE_TASK_NAME"
+    fi
+fi
+
+response="$(jq -n --arg password "$BW_PASSWORD" '{password: $password}' |
+    curl -s -X POST http://localhost:8087/unlock -H "Content-Type: application/json" -d @-)"
+unset BW_PASSWORD
+
+if [[ "$(printf '%s' "$response" | jq -r '.success')" != "true" ]]; then
+    mise run //:log fatal "Failed to unlock Bitwarden vault" stage "$MISE_TASK_NAME"
+fi
+
+mise run //:log info "Bitwarden vault unlocked successfully"
+'''
+
+# Runs in the caller's directory, so callers pass template paths relative to it.
+[tasks.template]
+hide = true
+dir = "{{ cwd }}"
+usage = '''
+arg "<file>" help="Template path, or - for stdin"
+arg "[args]" var=#true help="Extra arguments for minijinja-cli"
+'''
+run = '''
+eval "args=(${usage_args:-})"
+mise run //:bitwarden
+minijinja-cli "$usage_file" "${args[@]}" | vals eval -f -
+'''
+
+[task_config]
+cascade = true
+shell = "bash -euo pipefail -c"
+
+[monorepo]
+config_roots = ["bootstrap", "kubernetes", "talos"]
+
+[settings]
+task.quiet = true

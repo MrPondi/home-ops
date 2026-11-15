@@ -291,7 +291,7 @@ Verify that:
 3. `ks.yaml` omits `targetNamespace` (stamped by the overlay replacement), sets `postBuild.substitute.APP`, and its `path` points at the right subdir.
 4. The app has its own `ocirepository.yaml` (named after the app), and the HelmRelease's `spec.chartRef.name` matches it.
 5. In a fail-closed namespace the CNP only adds app-specific routes (no DNS/kube-API/scrape rules); no partial CNP was added in an open namespace.
-6. Render cleanly: `just kube render-local-ks <ns> <app>` (or `kubectl kustomize <dir>` before the overlay entry is added), and `uv run scripts/kustomization_order_audit.py` + `uv run scripts/cnp_prefix_audit.py` pass.
+6. Render cleanly: `mise run //kubernetes:render-local-ks <ns> <app>` (or `kubectl kustomize <dir>` before the overlay entry is added), and `uv run scripts/kustomization_order_audit.py` + `uv run scripts/cnp_prefix_audit.py` pass.
 7. No plain-text secrets were introduced.
 8. If the app attaches `components/kopiur/backup`: the namespace overlay attaches `kopiur/base`, and a verification snapshot run (`kubectl kopiur snapshot now -n <ns> --policy <app>`) completed with zero `POLICY_DENIED` flows from the mover pod in hubble.
 

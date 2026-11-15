@@ -13,20 +13,19 @@ home-ops/
 │   ├── instructions/    # sorting.instructions.md — YAML key-order rules (see Conventions)
 │   └── skills/          # AI skills (e.g. add-app scaffolder)
 ├── .github/             # GitHub Actions workflows (renovate, label-sync, image-pull)
-├── .mise/               # Env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env) + hooks; tools live in Brewfile
-├── .justfile            # Task runner entrypoint (bootstrap / kube / talos modules)
-├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mod.just
-├── kubernetes/          # Kubernetes configurations (Flux-managed)
+├── .mise/               # Env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env), hooks, shared tasks; monorepo root
+├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mise.toml tasks
+├── kubernetes/          # Kubernetes configurations (Flux-managed) + mise.toml tasks
 │   ├── apps/            # Applications grouped by namespace (namespace overlays)
 │   └── components/      # Reusable kustomize components + replacements list
-├── talos/               # Talos Linux machine config templates (minijinja) + mod.just
+├── talos/               # Talos Linux machine config templates (minijinja) + mise.toml tasks
 ├── terraform/           # Terraform IaC (proxmox VMs, authentik configuration)
 └── scripts/             # Standalone maintenance/audit helper scripts (not cluster-deployed)
 ```
 
 ## Environment
 
-- **Homebrew** (`Brewfile`, `brew bundle`) installs every CLI (flux, kubectl, talosctl, flate, cilium, hubble, helm, uv, …), unpinned. **mise** (`.mise/config.toml`, env + hooks only, no tools) exports `KUBECONFIG`, `TALOSCONFIG`, `FLATE_PATH`, `MINIJINJA_CONFIG_FILE`, `SOPS_AGE_KEY_FILE` and `.secrets.env`. In a shell without mise activation, prefix commands with `mise exec --`. CI installs its own tools via mise-action.
+- **Homebrew** (`Brewfile`, `brew bundle`) installs every CLI (flux, kubectl, talosctl, flate, cilium, hubble, helm, uv, …), unpinned. **mise** (`.mise/config.toml`, min version pinned there; env, hooks, the `flate` tool and the task runner) exports `KUBECONFIG`, `TALOSCONFIG`, `FLATE_PATH`, `MINIJINJA_CONFIG_FILE`, `SOPS_AGE_KEY_FILE` and `.secrets.env`. `mise run` tasks always get this env; for ad-hoc commands in a shell without mise activation, prefix them with `mise exec --`. CI installs its own tools via mise-action.
 - **Never read, print or commit** `kubeconfig`, `talosconfig`, `age.key`, `.secrets.env` or decrypted SOPS files (all gitignored).
 - Scratch files go in a per-session directory (`mktemp -d`), not fixed `/tmp/<name>` paths — parallel sessions clobber each other.
 
@@ -97,9 +96,9 @@ For any change under `kubernetes/`, `talos/`, `terraform/` or CI:
 
 1. **Branch** `agent/<topic>` off `main`.
 2. **Edit** following Conventions (incl. the sorting rules file). New apps: load the `add-app` skill first.
-3. **Render** every touched Kustomization: `just kube render-local-ks <ns> <ks>`; for non-trivial changes diff against `main` (see "Validate locally").
+3. **Render** every touched Kustomization: `mise run //kubernetes:render-local-ks <ns> <ks>`; for non-trivial changes diff against `main` (see "Validate locally").
 4. **Audit**: `uv run scripts/kustomization_order_audit.py` and `uv run scripts/cnp_prefix_audit.py` (when CNPs changed) — both exit 1 on violations. Fix violations you introduced; report pre-existing ones instead of silently fixing unrelated files.
-5. **Commit** with a Conventional Commit message (`type(scope): summary`, `!` for breaking; e.g. `fix(policy): …`, `feat(media): …`, `docs(agents): …`). lefthook runs oxfmt / `just --fmt` / actionlint on commit and restages fixes.
+5. **Commit** with a Conventional Commit message (`type(scope): summary`, `!` for breaking; e.g. `fix(policy): …`, `feat(media): …`, `docs(agents): …`). lefthook runs oxfmt / `mise fmt` / actionlint on commit and restages fixes.
 6. **PR**: `git push -u origin agent/<topic>` → `gh pr create` → konflate `get_pr_summary` (render failures are blockers) → wait for required checks → `gh pr merge`.
 7. **Deploy**: `flux reconcile kustomization <ks> -n <ns> --with-source` (intervals are 1h — never wait).
 8. **Verify**: workload healthy; network changes show zero `POLICY_DENIED` in hubble; event-driven paths triggered (see "Verifying policies"); `flux get kustomizations -A` shows no `SUSPENDED True`.
@@ -108,18 +107,18 @@ Docs-only changes stop after step 5 (commit, no push). Read-only/analysis tasks 
 
 ## Tools
 
-### just
+### mise tasks
 
-The repo is driven by `just` — run `just --list`, `just --list kube`, `just --list talos` for the full set (modules: `.justfile`, `bootstrap/mod.just`, `kubernetes/mod.just`, `talos/mod.just`). High-value recipes:
+The repo is driven by [mise monorepo tasks](https://mise.jdx.dev/tasks/monorepo.html): `.mise/config.toml` is the monorepo root (shared hidden tasks `//:log`, `//:template`, `//:bitwarden`) and `bootstrap/`, `kubernetes/`, `talos/` each have a `mise.toml`. Tasks are addressed as `//<dir>:<task>` from anywhere in the repo, run with the mise env loaded, and document their arguments via `--help` (e.g. `mise run //kubernetes:sync --help`). `mise tasks --all` lists everything (`--hidden` includes helpers). Tasks with a `confirm` prompt refuse to run without a TTY; pass `mise --yes run …` only when the action is intended. High-value tasks:
 
-- `just kube render-local-ks <ns> <ks>` — render with flate (`--allow-missing-secrets`). **`<ks>` is the Kustomization's `metadata.name`** from `ks.yaml` (e.g. `just kube render-local-ks ai toolhive-config`), not the directory name.
-- `just kube apply-ks <ns> <ks>` / `delete-ks <ns> <ks>` — SSA-apply / delete a locally rendered Kustomization (experiment window only).
-- `just kube sync ks` — force-sync every Kustomization (annotates force-sync/reconcile/forceAt).
-- `just kube hubble-status|hubble-flows|hubble-drops|hubble-capture` — see "Hubble".
-- `just kube pg-initial-backup <ns> <app>` — immediate CNPG base backup (required before removing `components.postgres/cnpg=init`).
-- `just kube node-shell <node>`, `browse-pvc <ns> <claim>`, `view-secret <ns> <secret>`, `prune-pods`
-- `just talos apply-node|render-config|upgrade-node <node>`, `upgrade-k8s <version>`, `reset/reboot/shutdown-node`
-- `just template <file>` — minijinja-cli + vals (auto-unlocks Bitwarden via `bw serve` on `:8087`)
+- `mise run //kubernetes:render-local-ks <ns> <ks>` — render with flate. **`<ks>` is the Kustomization's `metadata.name`** from `ks.yaml` (e.g. `mise run //kubernetes:render-local-ks ai toolhive-config`), not the directory name.
+- `mise run //kubernetes:apply-ks <ns> <ks>` / `delete-ks <ns> <ks>` — SSA-apply / delete a locally rendered Kustomization (experiment window only).
+- `mise run //kubernetes:sync ks` — force-sync every Kustomization (annotates force-sync/reconcile/forceAt).
+- `mise run //kubernetes:hubble-status|hubble-flows|hubble-drops|hubble-capture` — see "Hubble".
+- `mise run //kubernetes:pg-initial-backup <ns> <app>` — immediate CNPG base backup (required before removing `components.postgres/cnpg=init`).
+- `mise run //kubernetes:node-shell <node>`, `browse-pvc <ns> <claim>`, `view-secret <ns> <secret>`, `prune-pods`
+- `mise run //talos:apply-node|render-config|upgrade-node <node>`, `upgrade-k8s <version>`, `reset/reboot/shutdown-node`
+- `mise run //:template <file>` — minijinja-cli + vals, paths relative to the caller's directory (auto-unlocks Bitwarden via `bw serve` on `:8087`)
 
 When live-applying a file manually you **must pass `-n <namespace>`** or it lands in `default`.
 
@@ -176,13 +175,13 @@ Components may use `${VAR:=default}` substitution fed by the Kustomization's `po
 
 The root `flux-system` Kustomization ("Label UX registry" in the FluxInstance `kustomize.patches`, `kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml`) patches child Kustomizations by `metadata.labels`. **Never** add `components/postgres` or `components/dragonfly` to `spec.components` by hand — set the label:
 
-| Label                                            | Injects                                                                                                                                              |
-| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `components.postgres/enabled: "true"`            | `components/postgres`; dependsOn `external-secrets-store`, `barman-cloud` + `cloudnative-pg` (database); CNPG Cluster healthCheckExpr                |
-| `components.postgres/cnpg: init`                 | `spec.patches` swapping bootstrap recovery → `initdb` (**temporary**: net-new DB only, remove after `just kube pg-initial-backup` shows `Completed`) |
-| `components.dragonfly/enabled: "true"`           | `components/dragonfly`; dependsOn `dragonfly-operator` (database); Dragonfly Ready healthCheckExpr                                                   |
-| `components.dragonfly/authentication: "true"`    | `components/dragonfly/authentication`; dependsOn `external-secrets-store`                                                                            |
-| `components.dragonfly/cluster-mode: non-cluster` | `spec.patches` adjusting Dragonfly args (ToolHive Lua scripts)                                                                                       |
+| Label                                            | Injects                                                                                                                                                          |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `components.postgres/enabled: "true"`            | `components/postgres`; dependsOn `external-secrets-store`, `barman-cloud` + `cloudnative-pg` (database); CNPG Cluster healthCheckExpr                            |
+| `components.postgres/cnpg: init`                 | `spec.patches` swapping bootstrap recovery → `initdb` (**temporary**: net-new DB only, remove after `mise run //kubernetes:pg-initial-backup` shows `Completed`) |
+| `components.dragonfly/enabled: "true"`           | `components/dragonfly`; dependsOn `dragonfly-operator` (database); Dragonfly Ready healthCheckExpr                                                               |
+| `components.dragonfly/authentication: "true"`    | `components/dragonfly/authentication`; dependsOn `external-secrets-store`                                                                                        |
+| `components.dragonfly/cluster-mode: non-cluster` | `spec.patches` adjusting Dragonfly args (ToolHive Lua scripts)                                                                                                   |
 
 Constraints: JSON6902 appends need the labeled KS to already carry `spec.components`, `spec.dependsOn` and `spec.healthCheckExprs` as lists (`[]` allowed) — a missing list fails the render (caught by the required konflate check). `spec.patches`-injecting labels (`cnpg: init`, `cluster-mode`) require the KS to define **no** `spec.patches` of its own. Render with flate to see the injected result.
 
@@ -204,7 +203,7 @@ Scaffold with the **`add-app` skill** (`.agents/skills/add-app/SKILL.md`) — it
 ## Adding New Resources
 
 - **Sensitive values always go through external-secrets** (`ExternalSecret` → Bitwarden SDK store) — never hardcode secrets, tokens or keys in manifests, chart values or postBuild substitutes. Where templating needs a secret value, use a postBuild secret (see above). Before adding an `ExternalSecret`, read 1-2 neighbouring ones and match their structure (`dataFrom.extract.key`, `target.template.data`).
-- **Never guess label selectors or match expressions.** Charts and CRDs pick their own labels and they differ per app. Render first, match second: `just kube render-local-ks <ns> <ks>` (or `kubectl kustomize <dir>` for a not-yet-wired dir) and copy the labels out of the rendered Deployment/CR, then cross-check live pods (`kubectl get pods -o jsonpath='{.items[*].metadata.labels}'`). This applies to anything that must match cluster state: CNPs, ServiceMonitors, PDBs, RBAC, affinity, job selectors.
+- **Never guess label selectors or match expressions.** Charts and CRDs pick their own labels and they differ per app. Render first, match second: `mise run //kubernetes:render-local-ks <ns> <ks>` (or `kubectl kustomize <dir>` for a not-yet-wired dir) and copy the labels out of the rendered Deployment/CR, then cross-check live pods (`kubectl get pods -o jsonpath='{.items[*].metadata.labels}'`). This applies to anything that must match cluster state: CNPs, ServiceMonitors, PDBs, RBAC, affinity, job selectors.
 
 ## Rollout
 
@@ -214,13 +213,13 @@ Run flate before pushing GitOps changes:
 
 ```bash
 # Render a Kustomization
-just kube render-local-ks <ns> <ks>
+mise run //kubernetes:render-local-ks <ns> <ks>
 
 # Diff against main
 tmp=$(mktemp -d)
 git worktree add --detach "$tmp/baseline" origin/main
-just kube render-local-ks <ns> <ks> > "$tmp/current.yaml"
-flate build ks --namespace <ns> --path "$tmp/baseline/kubernetes" --output yaml --allow-missing-secrets <ks> > "$tmp/baseline.yaml"
+mise run //kubernetes:render-local-ks <ns> <ks> > "$tmp/current.yaml"
+mise exec -- flate build ks --namespace <ns> --path "$tmp/baseline/kubernetes" --output yaml <ks> > "$tmp/baseline.yaml"
 diff -u "$tmp/baseline.yaml" "$tmp/current.yaml"
 git worktree remove "$tmp/baseline" --force
 ```
@@ -236,7 +235,7 @@ main = cluster state; merge the PR **before** deep verification, not after (step
 When a change needs repeated apply→observe→fix cycles (e.g. CNP selector tuning), open an experiment window instead of fighting drift:
 
 1. `flux suspend kustomization <ks> -n <ns>` — pauses drift correction + deploys for that app only. A child suspend **is sticky** with the SSA-based kustomize-controller: a forced parent `flux-system` reconcile does not clear it.
-2. Iterate: edit files → `just kube apply-ks <ns> <ks>` → verify → repeat. `apply-ks` renders locally (flate) and SSA-applies under flux's own `kustomize-controller` field manager, so it converges cleanly once flux resumes.
+2. Iterate: edit files → `mise run //kubernetes:apply-ks <ns> <ks>` → verify → repeat. `apply-ks` renders locally (flate) and SSA-applies under flux's own `kustomize-controller` field manager, so it converges cleanly once flux resumes.
 3. Commit the final change → PR → merge to `main`.
 4. `flux resume kustomization <ks> -n <ns>` — un-suspends and immediately reconciles the merged state.
 
@@ -286,8 +285,8 @@ Cilium (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.0.0/1
 ### Verifying policies (the loop)
 
 1. Attachment: `kubectl exec -n kube-system ds/cilium -c cilium-agent -- cilium-dbg endpoint list` — every endpoint must show `Enabled` on enforced directions. Use `-o json` → `status.policy.realized."policy-enabled"` (the `CiliumEndpoint` CRD does not carry policy status).
-2. Live flows: `just kube hubble-drops <ns>` (interactive follow) or `just kube hubble-capture <ns> 60` (bounded capture; the output file is auto-named under `/tmp` and its path printed). Zero `POLICY_DENIED` drops in the touched namespaces = good. For anything older than a few seconds, query the persistent drop history in VictoriaLogs (see "Hubble").
-3. Event-driven paths (webhooks, backups, cert renewals) do not show up in short captures — trigger them (e.g. CNPG `Backup` CR / `just kube pg-initial-backup`, ExternalSecret `force-sync` annotation, `kubectl kopiur snapshot now -n <ns> --policy <app>`, re-apply a CR) or wait.
+2. Live flows: `mise run //kubernetes:hubble-drops <ns>` (interactive follow) or `mise run //kubernetes:hubble-capture <ns> 60` (bounded capture; the output file is auto-named under `/tmp` and its path printed). Zero `POLICY_DENIED` drops in the touched namespaces = good. For anything older than a few seconds, query the persistent drop history in VictoriaLogs (see "Hubble").
+3. Event-driven paths (webhooks, backups, cert renewals) do not show up in short captures — trigger them (e.g. CNPG `Backup` CR / `mise run //kubernetes:pg-initial-backup`, ExternalSecret `force-sync` annotation, `kubectl kopiur snapshot now -n <ns> --policy <app>`, re-apply a CR) or wait.
 
 ## PR Review Standards
 
@@ -361,25 +360,25 @@ Detail that is only needed for the specific task at hand.
 
 ## Key Technologies
 
-| Category   | Tool                                    | Purpose                                                                           |
-| ---------- | --------------------------------------- | --------------------------------------------------------------------------------- |
-| GitOps     | Flux (flux-operator)                    | Deploys configs from Git to k8s                                                   |
-| CI         | Renovate + GitHub Actions               | Dependency updates, automation                                                    |
-| Networking | Cilium (eBPF)                           | CNI, kubeProxyReplacement, native routing                                         |
-| Visibility | Hubble                                  | Network flow observation (`just kube hubble-*` recipes over a local port-forward) |
-| Ingress    | Envoy Gateway                           | L7 proxy (`envoy-internal` / `envoy-external` gateways)                           |
-| DNS        | external-dns ×2                         | Private records → UniFi, public records → Cloudflare                              |
-| Access     | cloudflared + authentik                 | Cloudflare-protected tunnels, SSO/MFA                                             |
-| TLS        | cert-manager                            | Certificate automation                                                            |
-| Secrets    | external-secrets + Bitwarden SDK store  | Secret management                                                                 |
-| Storage    | Longhorn                                | Block storage for PVCs                                                            |
-| Databases  | CloudNativePG + barman-cloud, Dragonfly | Per-app Postgres / Redis-compatible stores (label-driven components)              |
-| Backups    | kopiur                                  | PVC backup/snapshot orchestration (kopia)                                         |
-| Charts     | app-template (bjw-s)                    | Common Helm chart for most apps                                                   |
-| Sources    | per-app `OCIRepository`                 | Each app declares its own Flux OCI chart source                                   |
-| Upgrades   | tuppr                                   | Talos + Kubernetes upgrade automation                                             |
-| Validation | flate + yayamlls                        | Local Kustomization/HelmRelease rendering + YAML LSP                              |
-| Reviews    | konflate (via ToolHive MCP)             | Rendered-diff evidence for PR reviews                                             |
+| Category   | Tool                                    | Purpose                                                                                     |
+| ---------- | --------------------------------------- | ------------------------------------------------------------------------------------------- |
+| GitOps     | Flux (flux-operator)                    | Deploys configs from Git to k8s                                                             |
+| CI         | Renovate + GitHub Actions               | Dependency updates, automation                                                              |
+| Networking | Cilium (eBPF)                           | CNI, kubeProxyReplacement, native routing                                                   |
+| Visibility | Hubble                                  | Network flow observation (`mise run //kubernetes:hubble-*` tasks over a local port-forward) |
+| Ingress    | Envoy Gateway                           | L7 proxy (`envoy-internal` / `envoy-external` gateways)                                     |
+| DNS        | external-dns ×2                         | Private records → UniFi, public records → Cloudflare                                        |
+| Access     | cloudflared + authentik                 | Cloudflare-protected tunnels, SSO/MFA                                                       |
+| TLS        | cert-manager                            | Certificate automation                                                                      |
+| Secrets    | external-secrets + Bitwarden SDK store  | Secret management                                                                           |
+| Storage    | Longhorn                                | Block storage for PVCs                                                                      |
+| Databases  | CloudNativePG + barman-cloud, Dragonfly | Per-app Postgres / Redis-compatible stores (label-driven components)                        |
+| Backups    | kopiur                                  | PVC backup/snapshot orchestration (kopia)                                                   |
+| Charts     | app-template (bjw-s)                    | Common Helm chart for most apps                                                             |
+| Sources    | per-app `OCIRepository`                 | Each app declares its own Flux OCI chart source                                             |
+| Upgrades   | tuppr                                   | Talos + Kubernetes upgrade automation                                                       |
+| Validation | flate + yayamlls                        | Local Kustomization/HelmRelease rendering + YAML LSP                                        |
+| Reviews    | konflate (via ToolHive MCP)             | Rendered-diff evidence for PR reviews                                                       |
 
 GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `flux-system` (`kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml` (FluxInstance `kustomize.patches`)), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
 
@@ -401,7 +400,7 @@ GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease �
 
 ## Hubble
 
-- Recipes: `just kube hubble-status` (ensure the `cilium hubble port-forward` tunnel on localhost:4245), `hubble-flows [ns]` (live follow, compact TSV lines: `time, verdict, drop reason, src, dst, :port, dns query`, replies hidden), `hubble-drops [ns]` (POLICY_DENIED only), `hubble-capture [ns] [seconds] [file]` (bounded capture to an auto-named file under `/tmp`, path printed; pass `file` to override). `*args` passes through to `hubble observe` (e.g. `just kube hubble-flows ai --pod-name xyz`).
+- Tasks: `mise run //kubernetes:hubble-status` (ensure the `cilium hubble port-forward` tunnel on localhost:4245), `hubble-flows [ns]` (live follow, compact TSV lines: `time, verdict, drop reason, src, dst, :port, dns query`, replies hidden), `hubble-drops [ns]` (POLICY_DENIED only), `hubble-capture [ns] [seconds] [file]` (bounded capture to an auto-named file under `/tmp`, path printed; pass `file` to override). Extra arguments pass through to `hubble observe` (e.g. `mise run //kubernetes:hubble-flows ai --pod ai/xyz`).
 - `hubble status` — ring buffer is 4095 flows/node ≈ **6 seconds** at this cluster's flow rate. There is NO history, and `--namespace` filters apply at the relay buffer (they do NOT give you more history). Use `hubble observe --follow` for live capture (`hubble watch` lacks `-o`/`--namespace` flags).
 - Flow JSON: `.flow.{verdict, traffic_direction, is_reply, drop_reason_desc, source|destination{namespace, pod_name, labels}, IP, l4.TCP.destination_port, l7.dns.query}`. Filter `.is_reply != true` for original requests; `drop_reason_desc | test("POLICY")` for policy drops.
 - Noise cheat-sheet: `reserved:host` sources are kubelet probes/apiserver/VIP traffic; reply halves double every connection; `UNSUPPORTED_L3_PROTOCOL` drops are ICMP noise, not policy.
