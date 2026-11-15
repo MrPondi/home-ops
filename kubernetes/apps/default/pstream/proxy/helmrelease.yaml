@@ -59,6 +59,14 @@ spec:
                   periodSeconds: 600
                   timeoutSeconds: 5
                   failureThreshold: 5
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthcheck
+                    port: *port
+                  failureThreshold: 30
             command:
               - "sh"
               - "-c"
