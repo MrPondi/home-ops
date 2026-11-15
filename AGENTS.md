@@ -43,7 +43,7 @@ This repo is harness-agnostic: `AGENTS.md` (this file; Claude Code reads it nati
 
 Single node on a Proxmox hypervisor:
 
-- **k8s-0** (`10.0.30.21`, Talos + Kubernetes, versions per "Versions" below) — kube API also on VIP `k8s.internal` (`10.0.30.10:6443`)
+- **k8s-0** (`10.0.30.21`, Talos + Kubernetes, versions per "Versions" below) — kube API also on VIP `k8s.internal` (`10.0.30.10:6443`, Cilium `kube-api` LoadBalancer Service; only up once Cilium runs — fall back to `10.0.30.21:6443`)
 - Workloads and Longhorn block storage coexist on the same node; a separate TrueNAS server handles NFS/SMB shares, media storage, and backups
 
 | Device                                                 | OS               | Purpose                     |

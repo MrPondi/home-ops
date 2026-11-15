@@ -32,7 +32,9 @@ labels:
 apiVersion: v1alpha1
 kind: KubeAPIServerConfig
 certExtraSANs:
+  - 10.0.30.10
   - k8s.internal
+  - k8s.pondi.dev
 extraArgs:
   enable-aggregator-routing: "true"
 image: registry.k8s.io/kube-apiserver:v1.37.2
@@ -124,8 +126,3 @@ allowedKubernetesNamespaces:
   - actions-runner-system
   - ai
   - system-upgrade
----
-apiVersion: v1alpha1
-kind: Layer2VIPConfig
-name: 10.0.30.10
-link: ethSel0
