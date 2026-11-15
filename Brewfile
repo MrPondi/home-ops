@@ -50,6 +50,8 @@ brew "uv"
 brew "cilium-cli"
 # Network, service and security observability for Kubernetes using eBPF
 brew "hubble"
+# Replacement for ls, cp and other commands for object storage
+brew "minio-mc"
 # Package manager for kubectl plugins
 brew "krew"
 krew "browse-pvc"
