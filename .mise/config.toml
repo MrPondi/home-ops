@@ -14,7 +14,7 @@ HOMEBREW_NO_ENV_HINTS = "1"
 postinstall = "lefthook install"
 
 [tools]
-"github:home-operations/flate" = "v0.6.5"
+"github:home-operations/flate" = "v0.7.3"
 
 # Shell completion runs this outside the task environment, from the caller's directory.
 [task_templates.node]
