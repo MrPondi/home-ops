@@ -5,7 +5,7 @@ kind: MCPServer
 metadata:
   name: servarr
 spec:
-  image: ghcr.io/aplaceforallmystuff/mcp-arr:1.8.1@sha256:1fefbe9c1e85197c848be62657eca7c17165468c990529e978688b1f771e5959
+  image: ghcr.io/aplaceforallmystuff/mcp-arr:1.9.0@sha256:f9ebc0ecf14cb89ff0a2702062d4ff8b0bf06a258e9fc9f0278acf418d9768e6
   transport: stdio
   proxyPort: 8080
   env:
