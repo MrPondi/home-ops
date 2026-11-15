@@ -13,7 +13,8 @@
   // still rebase every automerge PR each time main moves
   rebaseWhen: "conflicted",
   packageRules: [
-    // Auto-merge rules
+    // Auto-merge rules: every automerge goes through a PR and waits for its
+    // checks, so the Main ruleset's required kritika approval gates it
     {
       description: "Auto-merge Small changes",
       matchDatasources: ["docker"],
@@ -35,9 +36,9 @@
       description: "Auto-merge Tools",
       matchManagers: ["terraform"],
       automerge: true,
-      automergeType: "branch",
+      automergeType: "pr",
       matchUpdateTypes: ["minor", "patch"],
-      ignoreTests: true,
+      ignoreTests: false,
     },
     {
       description: "Auto-merge high-cadence OCI packages weekly",
@@ -64,9 +65,9 @@
       matchPackageNames: ["/^actions\\//", "/^renovatebot\\//"],
       matchUpdateTypes: ["minor", "patch", "digest"],
       automerge: true,
-      automergeType: "branch",
+      automergeType: "pr",
       minimumReleaseAge: "1 minute",
-      ignoreTests: true,
+      ignoreTests: false,
     },
     {
       description: "Auto-merge Grafana dashboards",
