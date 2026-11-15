@@ -53,6 +53,8 @@ spec:
     - name: kritika-database
     - name: external-secrets-store
       namespace: external-secrets
+    - name: gvisor
+      namespace: kube-system
     - name: litellm
       namespace: ai
   healthChecks:
