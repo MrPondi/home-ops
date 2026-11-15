@@ -1,0 +1,242 @@
+[tasks.apply-ks]
+description = "Apply local Flux Kustomization"
+usage = '''
+arg "<ns>" help="Namespace of the Flux Kustomization"
+arg "<ks>" help="Name of the Flux Kustomization (metadata.name)"
+'''
+run = 'mise run //kubernetes:render-local-ks "$usage_ns" "$usage_ks" | kubectl apply --server-side --force-conflicts --field-manager=kustomize-controller -f -'
+
+[tasks.browse-pvc]
+description = "Browse a PVC"
+interactive = true
+usage = '''
+arg "<ns>" help="Namespace of the PVC"
+arg "<claim>" help="Name of the PVC"
+'''
+run = '''
+kubectl run -n "$usage_ns" "browse-pvc-$usage_claim" -it --rm --restart=Never \
+    --image=mirror.gcr.io/alpine:latest \
+    --overrides='{"spec":{"containers":[{"name":"browse-pvc-{{ usage.claim }}","image":"mirror.gcr.io/alpine:latest","stdin":true,"tty":true,"command":["/bin/sh"],"workingDir":"/mnt","volumeMounts":[{"mountPath":"/mnt","name":"data"}]}],"volumes":[{"name":"data","persistentVolumeClaim":{"claimName":"{{ usage.claim }}"}}]}}'
+'''
+
+[tasks.delete-ks]
+description = "Delete local Flux Kustomization"
+usage = '''
+arg "<ns>" help="Namespace of the Flux Kustomization"
+arg "<ks>" help="Name of the Flux Kustomization (metadata.name)"
+'''
+run = 'mise run //kubernetes:render-local-ks "$usage_ns" "$usage_ks" | kubectl delete -f -'
+
+[tasks.hubble-capture]
+description = "Bounded flow capture to an auto-named file under /tmp (path printed)"
+depends = [":hubble-ensure"]
+usage = '''
+arg "[ns]" default="" help="Namespace to filter on (all when empty)"
+arg "[seconds]" default="60" help="Capture duration"
+arg "[file]" default="" help="Output file override"
+'''
+run = '''
+ns_args=()
+if [[ -n "${usage_ns:-}" ]]; then
+    ns_args=(--namespace "$usage_ns")
+fi
+file="${usage_file:-}"
+if [[ -z "$file" ]]; then
+    file="/tmp/hubble-${usage_ns:-all}-$(date +%Y%m%d-%H%M%S).tsv"
+fi
+timeout "$usage_seconds" hubble observe --follow -o json "${ns_args[@]}" 2>/dev/null |
+    jq --unbuffered -r '
+        .flow? // empty
+        | select(.is_reply != true)
+        | [
+            (.time | sub("^\\d{4}-\\d{2}-\\d{2}T"; "") | sub("\\..*"; "")),
+            .verdict,
+            (if .verdict == "DROPPED" then (.drop_reason_desc // "-") else "-" end),
+            (if .source.pod_name then "\(.source.namespace)/\(.source.pod_name)" elif .source.IP then .source.IP else "reserved:\(.source.identity // "?")" end),
+            (if .destination.pod_name then "\(.destination.namespace)/\(.destination.pod_name)" elif .destination.IP then .destination.IP else "reserved:\(.destination.identity // "?")" end),
+            ((.l4.TCP.destination_port // .l4.UDP.destination_port // null) | if . == null then "-" else ":\(.)" end),
+            (.l7.dns.query // "-")
+          ]
+        | @tsv' >"$file" || true
+mise run //:log info "captured $(wc -l <"$file") flows -> $file"
+'''
+
+[tasks.hubble-drops]
+description = "Follow policy drops only (POLICY_DENIED)"
+depends = [":hubble-ensure"]
+interactive = true
+usage = '''
+arg "[ns]" default="" help="Namespace to filter on (all when empty)"
+arg "[args]" var=#true help="Extra arguments for hubble observe"
+'''
+run = '''
+trap 'exit 0' INT TERM
+eval "args=(${usage_args:-})"
+ns_args=()
+if [[ -n "${usage_ns:-}" ]]; then
+    ns_args=(--namespace "$usage_ns")
+fi
+hubble observe --follow -o json "${ns_args[@]}" "${args[@]}" 2>/dev/null |
+    jq --unbuffered -r '
+        .flow? // empty
+        | select(.is_reply != true)
+        | select(.verdict == "DROPPED" and ((.drop_reason_desc // "") | test("POLICY")))
+        | [
+            (.time | sub("^\\d{4}-\\d{2}-\\d{2}T"; "") | sub("\\..*"; "")),
+            (.source.pod_name // .source.IP // "reserved:\(.source.identity // "?")"),
+            (.destination.pod_name // .destination.IP // "reserved:\(.destination.identity // "?")"),
+            ((.l4.TCP.destination_port // .l4.UDP.destination_port // null) | if . == null then "-" else ":\(.)" end),
+            (.l7.dns.query // "-")
+          ]
+        | @tsv'
+'''
+
+[tasks.hubble-ensure]
+hide = true
+run = '''
+if hubble status >/dev/null 2>&1; then
+    exit 0
+fi
+nohup cilium hubble port-forward >/dev/null 2>&1 &
+for _ in $(seq 1 30); do
+    if hubble status >/dev/null 2>&1; then
+        exit 0
+    fi
+    sleep 1
+done
+mise run //:log fatal "hubble relay unreachable - 'cilium hubble port-forward' failed to become ready"
+'''
+
+[tasks.hubble-flows]
+description = "Follow live flows (replies hidden)"
+depends = [":hubble-ensure"]
+interactive = true
+usage = '''
+arg "[ns]" default="" help="Namespace to filter on (all when empty)"
+arg "[args]" var=#true help="Extra arguments for hubble observe"
+'''
+run = '''
+trap 'exit 0' INT TERM
+eval "args=(${usage_args:-})"
+ns_args=()
+if [[ -n "${usage_ns:-}" ]]; then
+    ns_args=(--namespace "$usage_ns")
+fi
+hubble observe --follow -o json "${ns_args[@]}" "${args[@]}" 2>/dev/null |
+    jq --unbuffered -r '
+        .flow? // empty
+        | select(.is_reply != true)
+        | [
+            (.time | sub("^\\d{4}-\\d{2}-\\d{2}T"; "") | sub("\\..*"; "")),
+            .verdict,
+            (if .verdict == "DROPPED" then (.drop_reason_desc // "-") else "-" end),
+            (if .source.pod_name then "\(.source.namespace)/\(.source.pod_name)" elif .source.IP then .source.IP else "reserved:\(.source.identity // "?")" end),
+            (if .destination.pod_name then "\(.destination.namespace)/\(.destination.pod_name)" elif .destination.IP then .destination.IP else "reserved:\(.destination.identity // "?")" end),
+            ((.l4.TCP.destination_port // .l4.UDP.destination_port // null) | if . == null then "-" else ":\(.)" end),
+            (.l7.dns.query // "-")
+          ]
+        | @tsv'
+'''
+
+[tasks.hubble-status]
+description = "Hubble relay status (starts the port-forward when needed)"
+depends = [":hubble-ensure"]
+run = "hubble status"
+
+[tasks.node-shell]
+description = "Open a shell on a node"
+extends = "node"
+interactive = true
+usage = 'arg "<node>" help="Name of the node"'
+run = '''
+kubectl debug "node/$usage_node" -n default -it --image="mirror.gcr.io/ubuntu:latest" --profile sysadmin
+name="$(kubectl get pods -n default --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}')"
+if [[ "$name" == node-debugger-"$usage_node"* ]]; then
+    kubectl delete pod -n default "$name"
+else
+    echo "Pod name '$name' does not start with 'node-debugger-$usage_node', skipping deletion"
+fi
+'''
+
+[tasks.pg-initial-backup]
+description = "Trigger an immediate CNPG base backup for a cluster (plugin method)"
+usage = '''
+arg "<ns>" help="Namespace of the CNPG cluster"
+arg "<app>" help="Name of the CNPG cluster"
+'''
+run = '''
+kubectl apply -n "$usage_ns" -f - <<EOF
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: ${usage_app}-initial
+spec:
+  cluster:
+    name: ${usage_app}
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
+EOF
+'''
+
+[tasks.prune-pods]
+description = "Prune pods in Failed, Pending, or Succeeded state"
+run = '''
+for phase in Failed Pending Succeeded; do
+    kubectl delete pods -A --field-selector status.phase="$phase" --ignore-not-found=true
+done
+'''
+
+[tasks.sync]
+description = "Force-sync Flux resources (all, or narrowed by namespace/name)"
+usage = '''
+arg "<resource>" help="Kind of resource to sync" {
+  choices "hr" "ks" "gitrepo" "ocirepo" "es" "ps"
+}
+arg "[namespace]" default="" help="Namespace (all when empty)"
+arg "[name]" default="" help="Resource name (all when empty)"
+'''
+run = '''
+if [[ -n "${usage_name:-}" && -z "${usage_namespace:-}" ]]; then
+    mise run //:log fatal "a resource name needs a namespace" resource "$usage_resource" name "$usage_name"
+fi
+get_args=()
+if [[ -n "${usage_name:-}" ]]; then
+    get_args+=("$usage_name")
+fi
+if [[ -n "${usage_namespace:-}" ]]; then
+    get_args+=(-n "$usage_namespace")
+else
+    get_args+=(-A)
+fi
+kubectl get "$usage_resource" "${get_args[@]}" -o custom-columns=NS:.metadata.namespace,NAME:.metadata.name --no-headers |
+    while read -r ns name _; do
+        kubectl -n "$ns" annotate --field-manager flux-client-side-apply --overwrite "$usage_resource" "$name" \
+            "force-sync=$(date +%s)" \
+            "reconcile.fluxcd.io/requestedAt=$(date +%s)" \
+            "reconcile.fluxcd.io/forceAt=$(date +%s)"
+    done
+'''
+
+[tasks.view-secret]
+description = "View a secret"
+usage = '''
+arg "<ns>" help="Namespace of the secret"
+arg "[secret]" default="" help="Name of the secret (interactive picker when empty)"
+'''
+run = '''
+args=()
+if [[ -n "${usage_secret:-}" ]]; then
+    args+=("$usage_secret")
+fi
+kubectl view-secret -n "$usage_ns" "${args[@]}"
+'''
+
+[tasks.render-local-ks]
+hide = true
+description = "Render a Flux Kustomization locally with flate"
+usage = '''
+arg "<ns>" help="Namespace of the Flux Kustomization"
+arg "<ks>" help="Name of the Flux Kustomization (metadata.name)"
+'''
+run = 'flate build ks --namespace "$usage_ns" --output yaml "$usage_ks"'

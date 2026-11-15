@@ -74,7 +74,7 @@ metadata:
     name: <app>-db
     labels:
         components.postgres/enabled: "true"
-        components.postgres/cnpg: init # TEMPORARY net-new bootstrap — remove after first backup lands (just kube pg-initial-backup <ns> <app>); recovery is the default once a backup exists
+        components.postgres/cnpg: init # TEMPORARY net-new bootstrap — remove after first backup lands (mise run //kubernetes:pg-initial-backup <ns> <app>); recovery is the default once a backup exists
 spec:
     components: [] # existing entries like ../../../../components/kopiur/backup are fine — root patch appends ../../../../components/postgres
     # ... dependsOn, healthCheckExprs, postBuild ...
@@ -85,14 +85,17 @@ Label `components.postgres/cnpg=init` triggers the root patch (labelSelector `co
 ```yaml
 - op: replace
   path: /spec/bootstrap
-  value: {initdb: {database: ${POSTGRES_USERNAME:=${APP}}, owner: ${POSTGRES_USERNAME:=${APP}}}}
+  value:
+      initdb:
+          database: ${POSTGRES_USERNAME:=${APP}}
+          owner: ${POSTGRES_USERNAME:=${APP}}
 - op: remove
   path: /spec/externalClusters
 ```
 
 This replaces the default `bootstrap.recovery` (which always exists via the component) with `bootstrap.initdb`, creating database and owner `${POSTGRES_USERNAME:=${APP}}` (defaults to `APP`), and removes `externalClusters`.
 
-> **⚠️ WARNING — MUST remove label after first backup:** This label **MUST** be removed after the first successful base backup (`just kube pg-initial-backup <ns> <app>` + verify `Backup` `Completed`); leaving it means a future full recreate (Cluster CR + PVCs deleted) would bootstrap an **EMPTY** database via `initdb` instead of recovering from Barman.
+> **⚠️ WARNING — MUST remove label after first backup:** This label **MUST** be removed after the first successful base backup (`mise run //kubernetes:pg-initial-backup <ns> <app>` + verify `Backup` `Completed`); leaving it means a future full recreate (Cluster CR + PVCs deleted) would bootstrap an **EMPTY** database via `initdb` instead of recovering from Barman.
 
 **Check before removing the label — `kubectl get backup -n <ns>` must show `Completed`:**
 
@@ -152,8 +155,8 @@ spec:
 After the Cluster is `Healthy`, create the first backup (or any on-demand backup):
 
 ```bash
-just kube pg-initial-backup <ns> <app>
-# e.g. just kube pg-initial-backup default pstream
+mise run //kubernetes:pg-initial-backup <ns> <app>
+# e.g. mise run //kubernetes:pg-initial-backup default pstream
 ```
 
 This applies a `Backup` CR (`<app>-initial`, `method: plugin`, `pluginConfiguration.name: barman-cloud.cloudnative-pg.io`) in namespace `<ns>`:
@@ -171,7 +174,7 @@ spec:
         name: barman-cloud.cloudnative-pg.io
 ```
 
-The recipe is `arg order ns app` matching `just kube apply-ks` / `browse-pvc`.
+The task takes `<ns> <app>`, the same argument order as `mise run //kubernetes:apply-ks` / `browse-pvc`.
 
 ## Backups
 
@@ -180,7 +183,7 @@ The recipe is `arg order ns app` matching `just kube apply-ks` / `browse-pvc`.
 - **WAL archiving:** continuous via the plugin sidecar (`isWALArchiver: true`, `maxParallel: 4`, bzip2). Enables PITR within the retention window.
 - **Retention:** `7d` (`retentionPolicy: 7d` on the `ObjectStore`; `ScheduledBackup` uses `backupOwnerReference: self` so old Backups are pruned with the Cluster).
 - **Backend:** QNAP MinIO at `http://qnap.internal:9000` (`s3://backups/cloudnative-pg`, shared; per-app isolation via `serverName` `${APP}`), credentials from Bitwarden item `cloudnative-pg` via `${APP}-s3`.
-- **On-demand:** `just kube pg-initial-backup <ns> <app>` or `kubectl apply` a `Backup` CR as above. Check `kubectl get backup -n <ns>` and `kubectl cnpg status <app> -n <ns>`.
+- **On-demand:** `mise run //kubernetes:pg-initial-backup <ns> <app>` or `kubectl apply` a `Backup` CR as above. Check `kubectl get backup -n <ns>` and `kubectl cnpg status <app> -n <ns>`.
 
 ## Connecting
 
@@ -314,8 +317,8 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
 1. **Render locally** (flate, allow missing secrets):
 
     ```bash
-    just kube render-local-ks <ns> <ks>
-    # e.g. just kube render-local-ks default pstream-backend
+    mise run //kubernetes:render-local-ks <ns> <ks>
+    # e.g. mise run //kubernetes:render-local-ks default pstream-backend
     ```
 
     Confirm rendered `Cluster` has `bootstrap.recovery.source: <app>-backup`, `serverName: <app>`, `barmanObjectName: <app>`, `size: <POSTGRES_STORAGE_SIZE>`, and `ObjectStore` `destinationPath: s3://backups/cloudnative-pg` (shared across all consumers).
@@ -323,9 +326,9 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
 2. **Hubble drops — zero policy denies:**
 
     ```bash
-    just kube hubble-drops <ns>
+    mise run //kubernetes:hubble-drops <ns>
     # or bounded capture:
-    just kube hubble-capture <ns> 60
+    mise run //kubernetes:hubble-capture <ns> 60
     ```
 
     Expect `0` `POLICY_DENIED` flows from the Cluster pods. If you added a `patches` bootstrap override, this is also when you'd catch a mis-patched Cluster.
@@ -342,7 +345,7 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
 4. **Backup CR:**
 
     ```bash
-    just kube pg-initial-backup <ns> <app>
+    mise run //kubernetes:pg-initial-backup <ns> <app>
     kubectl -n <ns> get backup -o wide
     kubectl -n <ns> get scheduledbackup <app>-daily -o yaml
     kubectl -n <ns> get objectstore <app> -o yaml
@@ -357,4 +360,4 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
     kubectl -n <ns> get svc <app>-rw -o wide
     ```
 
-6. **Remove temporary label** (if you used net-new `initdb`): delete the `labels: {components.postgres/cnpg: init}` entry (and TEMPORARY comment) from the consumer `ks.yaml`, commit, and re-run `just kube render-local-ks <ns> <ks>` to confirm `bootstrap.recovery` is back before pushing.
+6. **Remove temporary label** (if you used net-new `initdb`): delete the `labels: {components.postgres/cnpg: init}` entry (and TEMPORARY comment) from the consumer `ks.yaml`, commit, and re-run `mise run //kubernetes:render-local-ks <ns> <ks>` to confirm `bootstrap.recovery` is back before pushing.

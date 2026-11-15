@@ -113,9 +113,6 @@
   "sops.defaults.ageKeyFile": "age.key",
   "terminal.integrated.fontSize": 14,
   "window.zoomLevel": 0,
-  "[just]": {
-    "editor.defaultFormatter": "nefrob.vscode-just-syntax"
-  },
   "[yaml]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
