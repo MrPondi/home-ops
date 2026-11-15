@@ -110,7 +110,8 @@ confirm = { message = "Upgrade node {{ usage.node }}?", default = "no" }
 run = '''
 eval "args=(${usage_args:-})"
 image="$(mise run //talos:machine-image "$usage_node")"
-talosctl -n "$usage_node" upgrade -i "$image" -m powercycle --timeout=10m "${args[@]}"
+# --drain=false: single node, see kubernetes/apps/system-upgrade/tuppr/upgrades/talosupgrade.yaml
+talosctl -n "$usage_node" upgrade -i "$image" -m powercycle --drain=false --timeout=10m "${args[@]}"
 '''
 
 [tasks.machine-image]
