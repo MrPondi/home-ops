@@ -1,0 +1,96 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Renovate Automerge
+
+# Renovate (automergeType: label) adds the `automerge` label to eligible PRs (minor/patch/digest,
+# never majors or 0.x minors) once every check is green. This merges the PR only if kritika
+# approved its current head (score >= threshold, risk <= medium); otherwise it requests a review.
+on:
+  pull_request:
+    types:
+      - labeled
+
+permissions: {}
+
+jobs:
+  automerge:
+    if: >-
+      ${{
+        github.event.label.name == 'automerge' &&
+        github.event.pull_request.user.login == 'renovate[bot]' &&
+        github.event.pull_request.head.repo.full_name == github.repository
+      }}
+    name: Renovate Automerge - Merge On Kritika Approval
+    runs-on: ubuntu-26.04
+    # Job-level so skipped runs for other labels never join (and cancel) the group
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Merge if kritika approved, else request review
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          # kritika posts its status and approval as this app; the approval body starts "kritika:"
+          KRITIKA_CONTEXT: Kritika / Review
+          KRITIKA_LOGIN: branch-hopper[bot]
+          PR: ${{ github.event.pull_request.number }}
+          REVIEWER: MrPondi
+        run: |
+          set -euo pipefail
+
+          request_review() {
+            echo "::notice::#${PR} not automerged: $1"
+            local requested
+            requested=$(gh api "repos/${GH_REPO}/pulls/${PR}/requested_reviewers" --jq '.users[].login')
+            if grep -qxF "${REVIEWER}" <<<"${requested}"; then
+              echo "${REVIEWER} already requested"
+            else
+              gh api --method POST "repos/${GH_REPO}/pulls/${PR}/requested_reviewers" \
+                -f "reviewers[]=${REVIEWER}" --silent
+            fi
+          }
+
+          pr_json=$(gh api "repos/${GH_REPO}/pulls/${PR}")
+          head_ref=$(jq -r '.head.ref' <<<"${pr_json}")
+          # Belt and braces: majors and grouped majors / 0.x minors (renovate/major-*) never automerge
+          if jq -e '.labels | any(.name == "type/major")' <<<"${pr_json}" >/dev/null \
+              || [[ "${head_ref}" == renovate/major-* ]]; then
+            request_review "major update"; exit 0
+          fi
+
+          # Wait for kritika to finish on the current head (up to 30 min); its approval lands
+          # ~2s after the final status, so allow one extra poll after a final status.
+          final_polls=0
+          for _ in $(seq 1 120); do
+            pr_json=$(gh api "repos/${GH_REPO}/pulls/${PR}")
+            if [[ "$(jq -r '.state' <<<"${pr_json}")" != "open" ]]; then
+              echo "#${PR} is no longer open"; exit 0
+            fi
+            export HEAD_SHA
+            HEAD_SHA=$(jq -r '.head.sha' <<<"${pr_json}")
+            approved=$(gh api --paginate "repos/${GH_REPO}/pulls/${PR}/reviews?per_page=100" \
+              --jq '.[] | select(.user.login == env.KRITIKA_LOGIN and .state == "APPROVED"
+                and .commit_id == env.HEAD_SHA and (.body | startswith("kritika:"))) | .id')
+            if [[ -n "${approved}" ]]; then
+              echo "kritika approved ${HEAD_SHA}; merging"
+              if gh pr merge "${PR}" --squash --match-head-commit "${HEAD_SHA}"; then
+                exit 0
+              fi
+              request_review "merge of ${HEAD_SHA} failed"; exit 0
+            fi
+            state=$(gh api "repos/${GH_REPO}/commits/${HEAD_SHA}/status" \
+              --jq '[.statuses[] | select(.context == env.KRITIKA_CONTEXT)][0].state // "missing"')
+            if [[ "${state}" != "pending" && "${state}" != "missing" ]]; then
+              final_polls=$((final_polls + 1))
+              if (( final_polls > 1 )); then
+                request_review "kritika finished (${state}) without approving ${HEAD_SHA}"; exit 0
+              fi
+            fi
+            sleep 15
+          done
+
+          request_review "kritika did not finish reviewing within 30 minutes"

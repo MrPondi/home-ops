@@ -8,81 +8,52 @@
     "github>home-operations/renovate-presets//apps/talosFactory.json5#11.0.0",
     ":timezone(Europe/Warsaw)",
   ],
+  // Automerge = label hand-off to .github/workflows/renovate-automerge.yaml (overrides the
+  // preset's :automergeBranch); Renovate never merges or enables platform auto-merge itself
+  automergeType: "label",
+  // Requested at creation on non-automerge PRs, and on automerge PRs once a check fails
   reviewers: ["@MrPondi"],
   // The Main ruleset does not require up-to-date branches, and `auto` would
   // still rebase every automerge PR each time main moves
   rebaseWhen: "conflicted",
   packageRules: [
-    // Auto-merge rules
+    // Auto-merge rules: Renovate only adds the `automerge` label once every check is green; the
+    // renovate-automerge workflow merges when kritika approved the head SHA, otherwise it requests
+    // a review. Never use automergeType pr/branch or ignoreTests here: they bypass kritika.
     {
-      description: "Auto-merge Small changes",
-      matchDatasources: ["docker"],
+      description: "Auto-merge patch and digest updates (gated by kritika approval)",
+      matchUpdateTypes: ["patch", "digest"],
       automerge: true,
-      automergeType: "pr",
-      matchUpdateTypes: ["minor", "patch", "digest"],
-      ignoreTests: false,
     },
     {
-      description: "Auto-merge trusted OCI digests",
-      matchDatasources: ["docker"],
+      description: "Auto-merge minor updates of stable (>=1.0) versions (gated by kritika approval)",
+      matchUpdateTypes: ["minor"],
+      matchCurrentVersion: "!/^v?0\\./",
       automerge: true,
-      automergeType: "pr",
-      matchUpdateTypes: ["digest"],
-      matchPackageNames: ["/home-operations/", "/alpine/", "/python/", "/nginx/", "/node/"],
-      ignoreTests: false,
     },
     {
-      description: "Auto-merge Tools",
-      matchManagers: ["terraform"],
-      automerge: true,
-      automergeType: "branch",
-      matchUpdateTypes: ["minor", "patch"],
-      ignoreTests: true,
+      description: "Never auto-merge major updates",
+      matchUpdateTypes: ["major"],
+      automerge: false,
+    },
+    // Scheduling rules
+    {
+      description: "Let GitHub Actions releases settle",
+      matchManagers: ["github-actions"],
+      minimumReleaseAge: "3 days",
     },
     {
-      description: "Auto-merge high-cadence OCI packages weekly",
+      description: "Trusted GitHub Actions need no settling time",
+      matchManagers: ["github-actions"],
+      matchPackageNames: ["/^actions\\//", "/^renovatebot\\//"],
+      minimumReleaseAge: "1 minute",
+    },
+    {
+      description: "Batch high-cadence OCI packages weekly",
       matchDatasources: ["docker"],
       matchUpdateTypes: ["minor", "patch"],
       matchPackageNames: ["/kube-prometheus-stack/"],
-      automerge: true,
-      automergeType: "pr",
-      ignoreTests: false,
       schedule: ["before 6am on Monday"],
-    },
-    {
-      description: "Auto-merge GitHub Actions",
-      matchManagers: ["github-actions"],
-      matchUpdateTypes: ["minor", "patch", "digest"],
-      automerge: true,
-      automergeType: "pr",
-      minimumReleaseAge: "3 days",
-      ignoreTests: false,
-    },
-    {
-      description: "Auto-merge trusted GitHub Actions",
-      matchManagers: ["github-actions"],
-      matchPackageNames: ["/^actions\\//", "/^renovatebot\\//"],
-      matchUpdateTypes: ["minor", "patch", "digest"],
-      automerge: true,
-      automergeType: "branch",
-      minimumReleaseAge: "1 minute",
-      ignoreTests: true,
-    },
-    {
-      description: "Auto-merge Grafana dashboards",
-      matchDatasources: ["custom.grafana-dashboards"],
-      matchUpdateTypes: ["major"],
-      automerge: true,
-      automergeType: "pr",
-      ignoreTests: false,
-    },
-    {
-      description: "Auto-merge Renovate Presents",
-      matchManagers: ["renovate-config"],
-      matchUpdateTypes: ["minor", "patch"],
-      automerge: true,
-      automergeType: "pr",
-      ignoreTests: false,
     },
     // Grouping rules
     {

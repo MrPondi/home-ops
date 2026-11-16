@@ -109,7 +109,8 @@ the take, with the search that came up empty, is enough.
 
 `.renovaterc.json5` is the source for how Renovate treats this update:
 its `automerge` rules say whether the PR merges on its own, in which case
-the review is the last look before the merge; its `groupName` rules say
+an approving review is the merge gate (see "Renovate automerge" in
+`AGENTS.md`); its `groupName` rules say
 which PRs move several packages at once, each of which the review
 covers; its labels and the shared preset's `!` on a major update should
 agree with the title, and drift between them is worth a note.

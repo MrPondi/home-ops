@@ -20,8 +20,12 @@ spec:
       auth:
         admin:
           password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
+      # Approval = score >= threshold AND risk <= risk. Only an approval on the head SHA lets the
+      # renovate-automerge workflow merge a Renovate PR (score 4 = no P0/P1 finding)
       confidence:
         model: litellm/free-pool
+        risk: medium
+        threshold: 4
       # Runner traffic through the gateway proxy; serve's own model/S3 calls are not filtered here
       egress:
         allow: ["*"]

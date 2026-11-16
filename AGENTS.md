@@ -12,7 +12,7 @@ home-ops/
 │   ├── config.yaml      # default agent, MCP servers, MCP tool denies, protected paths
 │   ├── instructions/    # sorting.instructions.md — YAML key-order rules (see Conventions)
 │   └── skills/          # AI skills (e.g. add-app scaffolder)
-├── .github/             # GitHub Actions workflows (renovate, label-sync, image-pull)
+├── .github/             # GitHub Actions workflows (ci/image-pull, label-sync, renovate-automerge)
 ├── .mise/               # Env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env), hooks, shared tasks; monorepo root
 ├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mise.toml tasks
 ├── kubernetes/          # Kubernetes configurations (Flux-managed) + mise.toml tasks
@@ -376,6 +376,25 @@ GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease �
 - Alertmanager (kube-prometheus-stack `alertmanagerconfig.yaml`): severity `critical` → Pushover (groupWait 1m, repeatInterval 12h). `InfoInhibitor` → blackhole, `Watchdog` → buddy-heartbeat. Alerts keep firing ~10-15m after drops stop (10m rate window) then resolve automatically.
 - `hubble_drop_total` is preferred over `hubble_flows_processed_total` for drop alerting — the flow metric has no drop-reason label.
 - Prometheus API: the `prometheus` MCP server, or from inside the cluster `http://prometheus-kube-prometheus-stack.observability:9090/api/v1/query` (URL-encode queries).
+
+## Renovate automerge (kritika-gated)
+
+Hosted Renovate never merges by itself: `.renovaterc.json5` sets `automergeType: "label"`. The flow:
+
+1. Eligible updates (patch/digest, and minor from a version ≥ 1.0) are `automerge: true`. Majors (`type/major`) and 0.x minors (`renovate/major-*` branches) are not. Grafana dashboard revisions count as majors.
+2. While the checks run, Renovate requests no reviewer. If any check goes red (including an errored `Kritika / Review`), it requests `@MrPondi` itself.
+3. Once every check is green, Renovate adds the `automerge` label. `.github/workflows/renovate-automerge.yaml` then waits (up to 30 min) for kritika to finish on the head. It squash-merges with `--match-head-commit` **only if kritika's `APPROVE` review is on the current head SHA**; otherwise it requests `@MrPondi`. To retry, remove the label: Renovate adds it again on its next run.
+4. Non-eligible PRs get `@MrPondi` as reviewer at creation.
+
+Kritika approves when score ≥ `confidence.threshold` (4: no P0/P1 finding) **and** risk ≤ `confidence.risk` (`medium`). Both are set in `kubernetes/apps/kritika-system/kritika/app/helmrelease.yaml`. The `Kritika / Review` status passes whatever the risk, so the approval review is the only gate.
+
+Rules:
+
+- Never add `automergeType: "pr"`/`"branch"`, `platformAutomerge` or `ignoreTests` rules: they merge without kritika.
+- Never install renovate-approve: it approves every automerge PR.
+- Silent cases with no merge and no review request: a check stuck pending, or a human push to the Renovate branch (Renovate then never adds the label). Check the Renovate dependency dashboard for these.
+- Workflow-token merges do not fire `push` workflows on `main`; Flux webhooks are unaffected.
+- The ruleset requires 0 approvals, so human and agent PRs are unaffected. `Kritika / Review` is a required check pinned to the kritika app (integration 4044186).
 
 ## Shell / jq Pitfalls
 
