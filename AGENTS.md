@@ -19,7 +19,7 @@ home-ops/
 │   ├── apps/            # Applications grouped by namespace (namespace overlays)
 │   └── components/      # Reusable kustomize components + replacements list
 ├── talos/               # Talos Linux machine config templates (minijinja) + mise.toml tasks
-├── terraform/           # Terraform IaC (proxmox VMs, authentik configuration)
+├── terraform/           # Terraform IaC (proxmox VMs, authentik configuration, minio buckets/IAM)
 └── scripts/             # Standalone maintenance/audit helper scripts (not cluster-deployed)
 ```
 
