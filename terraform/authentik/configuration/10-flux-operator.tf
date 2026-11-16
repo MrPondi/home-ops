@@ -2,8 +2,6 @@ data "bitwarden-secrets_secret" "flux-operator" {
   id = "283d4479-b085-4a96-bf42-b3fd00123cb3"
 }
 
-# Shared by the GitOps apps (flux-operator, kritika): emits `admin` for superusers and
-# for holders of the application's "Admins" entitlement.
 resource "authentik_property_mapping_provider_scope" "gitops-admin" {
   name       = "GitOps Admin"
   scope_name = "admin"
@@ -62,7 +60,6 @@ resource "authentik_application" "flux-operator" {
   open_in_new_tab   = true
 }
 
-# Shared by the GitOps apps (flux-operator, kritika)
 resource "authentik_group" "gitops-users" {
   name         = "GitOps Users"
 }
@@ -70,21 +67,6 @@ resource "authentik_group" "gitops-users" {
 resource "authentik_group" "gitops-admins" {
   name         = "GitOps Admins"
   parents      = [authentik_group.gitops-users.id]
-}
-
-moved {
-  from = authentik_property_mapping_provider_scope.flux-operator-admin
-  to   = authentik_property_mapping_provider_scope.gitops-admin
-}
-
-moved {
-  from = authentik_group.flux-operator-users
-  to   = authentik_group.gitops-users
-}
-
-moved {
-  from = authentik_group.flux-operator-admins
-  to   = authentik_group.gitops-admins
 }
 
 resource "authentik_application_entitlement" "flux-operator-admins" {
