@@ -22,8 +22,6 @@ spec:
           privateKey: { env: KRITIKA_GITHUB_PRIVATE_KEY }
           webhookSecret: { env: KRITIKA_GITHUB_WEBHOOK_SECRET }
       auth:
-        admin:
-          password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
         oidc:
           clientId: { env: KRITIKA_AUTH_OIDC_CLIENT_ID }
           clientSecret: { env: KRITIKA_AUTH_OIDC_CLIENT_SECRET }
