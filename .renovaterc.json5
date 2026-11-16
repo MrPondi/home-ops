@@ -36,6 +36,16 @@
       matchUpdateTypes: ["major"],
       automerge: false,
     },
+    {
+      // The one exception to the kritika gate: every revision is a "major" (regex versioning) and
+      // only touches dashboard JSON. Pushed straight to main (no PR, no checks to wait for), which
+      // needs the Renovate app as a bypass actor on the main ruleset.
+      description: "Auto-merge Grafana dashboards straight to main",
+      matchDatasources: ["custom.grafana-dashboards"],
+      automerge: true,
+      automergeType: "branch",
+      ignoreTests: true,
+    },
     // Scheduling rules
     {
       description: "Let GitHub Actions releases settle",
