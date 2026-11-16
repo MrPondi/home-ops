@@ -99,7 +99,7 @@ For any change under `kubernetes/`, `talos/`, `terraform/` or CI:
 3. **Render** every touched Kustomization: `mise run //kubernetes:render-local-ks <ns> <ks>`; for non-trivial changes diff against `main` (see "Validate locally").
 4. **Audit**: `uv run scripts/kustomization_order_audit.py` and `uv run scripts/cnp_prefix_audit.py` (when CNPs changed) — both exit 1 on violations. Fix violations you introduced; report pre-existing ones instead of silently fixing unrelated files.
 5. **Commit** with a Conventional Commit message (`type(scope): summary`, `!` for breaking; e.g. `fix(policy): …`, `feat(media): …`, `docs(agents): …`). lefthook runs oxfmt / `mise fmt` / actionlint on commit and restages fixes.
-6. **PR**: `git push -u origin agent/<topic>` → `gh pr create` → konflate `get_pr_summary` (render failures are blockers) → wait for required checks → `gh pr merge`.
+6. **PR**: `git push -u origin agent/<topic>` → `gh pr create` → konflate `get_pr_summary` (render failures are blockers) → wait for required checks (`Konflate`, `Build Success`, `Kritika / Review`, `Renovate Approval`) → `gh pr merge`. Only Renovate PRs need an approval (kritika's up to medium risk, otherwise the user's), enforced by the `Renovate Approval` workflow — never use the admin bypass.
 7. **Deploy**: `flux reconcile kustomization <ks> -n <ns> --with-source` (intervals are 1h — never wait).
 8. **Verify**: workload healthy; network changes show zero `POLICY_DENIED` in hubble; event-driven paths triggered (see "Verifying policies"); `flux get kustomizations -A` shows no `SUSPENDED True`.
 
