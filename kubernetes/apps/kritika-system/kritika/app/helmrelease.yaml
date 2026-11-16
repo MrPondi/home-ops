@@ -36,6 +36,9 @@ spec:
         litellm:
           apiKey: { env: KRITIKA_LITELLM_API_KEY }
           baseUrl: http://litellm.ai.svc.cluster.local:4000/v1
+          # free tiers report no cost; price them explicitly so runs show $0, not "unpriced"
+          pricing:
+            free-pool: { input: 0, output: 0 }
           # free-pool is a LiteLLM load-balanced group of free-tier models: a retried
           # step (429/5xx/timeout) is routed to another member
           retries: 3
