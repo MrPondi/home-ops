@@ -22,6 +22,8 @@ spec:
           password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
       confidence:
         model: litellm/free-pool
+        # approve up to medium risk (default: low); high-risk changes need a human
+        risk: medium
       # Runner traffic through the gateway proxy; serve's own model/S3 calls are not filtered here
       egress:
         allow: ["*"]

@@ -1,0 +1,103 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Renovate Approval
+
+# Branch rulesets cannot target pull requests by author, so this check carries
+# the "Renovate needs an approval" rule: it is required on main, passes at once
+# for anyone else's pull request, and passes a Renovate pull request only once
+# kritika (or the owner) approved it. kritika approves up to medium risk; for
+# anything it does not approve, the owner is mentioned so GitHub pings them.
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+  # kritika's commit status lands after its summary comment is published
+  status:
+
+permissions: {}
+
+concurrency:
+  # every commit status (Konflate, CI, ...) starts a run: never let those cancel a ping
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || format('{0}-{1}', github.event.sha, github.event.context) }}
+  cancel-in-progress: ${{ github.event_name != 'status' }}
+
+env:
+  KRITIKA_BOT: branch-hopper[bot]
+  RENOVATE_BOT: renovate[bot]
+
+jobs:
+  gate:
+    name: Renovate Approval
+    if: github.event_name != 'status'
+    runs-on: ubuntu-26.04
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Require an approval on Renovate pull requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          if [ "$AUTHOR" != "$RENOVATE_BOT" ]; then
+            echo "Opened by $AUTHOR, not Renovate: no approval needed."
+            exit 0
+          fi
+          # Each reviewer's latest decision (APPROVED, CHANGES_REQUESTED or DISMISSED)
+          approvers=$(gh api --paginate "repos/$REPO/pulls/$PR/reviews" \
+            --jq '.[] | select(.state != "COMMENTED" and .state != "PENDING") | [.user.login, .state] | @tsv' \
+            | awk -F'\t' '{ last[$1] = $2 } END { for (u in last) if (last[u] == "APPROVED") print u }')
+          echo "Approved by: ${approvers:-nobody}"
+          if printf '%s\n' "$approvers" | grep -qxF -e "$KRITIKA_BOT" -e "$OWNER"; then
+            exit 0
+          fi
+          echo "::error::Renovate pull requests merge only after kritika or $OWNER approves them."
+          exit 1
+
+  ping:
+    name: Renovate Approval - Ping
+    if: >-
+      github.event_name == 'status' &&
+      github.event.context == 'Kritika / Review' &&
+      github.event.state != 'pending'
+    runs-on: ubuntu-26.04
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Mention the owner once per head commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.sha }}
+          STATE: ${{ github.event.state }}
+          DESCRIPTION: ${{ github.event.description }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          prs=$(gh api "repos/$REPO/commits/$SHA/pulls" \
+            --jq '.[] | select(.state == "open" and .user.login == env.RENOVATE_BOT and .head.sha == env.SHA) | .number')
+          for pr in $prs; do
+            marker="<!-- renovate-approval-ping:$SHA -->"
+            if gh api --paginate "repos/$REPO/issues/$pr/comments" --jq '.[].body' | grep -qF -- "$marker"; then
+              echo "#$pr: already pinged for $SHA."
+              continue
+            fi
+            if [ "$STATE" = "success" ]; then
+              summary=$(gh api --paginate "repos/$REPO/issues/$pr/comments" \
+                --jq '.[] | select(.user.login == env.KRITIKA_BOT and (.body | contains("<!-- kritika:pr-"))) | .body')
+              reason=$(printf '%s\n' "$summary" | grep -m1 -F -- '**Not approved**' || true)
+              if [ -z "$reason" ]; then
+                echo "#$pr: kritika approved it, or approval does not apply."
+                continue
+              fi
+              text="kritika did not approve this Renovate update, so it will not automerge. Approve it to let it merge."
+            else
+              reason="Kritika / Review: $STATE: $DESCRIPTION"
+              text="kritika's review did not complete, so this Renovate update will not automerge."
+            fi
+            body=$(printf '%s\n@%s %s\n\n> %s\n' "$marker" "$OWNER" "$text" "$reason")
+            gh pr comment "$pr" --repo "$REPO" --body "$body"
+          done
