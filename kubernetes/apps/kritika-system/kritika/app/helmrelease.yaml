@@ -10,7 +10,11 @@ spec:
     name: kritika
   interval: 1h
   values:
+    replicas: 1
+    deploymentAnnotations:
+      secret.reloader.stakater.com/auto: "true"
     config:
+      webUrl: https://{{ .Release.Name }}.pondi.dev
       apps:
         github:
           accounts: [MrPondi]
@@ -20,52 +24,44 @@ spec:
       auth:
         admin:
           password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
-      # Approval = score >= threshold AND risk <= risk. Only an approval on the head SHA lets the
-      # renovate-automerge workflow merge a Renovate PR (score 4 = no P0/P1 finding)
+      review:
+        approve: true
+        model: litellm/free-pool
       confidence:
         model: litellm/free-pool
         risk: medium
         threshold: 4
-      # Runner traffic through the gateway proxy; serve's own model/S3 calls are not filtered here
-      egress:
-        allow: ["*"]
-        deny: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, "*.internal"]
-      # Qwen3-Embedding-0.6B (llmkube `embed` InferenceService in ai, routed via LiteLLM)
       embedding:
         dims: 1024
         model: litellm/embed
         queryPrompt: "Instruct: Given a code change, retrieve code that implements similar logic\nQuery:"
         similarFloor: 0.3
+      egress:
+        allow: ["*"]
+        deny: [10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, "*.internal"]
       providers:
         litellm:
           apiKey: { env: KRITIKA_LITELLM_API_KEY }
           baseUrl: http://litellm.ai.svc.cluster.local:4000/v1
-          # free tiers report no cost; price them explicitly so runs show $0, not "unpriced"
           pricing:
             free-pool: { input: 0, output: 0 }
           # free-pool is a LiteLLM load-balanced group of free-tier models: a retried
           # step (429/5xx/timeout) is routed to another member
           retries: 3
           type: openai
-      review:
-        approve: true
-        model: litellm/free-pool
       trigger:
         exclude:
           - { expr: pr.fork, name: forks }
-      webUrl: https://{{ .Release.Name }}.pondi.dev
-    database:
-      app:
-        existingSecret: kritika-postgres-app
-      owner:
-        existingSecret: kritika-postgres-credentials
-    deploymentAnnotations:
-      secret.reloader.stakater.com/auto: "true"
     envFrom:
       - secretRef:
           name: kritika-secret
       - secretRef:
           name: litellm-key-kritika
+    database:
+      app:
+        existingSecret: kritika-postgres-app
+      owner:
+        existingSecret: kritika-postgres-credentials
     gatewayCache:
       enabled: true
       storage:
@@ -76,11 +72,17 @@ spec:
         region: us-east-1
         type: s3
     httpRoute:
+      enabled: true
       annotations:
         gatus.home-operations.com/endpoint: |-
           conditions: ["[STATUS] == 200"]
           path: /api/v1/meta
-      enabled: true
+        gethomepage.dev/enabled: "true"
+        gethomepage.dev/name: Kritika reviewer Dashboard
+        gethomepage.dev/group: Monitoring & Operations
+        gethomepage.dev/icon: github-copilot.svg
+        gethomepage.dev/description: AI PR reviewer
+        gethomepage.dev/weight: "45"
       hostnames:
         - "{{ .Release.Name }}.pondi.dev"
       parentRefs:
@@ -98,7 +100,6 @@ spec:
       serviceMonitor:
         enabled: true
     networkPolicy:
-      # NetworkPolicy syntax, rendered as its own policy for the serve pods; pod ports, not Service ports
       extraEgress:
         # LiteLLM proxy pods (ai)
         - to:
@@ -121,9 +122,7 @@ spec:
       postgres:
         podSelector:
           cnpg.io/cluster: kritika-postgres
-      # explicit: `auto` reads cluster capabilities, which offline flate renders do not see
       type: cilium
-    replicas: 1
     resources:
       requests:
         cpu: 10m

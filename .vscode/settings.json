@@ -103,6 +103,7 @@
     "external-secrets": "secure",
     "flux-system": "pipe",
     "kopiur-system": "aws",
+    "kritika-system": "review",
     "kube-system": "kubernetes",
     "longhorn-system": "dump",
     "miroir-system": "base",

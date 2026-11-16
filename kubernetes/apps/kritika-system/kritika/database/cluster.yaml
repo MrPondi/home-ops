@@ -4,16 +4,28 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: kritika-postgres
+  annotations:
+    cnpg.io/skipEmptyWalArchiveCheck: "enabled"
 spec:
-  # Net-new database. Disaster recovery = swap to bootstrap.recovery from the
-  # barman ObjectStore (see kubernetes/components/postgres/cluster.yaml).
+  # Bootstraps from the barman ObjectStore (initdb only for a net-new database, mirrors
+  # kubernetes/components/postgres/cluster.yaml)
   bootstrap:
-    initdb:
+    recovery:
       database: kritika
       owner: kritika
       secret:
         name: kritika-postgres-credentials
+      source: kritika-postgres-backup
   enablePDB: false # Not for single node clusters
+  externalClusters:
+    - name: kritika-postgres-backup
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        enabled: true
+        isWALArchiver: true
+        parameters:
+          barmanObjectName: kritika-postgres
+          serverName: kritika-postgres
   imageCatalogRef:
     apiGroup: postgresql.cnpg.io
     kind: ImageCatalog
