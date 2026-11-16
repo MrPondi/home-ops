@@ -29,8 +29,10 @@ spec:
           clientSecret: { env: KRITIKA_AUTH_OIDC_CLIENT_SECRET }
           issuer: https://auth.pondi.dev/application/o/kritika/
           name: authentik
-          roleMappingExpr: '"authentik Admins" in roles ? "admin" : ""'
-          rolesClaim: groups
+          # authentik admits only GitOps Users; the `admin` scope (GitOps Admin mapping)
+          # adds an admin claim for superusers and GitOps Admins entitlement holders
+          roleMappingExpr: '"admin" in claims ? "admin" : "member"'
+          scopes: [openid, email, profile, admin]
       review:
         approve: true
         model: litellm/free-pool

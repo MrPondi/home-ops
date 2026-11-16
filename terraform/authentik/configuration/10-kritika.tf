@@ -20,10 +20,16 @@ resource "authentik_provider_oauth2" "kritika" {
 
   grant_types = [
     "authorization_code",
+    "hybrid",
+    "implicit",
+    "client_credentials",
+    "password",
+    "urn:ietf:params:oauth:grant-type:device_code",
     "refresh_token"
   ]
 
   property_mappings = [
+    authentik_property_mapping_provider_scope.gitops-admin.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
@@ -41,8 +47,19 @@ resource "authentik_application" "kritika" {
   open_in_new_tab   = true
 }
 
+resource "authentik_application_entitlement" "kritika-admins" {
+  name        = "Admins"
+  application = authentik_application.kritika.uuid
+}
+
+resource "authentik_policy_binding" "kritika-admins-access" {
+  target = authentik_application_entitlement.kritika-admins.id
+  group  = authentik_group.gitops-admins.id
+  order  = 10
+}
+
 resource "authentik_policy_binding" "kritika-access" {
   target = authentik_application.kritika.uuid
-  group  = authentik_group.admins.id
+  group  = authentik_group.gitops-users.id
   order  = 10
 }

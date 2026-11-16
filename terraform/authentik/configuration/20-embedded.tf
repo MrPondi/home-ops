@@ -13,7 +13,7 @@ resource "authentik_group" "admins" {
     authentik_group.minio-admins.id,
     authentik_group.nextcloud-admins.id,
     authentik_group.torrent-mgmt.id,
-    authentik_group.flux-operator-admins.id,
+    authentik_group.gitops-admins.id,
     authentik_group.metrics-access.id,
     authentik_group.pelican-wings-ssh.id,
     authentik_group.ai-admins.id

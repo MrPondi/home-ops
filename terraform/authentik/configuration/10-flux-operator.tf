@@ -2,8 +2,10 @@ data "bitwarden-secrets_secret" "flux-operator" {
   id = "283d4479-b085-4a96-bf42-b3fd00123cb3"
 }
 
-resource "authentik_property_mapping_provider_scope" "flux-operator-admin" {
-  name       = "Flux Operator Admin"
+# Shared by the GitOps apps (flux-operator, kritika): emits `admin` for superusers and
+# for holders of the application's "Admins" entitlement.
+resource "authentik_property_mapping_provider_scope" "gitops-admin" {
+  name       = "GitOps Admin"
   scope_name = "admin"
   expression = <<EOF
 entitlement_names = {
@@ -42,7 +44,7 @@ resource "authentik_provider_oauth2" "flux-operator" {
   ]
 
   property_mappings = [
-    authentik_property_mapping_provider_scope.flux-operator-admin.id,
+    authentik_property_mapping_provider_scope.gitops-admin.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
@@ -60,13 +62,29 @@ resource "authentik_application" "flux-operator" {
   open_in_new_tab   = true
 }
 
-resource "authentik_group" "flux-operator-users" {
-  name         = "Flux Operator Users"
+# Shared by the GitOps apps (flux-operator, kritika)
+resource "authentik_group" "gitops-users" {
+  name         = "GitOps Users"
 }
 
-resource "authentik_group" "flux-operator-admins" {
-  name         = "Flux Operator Admins"
-  parents      = [authentik_group.flux-operator-users.id]
+resource "authentik_group" "gitops-admins" {
+  name         = "GitOps Admins"
+  parents      = [authentik_group.gitops-users.id]
+}
+
+moved {
+  from = authentik_property_mapping_provider_scope.flux-operator-admin
+  to   = authentik_property_mapping_provider_scope.gitops-admin
+}
+
+moved {
+  from = authentik_group.flux-operator-users
+  to   = authentik_group.gitops-users
+}
+
+moved {
+  from = authentik_group.flux-operator-admins
+  to   = authentik_group.gitops-admins
 }
 
 resource "authentik_application_entitlement" "flux-operator-admins" {
@@ -76,13 +94,13 @@ resource "authentik_application_entitlement" "flux-operator-admins" {
 
 resource "authentik_policy_binding" "flux-operator-admins-access" {
   target = authentik_application_entitlement.flux-operator-admins.id
-  group  = authentik_group.flux-operator-admins.id
+  group  = authentik_group.gitops-admins.id
   order  = 10
 }
 
 
 resource "authentik_policy_binding" "flux-operator-access" {
   target = authentik_application.flux-operator.uuid
-  group  = authentik_group.flux-operator-users.id
+  group  = authentik_group.gitops-users.id
   order  = 10
 }
