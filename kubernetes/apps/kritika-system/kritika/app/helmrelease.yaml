@@ -24,6 +24,15 @@ spec:
       auth:
         admin:
           password: { env: KRITIKA_AUTH_ADMIN_PASSWORD }
+        oidc:
+          clientId: { env: KRITIKA_AUTH_OIDC_CLIENT_ID }
+          clientSecret: { env: KRITIKA_AUTH_OIDC_CLIENT_SECRET }
+          issuer: https://auth.pondi.dev/application/o/kritika/
+          name: authentik
+          # authentik admits only GitOps Users; the `admin` scope (GitOps Admin mapping)
+          # adds an admin claim for superusers and GitOps Admins entitlement holders
+          roleMappingExpr: '"admin" in claims ? "admin" : "member"'
+          scopes: [openid, email, profile, admin]
       review:
         approve: true
         model: litellm/free-pool
@@ -111,6 +120,18 @@ spec:
                   app.kubernetes.io/name: litellm
           ports:
             - port: 4000
+              protocol: TCP
+        # envoy-internal gateway pods (network): OIDC via auth.pondi.dev, backend port 10443
+        - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: network
+              podSelector:
+                matchLabels:
+                  app.kubernetes.io/name: envoy
+                  gateway.envoyproxy.io/owning-gateway-name: envoy-internal
+          ports:
+            - port: 10443
               protocol: TCP
         # QNAP MinIO (gateway download cache)
         - to:
