@@ -132,7 +132,7 @@ Servers are declared once in `.agents/config.yaml`. Tool names are harness-prefi
 | Observability  | `prometheus`, `victoria-logs`, `grafana`               |
 | PRs / review   | `konflate`, `github`                                   |
 | Upstream docs  | `context7` (chart/library docs — prefer over guessing) |
-| Infrastructure | `unifi`, `proxmox`, `cloudflare`, `authentik`          |
+| Infrastructure | `unifi`, `proxmox`, `cloudflare`, `authentik`, `minio` |
 | Apps           | `hass`, `jellyfin`, `servarr`, `qbittorrent`, `seerr`  |
 
 Prefer MCP read tools for inspection and diagnosis (Flux status, pod logs, PromQL, LogsQL). Cluster **writes** still follow the git-first rollout — MCP tools never replace a PR.
