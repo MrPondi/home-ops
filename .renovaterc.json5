@@ -135,6 +135,13 @@
       matchPackageNames: ["ghcr.io/cloudnative-pg/postgresql"],
       allowedVersions: "/^18\\./",
     },
+    {
+      // cnpg preset maps Database vchord pins to vchord-scratch; we track ghcr.io/home-operations/vchord
+      description: "Ignore the cnpg preset's vchord-scratch tracking",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/tensorchord/vchord-scratch"],
+      enabled: false,
+    },
     // Labeling rules
     {
       matchUpdateTypes: ["major"],
