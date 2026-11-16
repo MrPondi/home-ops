@@ -8,3 +8,6 @@
   color: "ff9800"
 - name: type/major
   color: "f6412d"
+# Renovate automerge (applied by Renovate once green; renovate-automerge workflow merges on kritika approval)
+- name: automerge
+  color: "0e8a16"
