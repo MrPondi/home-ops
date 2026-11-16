@@ -20,11 +20,6 @@ resource "authentik_provider_oauth2" "kritika" {
 
   grant_types = [
     "authorization_code",
-    "hybrid",
-    "implicit",
-    "client_credentials",
-    "password",
-    "urn:ietf:params:oauth:grant-type:device_code",
     "refresh_token"
   ]
 
