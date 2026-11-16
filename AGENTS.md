@@ -381,16 +381,17 @@ GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease �
 
 Hosted Renovate never merges by itself: `.renovaterc.json5` sets `automergeType: "label"`. The flow:
 
-1. Eligible updates (patch/digest, and minor from a version ≥ 1.0) are `automerge: true`. Majors (`type/major`) and 0.x minors (`renovate/major-*` branches) are not. Grafana dashboard revisions count as majors.
+1. Eligible updates (patch/digest, and minor from a version ≥ 1.0) are `automerge: true`. Majors (`type/major`) and 0.x minors (`renovate/major-*` branches) are not.
 2. While the checks run, Renovate requests no reviewer. If any check goes red (including an errored `Kritika / Review`), it requests `@MrPondi` itself.
 3. Once every check is green, Renovate adds the `automerge` label. `.github/workflows/renovate-automerge.yaml` then waits (up to 30 min) for kritika to finish on the head. It squash-merges with `--match-head-commit` **only if kritika's `APPROVE` review is on the current head SHA**; otherwise it requests `@MrPondi`. To retry, remove the label: Renovate adds it again on its next run.
 4. Non-eligible PRs get `@MrPondi` as reviewer at creation.
+5. **Exception: Grafana dashboards** (`custom.grafana-dashboards`) are branch-automerged straight to `main`: no PR, no kritika review, no checks (`ignoreTests`). This works only because the Renovate app (integration 2740) is an `always` bypass actor on the main ruleset.
 
 Kritika approves when score ≥ `confidence.threshold` (4: no P0/P1 finding) **and** risk ≤ `confidence.risk` (`medium`). Both are set in `kubernetes/apps/kritika-system/kritika/app/helmrelease.yaml`. The `Kritika / Review` status passes whatever the risk, so the approval review is the only gate.
 
 Rules:
 
-- Never add `automergeType: "pr"`/`"branch"`, `platformAutomerge` or `ignoreTests` rules: they merge without kritika.
+- Never add `automergeType: "pr"`/`"branch"`, `platformAutomerge` or `ignoreTests` rules beyond the dashboards exception. With Renovate's ruleset bypass they merge without kritika **and** without required checks.
 - Never install renovate-approve: it approves every automerge PR.
 - Silent cases with no merge and no review request: a check stuck pending, or a human push to the Renovate branch (Renovate then never adds the label). Check the Renovate dependency dashboard for these.
 - Workflow-token merges do not fire `push` workflows on `main`; Flux webhooks are unaffected.
