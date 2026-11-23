@@ -14,7 +14,7 @@ components:
 
 resources:
   - ./namespace.yaml
-  - ./app-postbuild/ks.yaml
+  - ./ai-postbuild/ks.yaml
   # - ./hermes/ks.yaml
   - ./litellm/ks.yaml
   - ./llmkube/ks.yaml

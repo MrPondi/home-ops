@@ -145,8 +145,8 @@ spec:
             # POSTGRES_USERNAME defaults to ${APP} — set only if different
     prune: true
     sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: ExternalArtifact
+        name: <app> # the app directory name
         namespace: flux-system
 ```
 

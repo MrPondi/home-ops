@@ -9,6 +9,6 @@ spec:
   path: ./kubernetes/apps/system-upgrade/etcd-defrag/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: etcd-defrag
     namespace: flux-system

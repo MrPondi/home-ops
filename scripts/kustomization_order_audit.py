@@ -19,6 +19,10 @@ Flux Kustomizations):
    same-namespace deps first (by name), then `external-secrets-store`
    (ns `external-secrets`), then remaining cross-namespace deps (by name).
 4. `spec.components` sorted plain path-alphabetical.
+5. Per-app artifacts (ArtifactGenerator `apps`): app directory names under
+   `apps/<namespace>/<app>/` are unique across namespaces, and every
+   `sourceRef` in `apps/<namespace>/<app>/ks.yaml` is
+   `{kind: ExternalArtifact, name: <app>, namespace: flux-system}`.
 
 Usage:
     uv run scripts/kustomization_order_audit.py [--path kubernetes/] [--quiet]
@@ -259,6 +263,37 @@ def audit_components(f: Path, text: str, problems: list[str]) -> None:
                     problems.append(f"{f}: components not path-alphabetical: {paths}")
 
 
+SOURCE_REF_RE = re.compile(
+    r"^  sourceRef:\n((?:    \S.*\n?)+)", flags=re.M
+)
+
+
+def audit_artifacts(root: Path, problems: list[str]) -> None:
+    apps_root = root / "apps"
+    if not apps_root.is_dir():
+        return
+    seen: dict[str, list[str]] = {}
+    for d in sorted(p for p in apps_root.glob("*/*") if p.is_dir()):
+        seen.setdefault(d.name, []).append(d.parent.name)
+    for name, namespaces in seen.items():
+        if len(namespaces) > 1:
+            problems.append(
+                f"{apps_root}/*/{name}: app directory name not unique across namespaces "
+                f"({', '.join(namespaces)}); each one becomes ExternalArtifact {name!r}"
+            )
+    for f in sorted(apps_root.glob("*/*/ks.yaml")):
+        app = f.parent.name
+        for m in SOURCE_REF_RE.finditer(f.read_text()):
+            ref = dict(
+                re.match(r"\s+([\w]+):\s*(\S+)", l).groups()
+                for l in m.group(1).splitlines()
+                if re.match(r"\s+[\w]+:\s*\S", l)
+            )
+            want = {"kind": "ExternalArtifact", "name": app, "namespace": "flux-system"}
+            if ref != want:
+                problems.append(f"{f}: sourceRef {ref} must be {want}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -289,6 +324,7 @@ def main() -> int:
             audit_flux(f, text, problems)
             audit_depends_on(f, text, problems)
             audit_components(f, text, problems)
+    audit_artifacts(root, problems)
 
     if not args.quiet:
         if problems:

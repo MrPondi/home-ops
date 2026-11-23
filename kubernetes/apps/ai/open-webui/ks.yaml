@@ -28,6 +28,6 @@ spec:
         name: open-webui-postbuild-secret
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: open-webui
     namespace: flux-system

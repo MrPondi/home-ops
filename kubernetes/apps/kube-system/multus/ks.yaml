@@ -17,8 +17,8 @@ spec:
   path: ./kubernetes/apps/kube-system/multus/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: multus
     namespace: flux-system
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -33,7 +33,7 @@ spec:
   path: ./kubernetes/apps/kube-system/multus/networks
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: multus
     namespace: flux-system
   wait: true

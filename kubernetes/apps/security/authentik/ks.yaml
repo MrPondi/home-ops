@@ -21,7 +21,7 @@ spec:
       POSTGRES_MEMORY: "512"
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: authentik
     namespace: flux-system
   wait: true

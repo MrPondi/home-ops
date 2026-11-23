@@ -12,6 +12,6 @@ spec:
   path: ./kubernetes/apps/default/watermark-remover/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: watermark-remover
     namespace: flux-system

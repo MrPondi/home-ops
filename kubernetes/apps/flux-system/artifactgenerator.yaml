@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/source.extensions.fluxcd.io/artifactgenerator_v1beta1.json
+apiVersion: source.extensions.fluxcd.io/v1beta1
+kind: ArtifactGenerator
+metadata:
+  name: apps
+spec:
+  # One ExternalArtifact per app directory, named after the directory: app directory names must be unique across namespaces
+  artifacts:
+    - name: "{app}"
+      copy:
+        - from: "@repo/kubernetes/apps/{namespace}/{app}/**"
+          to: "@artifact/kubernetes/apps/{namespace}/{app}/"
+        - from: "@repo/kubernetes/components/**"
+          to: "@artifact/kubernetes/components/"
+      originRevision: "@repo"
+  pathPattern: "@repo/kubernetes/apps/{namespace}/{app}"
+  sources:
+    - alias: repo
+      kind: GitRepository
+      name: flux-system

@@ -13,12 +13,12 @@ components:
 
 resources:
   - ./namespace.yaml
-  - ./app-postbuild/ks.yaml
   - ./autobrr/ks.yaml
   - ./bazarr/ks.yaml
   - ./brrpolice/ks.yaml
   - ./cleanrr/ks.yaml
   - ./jellyfin/ks.yaml
+  - ./media-postbuild/ks.yaml
   - ./prowlarr/ks.yaml
   - ./qbittorrent/ks.yaml
   - ./qui/ks.yaml

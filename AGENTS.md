@@ -100,7 +100,7 @@ For any change under `kubernetes/`, `talos/`, `terraform/` or CI:
 4. **Audit**: `uv run scripts/kustomization_order_audit.py` and `uv run scripts/cnp_prefix_audit.py` (when CNPs changed) — both exit 1 on violations. Fix violations you introduced; report pre-existing ones instead of silently fixing unrelated files.
 5. **Commit** with a Conventional Commit message (`type(scope): summary`, `!` for breaking; e.g. `fix(policy): …`, `feat(media): …`, `docs(agents): …`). lefthook runs oxfmt / `mise fmt` / actionlint on commit and restages fixes.
 6. **PR**: `git push -u origin agent/<topic>` → `gh pr create` → konflate `get_pr_summary` (render failures are blockers) → wait for required checks (`Konflate`, `Build Success`, `Kritika / Review`; the `main` ruleset requires no approvals) → `gh pr merge`. Only Renovate PRs need an approval: kritika's (up to medium risk) for automerge, which `renovate-automerge.yaml` checks before merging (see "Renovate automerge"), otherwise the user's. Never use the admin bypass.
-7. **Deploy**: `flux reconcile kustomization <ks> -n <ns> --with-source` (intervals are 1h — never wait).
+7. **Deploy**: `flux reconcile source git flux-system -n flux-system` (intervals are 1h — never wait). source-watcher regenerates the per-app ExternalArtifacts from the new revision and their Kustomizations reconcile on the change; `flux reconcile kustomization <ks> -n <ns>` forces one. `--with-source` does not work here: it only refreshes Git/OCI/Bucket sources, not an `ExternalArtifact`.
 8. **Verify**: workload healthy; network changes show zero `POLICY_DENIED` in hubble; event-driven paths triggered (see "Verifying policies"); `flux get kustomizations -A` shows no `SUSPENDED True`.
 
 Docs-only changes stop after step 5 (commit, no push). Read-only/analysis tasks change nothing.
@@ -189,7 +189,7 @@ Constraints: JSON6902 appends need the labeled KS to already carry `spec.compone
 
 Values that `postBuild` substitution needs from secrets come from a Secret listed in `spec.postBuild.substituteFrom`. The Secret must exist **before** the consumer Kustomization builds, so it can't live in the app's own path:
 
-- **`<ns>-postbuild` (default)** — each namespace that needs it has `kubernetes/apps/<ns>/app-postbuild/` (a Kustomization named `<ns>-postbuild`, e.g. `ai-postbuild`, `media-postbuild`; the name must be namespace-prefixed because flate drops same-named Kustomizations across namespaces; `wait: true`) whose `secrets/` dir holds one `ExternalSecret` per consumer producing `<app>-postbuild-secret` (`ai`: hermes, open-webui, toolhive; `media`: `servarr.yaml` → radarr/sonarr/prowlarr). A consumer adds its ExternalSecret there, lists `- name: <ns>-postbuild` first in `dependsOn`, and sets `substituteFrom: [{kind: Secret, name: <app>-postbuild-secret}]`. A new namespace gets its own `app-postbuild/` dir and overlay entry.
+- **`<ns>-postbuild` (default)** — each namespace that needs it has `kubernetes/apps/<ns>/<ns>-postbuild/` (a Kustomization named `<ns>-postbuild`, e.g. `ai-postbuild`, `media-postbuild`; the name must be namespace-prefixed because flate drops same-named Kustomizations across namespaces; `wait: true`) whose `secrets/` dir holds one `ExternalSecret` per consumer producing `<app>-postbuild-secret` (`ai`: hermes, open-webui, toolhive; `media`: `servarr.yaml` → radarr/sonarr/prowlarr). A consumer adds its ExternalSecret there, lists `- name: <ns>-postbuild` first in `dependsOn`, and sets `substituteFrom: [{kind: Secret, name: <app>-postbuild-secret}]`. A new namespace gets its own `<ns>-postbuild/` dir and overlay entry. The postbuild dir is its own ExternalArtifact, so a commit that adds both a postbuild ExternalSecret and its consumer's `substituteFrom` does not order them by revision: the consumer fails once and recovers on the 2m `retryInterval`.
 - **Bootstrap-seeded** — secrets needed before external-secrets is running come from `bootstrap/kustomize/` (e.g. `cloudflare-tunnel-id-secret` for `network/cloudflare-tunnel`).
 
 ## Adding New Apps
@@ -197,7 +197,8 @@ Values that `postBuild` substitution needs from secrets come from a Secret liste
 Scaffold with the **`add-app` skill** (`.agents/skills/add-app/SKILL.md`) — it is the source of truth for file layout, templates, and the verification checklist. Load it before creating anything under `kubernetes/apps/`. High-level layout:
 
 - `kubernetes/apps/<ns>/kustomization.yaml` — namespace overlay (sets `namespace: <ns>`, lists `./namespace.yaml` + one `./<app>/ks.yaml` per app + namespace-wide components)
-- `kubernetes/apps/<ns>/<app>/ks.yaml` — Kustomization doc(s): `interval: 1h`, `prune: true`, `postBuild.substitute.APP`, usually `dependsOn: [external-secrets-store]` (namespace `external-secrets`); shared infra via `spec.components` or component labels
+- `kubernetes/apps/<ns>/<app>/ks.yaml` — Kustomization doc(s): `interval: 1h`, `prune: true`, `postBuild.substitute.APP`, `sourceRef: {kind: ExternalArtifact, name: <app>, namespace: flux-system}`, usually `dependsOn: [external-secrets-store]` (namespace `external-secrets`); shared infra via `spec.components` or component labels
+- **Per-app artifacts**: the `apps` ArtifactGenerator (`kubernetes/apps/flux-system/artifactgenerator.yaml`, run by source-watcher) publishes one `ExternalArtifact` per `kubernetes/apps/<ns>/<app>/` directory, named after the directory and holding that directory plus `kubernetes/components/`. So app directory names must be **unique across namespaces**, and an app's manifests may only reference files in its own directory or in `kubernetes/components/`. Every Kustomization in the app's `ks.yaml` uses that artifact. If source-watcher is down, point `flux-operator` and `flux-instance` (`flux-system/flux-operator/ks.yaml`) back at the `flux-system` GitRepository to apply a fix from Git.
 - Manifests for each Kustomization live in a subdir next to `ks.yaml`: `app/` is the norm; multi-part apps use `backend/`, `client/`, `config/`, `crds/`, `cluster/` (e.g. `pstream`, `toolhive`, `litellm`)
 
 ## Adding New Resources
@@ -303,7 +304,7 @@ PR review criteria (HelmRelease, secrets, image/digest policy, breaking changes,
 ## Python tooling & scripts
 
 - Python scripts run through the **uv project at the repo root** (`pyproject.toml` + `uv.lock` + `.python-version`) — never install packages globally (no `pip install --user` / system pip). Add dependencies with `uv add <pkg>` (updates `pyproject.toml` and `uv.lock`, commit both), sync with `uv sync`, invoke as `uv run scripts/<script>.py`. Each script documents itself in its docstring and `--help`; audits default to `--path kubernetes` and exit 1 on violations.
-- `kustomization_order_audit.py` — `resources:` section ordering, `ks.yaml` key order, `dependsOn` chain order, `components` order (see Conventions).
+- `kustomization_order_audit.py` — `resources:` section ordering, `ks.yaml` key order, `dependsOn` chain order, `components` order (see Conventions), and per-app artifacts (unique app directory names, `sourceRef` = `ExternalArtifact <app dir>`).
 - `cnp_prefix_audit.py` — CNP/CCNP label-selector prefixes against the Selectors rules; also fails on unparseable YAML.
 - `sync_agents.py` — renders per-harness agent adapters from `.agents/` (see "Agent tooling"); `--check` for drift.
 
@@ -345,7 +346,7 @@ Detail that is only needed for the specific task at hand.
 | Validation | flate + yayamlls                        | Local Kustomization/HelmRelease rendering + YAML LSP                                        |
 | Reviews    | konflate (via ToolHive MCP)             | Rendered-diff evidence for PR reviews                                                       |
 
-GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `flux-system` (`kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml` (FluxInstance `kustomize.patches`)), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
+GitOps flow: `Git push → GitRepository flux-system → ArtifactGenerator apps (source-watcher) → per-app ExternalArtifact → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `flux-system` (`kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml` (FluxInstance `kustomize.patches`)), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
 
 ## Kopiur backups (snapshot mover jobs)
 

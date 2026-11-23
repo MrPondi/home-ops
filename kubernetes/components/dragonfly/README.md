@@ -48,8 +48,8 @@ spec:
             # DRAGONFLY_APP_NAME defaults to ${APP} — set only if different (e.g. virtualmcpserver for toolhive-config)
     prune: true
     sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: ExternalArtifact
+        name: <app> # the app directory name
         namespace: flux-system
 ```
 
@@ -76,8 +76,8 @@ spec:
             APP: <app>
     prune: true
     sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: ExternalArtifact
+        name: <app> # the app directory name
         namespace: flux-system
 ```
 

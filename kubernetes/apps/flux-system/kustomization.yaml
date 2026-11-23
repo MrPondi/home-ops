@@ -11,6 +11,7 @@ components:
   - ../../components/alerts
 
 resources:
+  - ./artifactgenerator.yaml
   - ./namespace.yaml
   - ./flux-operator/ks.yaml
   - ./konflate/ks.yaml

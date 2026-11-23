@@ -9,8 +9,8 @@ spec:
   path: ./kubernetes/apps/ai/llmkube/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: llmkube
     namespace: flux-system
   wait: true
 ---
@@ -30,6 +30,6 @@ spec:
   path: ./kubernetes/apps/ai/llmkube/models
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: llmkube
     namespace: flux-system

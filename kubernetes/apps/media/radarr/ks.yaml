@@ -23,6 +23,6 @@ spec:
         name: radarr-postbuild-secret
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: radarr
     namespace: flux-system

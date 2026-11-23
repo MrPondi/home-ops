@@ -18,6 +18,6 @@ spec:
       DS_PROMETHEUS: prometheus
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: tar1090
     namespace: flux-system
