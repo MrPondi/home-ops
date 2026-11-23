@@ -15,5 +15,5 @@ spec:
           image:
             reference: ghcr.io/home-operations/vchord:1.3.0@sha256:c705b2313d64370eb19d3958a32ff1c68bbd76dd015dfe0ecceae9649949965a
       # standard image ships pgvector (extension `vector`)
-      image: ghcr.io/cloudnative-pg/postgresql:18.7-standard-bookworm@sha256:2f690a4072bd00715c579cd19d0ba41599557687052ecd149560e673f77ce02a
+      image: ghcr.io/cloudnative-pg/postgresql:18.7-standard-bookworm@sha256:4eae19c85f20f9ad1457b25f0dfeabef8673e67a96a6fa37ef91e6af343d6631
       major: 18
