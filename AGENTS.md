@@ -63,7 +63,7 @@ Never hardcode or quote versions from memory — read them from the Renovate-man
 | Talos                             | `kubernetes/apps/system-upgrade/tuppr/upgrades/talosupgrade.yaml` (`spec.talos.version`)           |
 | Kubernetes                        | `kubernetes/apps/system-upgrade/tuppr/upgrades/kubernetesupgrade.yaml` (`spec.kubernetes.version`) |
 | Cilium                            | `kubernetes/apps/kube-system/cilium/app/ocirepository.yaml` (`ref.tag`)                            |
-| Flux                              | `kubernetes/apps/flux-system/flux-operator/` + `flux-instance/` (`ref.tag`)                        |
+| Flux                              | `kubernetes/apps/flux-system/flux-operator/` (`app/` + `instance/`, `ref.tag`)                     |
 | Any other chart                   | the app's `ocirepository.yaml` (`ref.tag`)                                                         |
 | CLIs (talosctl, flux, kubectl, …) | `brew info <formula>` (unpinned)                                                                   |
 
@@ -173,7 +173,7 @@ Components may use `${VAR:=default}` substitution fed by the Kustomization's `po
 
 ### Label-driven components
 
-The root `flux-system` Kustomization ("Label UX registry" in the FluxInstance `kustomize.patches`, `kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml`) patches child Kustomizations by `metadata.labels`. **Never** add `components/postgres` or `components/dragonfly` to `spec.components` by hand — set the label:
+The root `flux-system` Kustomization ("Label UX registry" in the FluxInstance `kustomize.patches`, `kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml`) patches child Kustomizations by `metadata.labels`. **Never** add `components/postgres` or `components/dragonfly` to `spec.components` by hand — set the label:
 
 | Label                                            | Injects                                                                                                                                                          |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -343,7 +343,7 @@ Detail that is only needed for the specific task at hand.
 | Validation | flate + yayamlls                        | Local Kustomization/HelmRelease rendering + YAML LSP                                        |
 | Reviews    | konflate (via ToolHive MCP)             | Rendered-diff evidence for PR reviews                                                       |
 
-GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `flux-system` (`kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml` (FluxInstance `kustomize.patches`)), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
+GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `flux-system` (`kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml` (FluxInstance `kustomize.patches`)), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
 
 ## Kopiur backups (snapshot mover jobs)
 
