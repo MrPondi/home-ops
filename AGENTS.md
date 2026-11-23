@@ -12,7 +12,7 @@ home-ops/
 │   ├── config.yaml      # default agent, MCP servers, MCP tool denies, protected paths
 │   ├── instructions/    # sorting.instructions.md — YAML key-order rules (see Conventions)
 │   └── skills/          # AI skills (e.g. add-app scaffolder)
-├── .github/             # GitHub Actions workflows (ci/image-pull, label-sync, renovate-automerge)
+├── .github/             # GitHub Actions workflows (ci: image pull + flate test, label-sync, renovate-automerge)
 ├── .mise/               # Env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env), hooks, shared tasks; monorepo root
 ├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mise.toml tasks
 ├── kubernetes/          # Kubernetes configurations (Flux-managed) + mise.toml tasks
