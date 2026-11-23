@@ -5,8 +5,6 @@ kind: Kustomization
 metadata:
   name: talos-logs-relay
 spec:
-  dependsOn:
-    - name: victoria-logs
   interval: 1h
   path: ./kubernetes/apps/observability/talos-logs-relay/app
   # No postBuild: the Fluent Bit config uses ${NODE_NAME} and $record accessors that envsubst must not touch
