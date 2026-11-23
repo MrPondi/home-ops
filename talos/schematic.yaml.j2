@@ -6,6 +6,10 @@ customization:
     - pcie_aspm=off                       # Disable PCIe ASPM
     - pcie_port_pm=off                    # Disable PCIe Port PM
     - i915.force_probe=56a6               # Intel GPU (i915) Force Probe
+    - -selinux                            # Disable SELinux (removes the default selinux=1)
+    - audit=0                             # Disable kernel audit
+    - selinux=0                           # Disable SELinux
+    - talos.auditd.disabled=1             # Disable Talos auditd (pair with audit=0)
   systemExtensions:
     officialExtensions:
       - siderolabs/amd-ucode              # AMD CPU Microcode
