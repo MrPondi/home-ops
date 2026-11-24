@@ -183,7 +183,7 @@ The root `flux-system` Kustomization ("Label UX registry" in the FluxInstance `k
 | `components.dragonfly/authentication: "true"`    | `components/dragonfly/authentication`; dependsOn `external-secrets-store`                                                                                        |
 | `components.dragonfly/cluster-mode: non-cluster` | `spec.patches` adjusting Dragonfly args (ToolHive Lua scripts)                                                                                                   |
 
-Constraints: JSON6902 appends need the labeled KS to already carry `spec.components`, `spec.dependsOn` and `spec.healthCheckExprs` as lists (`[]` allowed) — a missing list fails the render (caught by the required konflate check). `spec.patches`-injecting labels (`cnpg: init`, `cluster-mode`) require the KS to define **no** `spec.patches` of its own. Render with flate to see the injected result.
+Constraints: JSON6902 appends need the labeled KS to already carry `spec.components`, `spec.dependsOn` and `spec.healthCheckExprs` as lists (`[]` allowed) — a missing list fails the render (caught by the required konflate check). Child `ks.yaml` files never set `spec.patches`: the root's first entry sets it on every child Kustomization (the HelmRelease defaults), and the `cnpg: init` / `cluster-mode` labels append to that list (`/spec/patches/-`). Render with flate to see the injected result.
 
 ### Postbuild secrets (`<ns>-postbuild`)
 

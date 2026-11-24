@@ -80,7 +80,7 @@ spec:
     # ... dependsOn, healthCheckExprs, postBuild ...
 ```
 
-Label `components.postgres/cnpg=init` triggers the root patch (labelSelector `components.postgres/cnpg=init` on `kind: Kustomization`) which injects a strategic-merge doc carrying `spec.patches -> target Cluster (postgresql.cnpg.io/v1)` with JSON6902 ops:
+Label `components.postgres/cnpg=init` triggers the root patch (labelSelector `components.postgres/cnpg=init` on `kind: Kustomization`) which appends a `spec.patches` entry (JSON6902 `add /spec/patches/-`, after the HelmRelease defaults entry every child gets) targeting `Cluster (postgresql.cnpg.io/v1)` with JSON6902 ops:
 
 ```yaml
 - op: replace
@@ -111,7 +111,7 @@ Real example: `kubernetes/apps/default/pstream/ks.yaml` (`pstream-backend` Kusto
 
 ### Label precondition (per-consumer)
 
-The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it is a strategic-merge `spec.patches` injection (like `components.dragonfly/cluster-mode=non-cluster`). Labels that append via JSON6902 `op: add` with `path: /spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-` _do_ require the labeled `Kustomization` to carry each required field as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced at PR time by the required Konflate check (a missing list fails the rendered build), registry-driven from `kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml` (FluxInstance `kustomize.patches`) (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-`; 2 strategic-merge selectors need no precondition, 3 components appends + 5 dependsOn appends + 2 healthCheckExprs appends have Rule A active).
+The `components.postgres/cnpg=init` label itself needs **no** `spec.components` — it appends to the `spec.patches` list the root's HelmRelease-defaults entry puts on every child Kustomization (like `components.dragonfly/cluster-mode=non-cluster`), so the KS must not set `spec.patches` itself. Labels that append via JSON6902 `op: add` with `path: /spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-` _do_ require the labeled `Kustomization` to carry each required field as a list (empty `[]` allowed) — per-consumer scoping (only the adopting KS needs it). Enforced at PR time by the required Konflate check (a missing list fails the rendered build), registry-driven from `kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml` (FluxInstance `kustomize.patches`) (derived from which `labelSelector` entries pair with a JSON6902 `add` to `/spec/components/-`, `/spec/dependsOn/-` or `/spec/healthCheckExprs/-`; 2 strategic-merge selectors need no precondition, 3 components appends + 5 dependsOn appends + 2 healthCheckExprs appends have Rule A active).
 
 ### Label adoption
 

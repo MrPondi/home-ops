@@ -89,7 +89,7 @@ Consumers use `components.dragonfly/enabled=true` label with `spec.components: [
 
 ### Cluster-mode override — ToolHive Lua auth storage
 
-Label `components.dragonfly/cluster-mode=non-cluster` triggers the root `flux-system` patch (labelSelector `components.dragonfly/cluster-mode=non-cluster` on `kind: Kustomization`) which injects a `spec.patches` JSON6902 patch on the `Dragonfly` CR:
+Label `components.dragonfly/cluster-mode=non-cluster` triggers the root `flux-system` patch (labelSelector `components.dragonfly/cluster-mode=non-cluster` on `kind: Kustomization`) which appends a `spec.patches` entry (after the HelmRelease defaults entry every child gets) with a JSON6902 patch on the `Dragonfly` CR:
 
 - `remove` `/spec/args/2` — drops `--cluster_mode=emulated` (standalone mode required by ToolHive's Redis Lua scripts; replication remains enabled)
 - `add` `/spec/args/-` `value: --default_lua_flags=allow-undeclared-keys` — allows Lua scripts to access undeclared keys
