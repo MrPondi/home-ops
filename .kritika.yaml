@@ -5,6 +5,6 @@ skills:
     reviewing-pull-requests:
       load: true
 tools:
-  # Keep in step with .mise/config.toml (0.7.x breaks local named-Kustomization renders)
+  # Keep in step with .mise/config.toml
   # renovate: datasource=github-releases depName=home-operations/flate
-  aqua:home-operations/flate: v0.6.5
+  aqua:home-operations/flate: v0.8.1
