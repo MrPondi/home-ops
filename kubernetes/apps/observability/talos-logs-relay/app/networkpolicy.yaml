@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: talos-logs-relay
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: talos-logs-relay
+      app.kubernetes.io/name: fluent-bit
+  egress:
+    # victoria-logs server pods, same-ns
+    - toEndpoints:
+        - matchLabels:
+            app.kubernetes.io/name: victoria-logs-single
+      toPorts:
+        - ports:
+            - port: "9428"
+              protocol: TCP
+  ingress:
+    # Talos machined service logs + KmsgLogConfig kernel logs, sent from the node's host netns
+    - fromEntities:
+        - host
+      toPorts:
+        - ports:
+            - port: "6050"
+              protocol: TCP

@@ -13,6 +13,8 @@ spec:
       value: unifi.internal
     - name: UNIFI_NETWORK_SITE
       value: default
+    - name: UNIFI_NETWORK_WEBSOCKET_ENABLED
+      value: "false"
     - name: UNIFI_VERIFY_SSL
       value: "false"
     - name: UNIFI_MCP_HTTP_ENABLED

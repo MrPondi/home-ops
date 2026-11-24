@@ -12,7 +12,7 @@ home-ops/
 │   ├── config.yaml      # default agent, MCP servers, MCP tool denies, protected paths
 │   ├── instructions/    # sorting.instructions.md — YAML key-order rules (see Conventions)
 │   └── skills/          # AI skills (e.g. add-app scaffolder)
-├── .github/             # GitHub Actions workflows (ci/image-pull, label-sync, renovate-automerge)
+├── .github/             # GitHub Actions workflows (ci: image pull + flate test, label-sync, renovate-automerge)
 ├── .mise/               # Env (KUBECONFIG, TALOSCONFIG, FLATE_PATH, .secrets.env), hooks, shared tasks; monorepo root
 ├── bootstrap/           # Cluster bootstrap (helmfile + kustomize) + mise.toml tasks
 ├── kubernetes/          # Kubernetes configurations (Flux-managed) + mise.toml tasks
@@ -63,7 +63,7 @@ Never hardcode or quote versions from memory — read them from the Renovate-man
 | Talos                             | `kubernetes/apps/system-upgrade/tuppr/upgrades/talosupgrade.yaml` (`spec.talos.version`)           |
 | Kubernetes                        | `kubernetes/apps/system-upgrade/tuppr/upgrades/kubernetesupgrade.yaml` (`spec.kubernetes.version`) |
 | Cilium                            | `kubernetes/apps/kube-system/cilium/app/ocirepository.yaml` (`ref.tag`)                            |
-| Flux                              | `kubernetes/apps/flux-system/flux-operator/` + `flux-instance/` (`ref.tag`)                        |
+| Flux                              | `kubernetes/apps/flux-system/flux-operator/` (`app/` + `instance/`, `ref.tag`)                     |
 | Any other chart                   | the app's `ocirepository.yaml` (`ref.tag`)                                                         |
 | CLIs (talosctl, flux, kubectl, …) | `brew info <formula>` (unpinned)                                                                   |
 
@@ -173,7 +173,7 @@ Components may use `${VAR:=default}` substitution fed by the Kustomization's `po
 
 ### Label-driven components
 
-The root `flux-system` Kustomization ("Label UX registry" in the FluxInstance `kustomize.patches`, `kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml`) patches child Kustomizations by `metadata.labels`. **Never** add `components/postgres` or `components/dragonfly` to `spec.components` by hand — set the label:
+The root `flux-system` Kustomization ("Label UX registry" in the FluxInstance `kustomize.patches`, `kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml`) patches child Kustomizations by `metadata.labels`. **Never** add `components/postgres` or `components/dragonfly` to `spec.components` by hand — set the label:
 
 | Label                                            | Injects                                                                                                                                                          |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -183,7 +183,7 @@ The root `flux-system` Kustomization ("Label UX registry" in the FluxInstance `k
 | `components.dragonfly/authentication: "true"`    | `components/dragonfly/authentication`; dependsOn `external-secrets-store`                                                                                        |
 | `components.dragonfly/cluster-mode: non-cluster` | `spec.patches` adjusting Dragonfly args (ToolHive Lua scripts)                                                                                                   |
 
-Constraints: JSON6902 appends need the labeled KS to already carry `spec.components`, `spec.dependsOn` and `spec.healthCheckExprs` as lists (`[]` allowed) — a missing list fails the render (caught by the required konflate check). `spec.patches`-injecting labels (`cnpg: init`, `cluster-mode`) require the KS to define **no** `spec.patches` of its own. Render with flate to see the injected result.
+Constraints: JSON6902 appends need the labeled KS to already carry `spec.components`, `spec.dependsOn` and `spec.healthCheckExprs` as lists (`[]` allowed) — a missing list fails the render (caught by the required konflate check). Child `ks.yaml` files never set `spec.patches`: the root's first entry sets it on every child Kustomization (the HelmRelease defaults), and the `cnpg: init` / `cluster-mode` labels append to that list (`/spec/patches/-`). Render with flate to see the injected result.
 
 ### Postbuild secrets (`<ns>-postbuild`)
 
@@ -253,6 +253,8 @@ When a change needs repeated apply→observe→fix cycles (e.g. CNP selector tun
 - **Do not push unless the change needs to land.** Push is only load-bearing for changes that drive the rollout pipeline (`kubernetes/`, `talos/`, `terraform/`, CI workflows). Docs-only edits (this file, READMEs, skills) have no cluster effect: committing alone is enough — only push when a PR/main-merge workflow requires it.
 - **AI assistants never push directly to `main`.** Rollout changes land via PR only: push a working branch (`agent/<topic>`), `gh pr create`, wait for the required checks, `gh pr merge`, then reconcile. Bypass-privileged credentials are not permission — the account's branch-protection bypass right must never be exercised by automation.
 - **`remote: Bypassed rule violations for refs/heads/main:` on a push is a hard stop.** It means branch protection was circumvented: stop immediately, report it to the user, and take no further rollout actions (no retry, no rebase-and-repush, no reconcile) without explicit approval.
+- **Dependent PRs go in a stack** (`gh stack`, the `github/gh-stack` gh extension), e.g. a change that has to be merged and rolled out before the next one can land: `gh stack init <bottom> <top>` (existing branches are adopted), `gh stack submit` to push and link the PRs, `gh stack rebase` / `gh stack sync` after changes or merges. After the bottom PR merges, GitHub retargets the next one to `main`. Mark the PRs that must wait as draft.
+- **No cross-repo references in anything pushed to GitHub** (commit messages, PR/issue bodies, comments). This repo is public: an issue/PR reference to another project (`owner/repo#123` or its URL) leaves a public "mentioned this" event on that project's timeline. Commit messages leave one too, once the commit reaches `main`. Commit references (`owner/repo@sha`, e.g. `Ported from onedr0p/home-ops@a23f9a6`) only link and leave no trace, so they are fine. Name them as plain text instead: `` `longhorn/longhorn` issue 12401 `` in Markdown, `flate issue 1557` in commit messages. References to this repo's own PRs (`#2448`) are fine.
 
 ## Networking & Policy (Cilium)
 
@@ -343,7 +345,7 @@ Detail that is only needed for the specific task at hand.
 | Validation | flate + yayamlls                        | Local Kustomization/HelmRelease rendering + YAML LSP                                        |
 | Reviews    | konflate (via ToolHive MCP)             | Rendered-diff evidence for PR reviews                                                       |
 
-GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `flux-system` (`kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml` (FluxInstance `kustomize.patches`)), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
+GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease → k8s resources`. Flux recursively walks `kubernetes/apps/` from the root Kustomization `flux-system` (`kubernetes/apps/flux-system/flux-operator/instance/helmrelease.yaml` (FluxInstance `kustomize.patches`)), which patches HelmRelease defaults onto every child (crds `CreateReplace`, rollback/upgrade remediation with retries) and applies the label-driven components. Each namespace overlay defines a `namespace:` and one Flux `Kustomization` per app (`ks.yaml`).
 
 ## Kopiur backups (snapshot mover jobs)
 
