@@ -10,7 +10,7 @@ spec:
       namespace: external-secrets
     - name: barman-cloud
       namespace: database
-    - name: cloudnative-pg
+    - name: cloudnative-pg-catalog
       namespace: database
   healthCheckExprs:
     - apiVersion: postgresql.cnpg.io/v1

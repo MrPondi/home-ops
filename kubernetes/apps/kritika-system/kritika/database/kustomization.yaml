@@ -7,7 +7,6 @@ resources:
   - ./database.yaml
   - ./databaserole.yaml
   - ./externalsecret.yaml
-  - ./imagecatalog.yaml
   - ./networkpolicy.yaml
   - ./objectstore.yaml
   - ./podmonitor.yaml
