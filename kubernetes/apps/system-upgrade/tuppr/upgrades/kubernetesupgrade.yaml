@@ -22,3 +22,12 @@ spec:
       expr: |-
         status.conditions.filter(c, c.type == "Ready").all(c, c.status == "True") &&
         status.conditions.filter(c, c.type == "Schedulable").all(c, c.status == "True")
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      expr: |-
+        has(status.readyInstances) && status.readyInstances == object.spec.instances &&
+        has(status.conditions) && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+    - apiVersion: miroir.home-operations.com/v1alpha1
+      kind: MiroirVolume
+      expr: |-
+        status.phase == 'Ready'

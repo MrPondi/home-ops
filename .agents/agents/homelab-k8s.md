@@ -30,7 +30,7 @@ Hand each subagent a self-contained brief — objective, the decisions already s
 
 ## Cluster rules (summary — AGENTS.md is authoritative)
 
-- Rollout is git-first: edit → commit → PR → merge → `flux reconcile kustomization <ks> -n <ns> --with-source` (or `mise run //kubernetes:sync ks`). Never push directly to `main`.
+- Rollout is git-first: edit → commit → PR → merge → `flux reconcile source git flux-system -n flux-system` (per-app ExternalArtifacts regenerate and their Kustomizations follow; `flux reconcile kustomization <ks> -n <ns>` to force one, or `mise run //kubernetes:sync ks`). Never push directly to `main`.
 - Validate locally before pushing: `mise run //kubernetes:render-local-ks <ns> <ks>` (`<ks>` = Kustomization `metadata.name`).
 - Never guess label selectors — render with flate and copy real labels from rendered/live objects.
 - Secrets only via external-secrets (Bitwarden); never hardcode secrets.

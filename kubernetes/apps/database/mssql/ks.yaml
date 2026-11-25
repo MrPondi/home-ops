@@ -20,6 +20,6 @@ spec:
       KOPIUR_PGID: "10001"
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: mssql
     namespace: flux-system

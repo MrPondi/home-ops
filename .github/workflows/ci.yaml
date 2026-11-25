@@ -19,7 +19,7 @@ permissions:
 env:
   FLATE_PATH: ./kubernetes/apps
   # renovate: datasource=github-releases depName=home-operations/flate
-  FLATE_VERSION: "0.6.5"
+  FLATE_VERSION: "0.8.1"
   # renovate: datasource=custom.talos-factory depName=siderolabs/talos
   TALOS_VERSION: v1.14.6
 
@@ -51,7 +51,7 @@ jobs:
           MISE_GITHUB_TOKEN: ${{ github.token }}
         run: |
           echo 'images<<EOF' >> $GITHUB_OUTPUT
-          mise exec "github:home-operations/flate@${FLATE_VERSION}" -- flate diff images -o json --allow-missing-secrets --skip-kinds LiteLLMModel >> $GITHUB_OUTPUT
+          mise exec "github:home-operations/flate@${FLATE_VERSION}" -- flate diff images -o json --allow-missing-kinds Secret --skip-kinds LiteLLMModel >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
 
   pull-images:
@@ -104,7 +104,7 @@ jobs:
       - name: Run Flate
         env:
           MISE_GITHUB_TOKEN: ${{ github.token }}
-        run: mise exec "github:home-operations/flate@${FLATE_VERSION}" -- flate test all --allow-missing-secrets
+        run: mise exec "github:home-operations/flate@${FLATE_VERSION}" -- flate test --allow-missing-kinds Secret --strict-substitutions
 
   zizmor:
     name: Zizmor

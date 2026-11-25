@@ -27,6 +27,6 @@ spec:
         name: hermes-postbuild-secret
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: hermes
     namespace: flux-system

@@ -12,6 +12,6 @@ spec:
   path: ./kubernetes/apps/default/fixly-bot/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: fixly-bot
     namespace: flux-system

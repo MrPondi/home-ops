@@ -9,8 +9,8 @@ spec:
   path: ./kubernetes/apps/network/envoy-gateway/app
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: envoy-gateway
     namespace: flux-system
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -25,6 +25,6 @@ spec:
   path: ./kubernetes/apps/network/envoy-gateway/routes
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: envoy-gateway
     namespace: flux-system

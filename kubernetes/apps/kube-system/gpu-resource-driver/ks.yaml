@@ -14,8 +14,8 @@ spec:
   path: ./kubernetes/apps/kube-system/gpu-resource-driver/amd
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: gpu-resource-driver
     namespace: flux-system
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
@@ -33,6 +33,6 @@ spec:
   path: ./kubernetes/apps/kube-system/gpu-resource-driver/intel
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: gpu-resource-driver
     namespace: flux-system

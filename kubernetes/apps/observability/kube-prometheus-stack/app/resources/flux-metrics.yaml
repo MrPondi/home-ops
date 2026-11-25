@@ -7,6 +7,7 @@ kube-state-metrics:
           - kustomize.toolkit.fluxcd.io
           - helm.toolkit.fluxcd.io
           - notification.toolkit.fluxcd.io
+          - source.extensions.fluxcd.io
         resources:
           - gitrepositories
           - buckets
@@ -18,6 +19,8 @@ kube-state-metrics:
           - alerts
           - providers
           - receivers
+          - externalartifacts
+          - artifactgenerators
         verbs:
           - list
           - watch
@@ -146,6 +149,62 @@ kube-state-metrics:
                   url:
                     - spec
                     - url
+          - groupVersionKind:
+              group: source.extensions.fluxcd.io
+              version: v1beta1
+              kind: ArtifactGenerator
+            metricNamePrefix: gotk
+            metrics:
+              - name: resource_info
+                help: The current state of a Flux ArtifactGenerator resource.
+                each:
+                  type: Info
+                  info:
+                    labelsFromPath:
+                      name:
+                        - metadata
+                        - name
+                labelsFromPath:
+                  exported_namespace:
+                    - metadata
+                    - namespace
+                  ready:
+                    - status
+                    - conditions
+                    - "[type=Ready]"
+                    - status
+          - groupVersionKind:
+              group: source.toolkit.fluxcd.io
+              version: v1
+              kind: ExternalArtifact
+            metricNamePrefix: gotk
+            metrics:
+              - name: resource_info
+                help: The current state of a Flux ExternalArtifact resource.
+                each:
+                  type: Info
+                  info:
+                    labelsFromPath:
+                      name:
+                        - metadata
+                        - name
+                labelsFromPath:
+                  exported_namespace:
+                    - metadata
+                    - namespace
+                  ready:
+                    - status
+                    - conditions
+                    - "[type=Ready]"
+                    - status
+                  revision:
+                    - status
+                    - artifact
+                    - revision
+                  source_name:
+                    - spec
+                    - sourceRef
+                    - name
           - groupVersionKind:
               group: source.toolkit.fluxcd.io
               version: v1

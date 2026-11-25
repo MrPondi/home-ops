@@ -25,6 +25,6 @@ spec:
       KOPIUR_PGID: "33"
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: nextcloud
     namespace: flux-system

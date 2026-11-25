@@ -23,6 +23,6 @@ spec:
       APP: pelican
   prune: true
   sourceRef:
-    kind: GitRepository
-    name: flux-system
+    kind: ExternalArtifact
+    name: pelican
     namespace: flux-system
