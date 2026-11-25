@@ -28,9 +28,9 @@ spec:
           serverName: kritika-postgres
   imageCatalogRef:
     apiGroup: postgresql.cnpg.io
-    kind: ImageCatalog
+    kind: ClusterImageCatalog
     major: 18
-    name: kritika-postgres
+    name: postgresql
   instances: 1
   managed:
     services:
@@ -47,6 +47,12 @@ spec:
   postgresql:
     extensions:
       - name: vchord
+        dynamic_library_path:
+          - /usr/lib/postgresql/18/lib/
+        extension_control_path:
+          - /usr/share/postgresql/18/
+        image:
+          reference: ghcr.io/home-operations/vchord:1.5.0@sha256:97b4a1aa15b65c29fa97e84b4270cb235e7bd39e80d4a4b2e91d9fa17997566d
     shared_preload_libraries:
       - vchord
   primaryUpdateStrategy: unsupervised
