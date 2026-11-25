@@ -2,7 +2,7 @@ terraform {
   required_providers {
     minio = {
       source  = "aminueza/minio"
-      version = "3.46.4"
+      version = "3.47.0"
     }
     bitwarden-secrets = {
       source  = "bitwarden/bitwarden-secrets"
