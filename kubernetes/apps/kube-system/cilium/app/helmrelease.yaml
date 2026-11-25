@@ -40,8 +40,7 @@ spec:
       enabled: false
     hubble:
       enabled: true
-      dashboards:
-        enabled: true
+      eventBufferCapacity: "65535"
       # Per-flow export of dropped flows to /var/run/cilium/hubble/ (hostPath),
       # collected by victoria-logs-collector on the node. JSON lines, hot-reloadable.
       export:
@@ -58,13 +57,13 @@ spec:
                   - verdict:
                       - DROPPED
       metrics:
+        dashboards:
+          enabled: true
         enabled:
-          - dns
-          - drop:labelsContext=source_namespace,destination_namespace
-          - tcp
-          - icmp
-          - http
-          - flow:labelsContext=source_namespace,destination_namespace
+          - drop:labelsContext=source_namespace,destination_namespace;sourceContext=app|reserved-identity;destinationContext=app|reserved-identity
+          - flow:labelsContext=source_namespace,destination_namespace;sourceContext=app|reserved-identity;destinationContext=app|reserved-identity
+          - icmp:labelsContext=source_namespace,destination_namespace;sourceContext=app|reserved-identity;destinationContext=app|reserved-identity
+          - tcp:labelsContext=source_namespace,destination_namespace;sourceContext=app|reserved-identity;destinationContext=app|reserved-identity
         serviceMonitor:
           enabled: true
           trustCRDsExist: true
