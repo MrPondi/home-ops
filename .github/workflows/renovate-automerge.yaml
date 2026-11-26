@@ -35,7 +35,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
           # kritika posts its status and approval as this app (konflate shares it but never approves);
-          # since kritika 0.0.126 the approval has no body, so match on login + state + head SHA only
+          # the approval has no body, so match on login + state + head SHA
           KRITIKA_CONTEXT: Kritika / Review
           KRITIKA_LOGIN: branch-hopper[bot]
           PR: ${{ github.event.pull_request.number }}

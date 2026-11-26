@@ -385,7 +385,7 @@ Hosted Renovate never merges by itself: `.renovaterc.json5` sets `automergeType:
 
 1. Eligible updates (patch/digest, and minor from a version ≥ 1.0) are `automerge: true`. Majors (`type/major`) and 0.x minors (`renovate/major-*` branches) are not.
 2. While the checks run, Renovate requests no reviewer. If any check goes red (including an errored `Kritika / Review`), it requests `@MrPondi` itself.
-3. Once every check is green, Renovate adds the `automerge` label. `.github/workflows/renovate-automerge.yaml` then waits (up to 30 min) for kritika to finish on the head. It squash-merges with `--match-head-commit` **only if kritika's `APPROVE` review is on the current head SHA** (matched by app login, state and commit; since kritika 0.0.126 the approval has no body, and kritika re-approves each head only while `reviewDecision` is not `APPROVED`, which holds because the ruleset requires 0 approvals); otherwise it requests `@MrPondi`. To retry, remove the label: Renovate adds it again on its next run.
+3. Once every check is green, Renovate adds the `automerge` label. `.github/workflows/renovate-automerge.yaml` then waits (up to 30 min) for kritika to finish on the head. It squash-merges with `--match-head-commit` **only if kritika's `APPROVE` review is on the current head SHA**; otherwise it requests `@MrPondi`. To retry, remove the label: Renovate adds it again on its next run.
 4. Non-eligible PRs get `@MrPondi` as reviewer at creation.
 5. **Exception: Grafana dashboards** (`custom.grafana-dashboards`) are branch-automerged straight to `main`: no PR, no kritika review, no checks (`ignoreTests`). This works only because the Renovate app (integration 2740) is an `always` bypass actor on the main ruleset.
 
