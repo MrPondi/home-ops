@@ -1,0 +1,292 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: flux-instance
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: flux-instance
+  interval: 1h
+  values:
+    commonAnnotations:
+      fluxcd.controlplane.io/reconcileArtifactEvery: 1h
+    instance:
+      cluster:
+        networkPolicy: false
+      components:
+        - source-controller
+        - kustomize-controller
+        - helm-controller
+        - notification-controller
+        - source-watcher
+      sync:
+        url: "ssh://git@github.com/MrPondi/home-ops.git"
+        pullSecret: github-deploy-key
+        ref: "refs/heads/main"
+        path: kubernetes/apps
+      kustomize:
+        patches:
+          - # Add Kustomization defaults for all child Kustomizations
+            patch: |-
+              apiVersion: kustomize.toolkit.fluxcd.io/v1
+              kind: Kustomization
+              metadata:
+                name: _
+              spec:
+                patches:
+                  - # HelmRelease defaults: the HelmReleases live in the child Kustomizations, so they get
+                    # the patch through each child's spec.patches. This owns spec.patches: child ks.yaml
+                    # files must not set their own (label entries below append to it instead).
+                    patch: |-
+                      - op: add
+                        path: /spec/patches
+                        value:
+                          - patch: |-
+                              apiVersion: helm.toolkit.fluxcd.io/v2
+                              kind: HelmRelease
+                              metadata:
+                                name: _
+                              spec:
+                                install:
+                                  crds: CreateReplace
+                                rollback:
+                                  cleanupOnFail: true
+                                upgrade:
+                                  cleanupOnFail: true
+                                  crds: CreateReplace
+                                  strategy:
+                                    name: RemediateOnFailure
+                                  remediation:
+                                    remediateLastFailure: true
+                                    retries: 2
+                            target:
+                              group: helm.toolkit.fluxcd.io
+                              kind: HelmRelease
+                    target:
+                      group: kustomize.toolkit.fluxcd.io
+                      kind: Kustomization
+                  # Label UX registry: entries below keyed by labelSelector; JSON6902 appends to spec.components/spec.dependsOn/spec.healthCheckExprs require labeled KSs to carry that field as a list.
+                  -
+                    # net-new CNPG cluster initdb; label components.postgres/cnpg=init
+                    # Appends to the spec.patches list the HelmRelease defaults entry creates.
+                    patch: |-
+                      - op: add
+                        path: /spec/patches/-
+                        value:
+                          patch: |-
+                            - op: replace
+                              path: /spec/bootstrap
+                              value:
+                                initdb:
+                                  database: ${POSTGRES_USERNAME:=${APP}}
+                                  owner: ${POSTGRES_USERNAME:=${APP}}
+                            - op: remove
+                              path: /spec/externalClusters
+                          target:
+                            group: postgresql.cnpg.io
+                            version: v1
+                            kind: Cluster
+                    target:
+                      group: kustomize.toolkit.fluxcd.io
+                      kind: Kustomization
+                      labelSelector: "components.postgres/cnpg=init"
+                  -
+                    # Configure Dragonfly for ToolHive's Redis auth-storage Lua scripts.
+                    # Replication remains enabled; standalone mode and undeclared-key access
+                    # are required by ToolHive's scripts.
+                    # Caveat: base component already sets allow-undeclared-keys (cluster.yaml args);
+                    # first labeled consumer must reconcile args layout (remove shifts indices).
+                    # Appends to the spec.patches list the HelmRelease defaults entry creates.
+                    patch: |-
+                      - op: add
+                        path: /spec/patches/-
+                        value:
+                          patch: |-
+                            - op: remove
+                              path: /spec/args/2
+                            - op: add
+                              path: /spec/args/-
+                              value: --default_lua_flags=allow-undeclared-keys
+                          target:
+                            group: dragonflydb.io
+                            version: v1alpha1
+                            kind: Dragonfly
+                    target:
+                      group: kustomize.toolkit.fluxcd.io
+                      kind: Kustomization
+                      labelSelector: "components.dragonfly/cluster-mode=non-cluster"
+                  - # Postgres consumers: component + operator dependsOn + CNPG health checks; label components.postgres/enabled=true
+                    patch: |-
+                      - op: add
+                        path: /spec/dependsOn/-
+                        value:
+                          name: external-secrets-store
+                          namespace: external-secrets
+                      - op: add
+                        path: /spec/components/-
+                        value: ../../../../components/postgres
+                      - op: add
+                        path: /spec/dependsOn/-
+                        value:
+                          name: barman-cloud
+                          namespace: database
+                      - op: add
+                        path: /spec/dependsOn/-
+                        value:
+                          name: cloudnative-pg
+                          namespace: database
+                      - op: add
+                        path: /spec/healthCheckExprs/-
+                        value:
+                          apiVersion: postgresql.cnpg.io/v1
+                          kind: Cluster
+                          failed: "status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')"
+                          current: "status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')"
+                    target:
+                      group: kustomize.toolkit.fluxcd.io
+                      kind: Kustomization
+                      labelSelector: "components.postgres/enabled=true"
+                  - # Dragonfly consumers: component + operator dependsOn + Ready health check; label components.dragonfly/enabled=true
+                    patch: |-
+                      - op: add
+                        path: /spec/components/-
+                        value: ../../../../components/dragonfly
+                      - op: add
+                        path: /spec/dependsOn/-
+                        value:
+                          name: dragonfly-operator
+                          namespace: database
+                      - op: add
+                        path: /spec/healthCheckExprs/-
+                        value:
+                          apiVersion: dragonflydb.io/v1alpha1
+                          kind: Dragonfly
+                          current: "has(status.phase) && status.phase == 'Ready'"
+                    target:
+                      group: kustomize.toolkit.fluxcd.io
+                      kind: Kustomization
+                      labelSelector: "components.dragonfly/enabled=true"
+                  - # Opt-in dragonfly auth sub-component; label components.dragonfly/authentication=true
+                    patch: |-
+                      - op: add
+                        path: /spec/dependsOn/-
+                        value:
+                          name: external-secrets-store
+                          namespace: external-secrets
+                      - op: add
+                        path: /spec/components/-
+                        value: ../../../../components/dragonfly/authentication
+                    target:
+                      group: kustomize.toolkit.fluxcd.io
+                      kind: Kustomization
+                      labelSelector: "components.dragonfly/authentication=true"
+            target:
+              group: kustomize.toolkit.fluxcd.io
+              kind: Kustomization
+          - # Increase the number of workers
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --concurrent=10
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --requeue-dependency=5s
+            target:
+              kind: Deployment
+              name: (helm-controller|source-controller)
+          - # Increase the memory limits
+            patch: |-
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: all
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: manager
+                        resources:
+                          limits:
+                            memory: 1Gi
+            target:
+              kind: Deployment
+              name: (kustomize-controller|helm-controller|source-controller)
+          - # Enable in-memory kustomize builds
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --concurrent=20
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --requeue-dependency=5s
+              - op: replace
+                path: /spec/template/spec/volumes/0
+                value:
+                  name: temp
+                  emptyDir:
+                    medium: Memory
+            target:
+              kind: Deployment
+              name: kustomize-controller
+          - # Enable Helm repositories caching
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --helm-cache-max-size=10
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --helm-cache-ttl=60m
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --helm-cache-purge-interval=5m
+            target:
+              kind: Deployment
+              name: source-controller
+          - # Cache Secrets and ConfigMaps
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --feature-gates=CacheSecretsAndConfigMaps=true
+            target:
+              kind: Deployment
+              name: source-controller
+          - # Flux near OOM detection for Helm
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --feature-gates=OOMWatch=true
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --oom-watch-memory-threshold=95
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --oom-watch-interval=500ms
+            target:
+              kind: Deployment
+              name: helm-controller
+          - # Default to retry on failure and disable chart digest tracking
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --feature-gates=DefaultToRetryOnFailure=true,DisableChartDigestTracking=true
+            target:
+              kind: Deployment
+              name: helm-controller
+          - # Watch configmaps and secrets attached to HelmReleases and Kustomizations
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --watch-configs-label-selector=owner!=helm
+            target:
+              kind: Deployment
+              name: (helm-controller|kustomize-controller)
+          - # Cancel health checks on new Kustomizations revisions
+            patch: |-
+              - op: add
+                path: /spec/template/spec/containers/0/args/-
+                value: --feature-gates=CancelHealthCheckOnNewRevision=true
+            target:
+              kind: Deployment
+              name: kustomize-controller

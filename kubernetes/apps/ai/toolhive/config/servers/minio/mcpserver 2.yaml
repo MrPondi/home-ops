@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/toolhive.stacklok.dev/mcpserver_v1beta1.json
+apiVersion: toolhive.stacklok.dev/v1beta1
+kind: MCPServer
+metadata:
+  name: minio
+spec:
+  # Official MinIO MCP server (read-only by default: no --allow-write/--allow-delete/--allow-admin)
+  image: quay.io/minio/aistor/mcp-server-aistor:RELEASE.2025-05-28T17-22-30Z@sha256:8bb7292bd9e0aa83664eacac7bc530381e0995526eb69c192e199865ccccfb8b
+  transport: stdio
+  proxyPort: 8080
+  args:
+    - --container-mode
+  env:
+    - name: MINIO_ENDPOINT
+      value: 10.0.25.25:9000
+    - name: MINIO_USE_SSL
+      value: "false"
+  secrets:
+    - name: toolhive-minio-secret
+      key: MINIO_ACCESS_KEY
+    - name: toolhive-minio-secret
+      key: MINIO_SECRET_KEY
+  groupRef:
+    name: mcp-tools
