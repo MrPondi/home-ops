@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       hermes:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -189,6 +190,19 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 1Gi
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 5Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
+              globalMounts:
+                - path: /opt/data
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -243,10 +257,6 @@ spec:
       #         - path:
       #             value: /whatsapp/webhook
     persistence:
-      data:
-        existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /opt/data
       config:
         type: configMap
         name: "{{ .Release.Name }}-config"
