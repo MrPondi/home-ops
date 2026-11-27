@@ -18,7 +18,6 @@ spec:
   postBuild:
     substitute:
       APP: radarr
-      CONTROLLER: StatefulSet
     substituteFrom:
       - kind: Secret
         name: radarr-postbuild-secret

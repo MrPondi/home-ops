@@ -17,7 +17,6 @@ spec:
   postBuild:
     substitute:
       APP: qbittorrent
-      CONTROLLER: StatefulSet
   prune: true
   sourceRef:
     kind: GitRepository

@@ -168,7 +168,7 @@ Attached via a Kustomization's `spec.components` (`../../../../components/...`) 
 - `auth-proxy`: envoy `SecurityPolicy` wiring an app's HTTPRoute through authentik (extAuth); target overridable via `${APP_HTTPROUTE:=${APP}}`.
 - `postgres` (**label-driven**): per-app CNPG Cluster + ObjectStore + ScheduledBackup + S3 ExternalSecret + CNP + PodMonitor. Docs: `kubernetes/components/postgres/README.md`.
 - `dragonfly` (**label-driven**): per-app Dragonfly CR + CNP + podmonitor; consumer label `${DRAGONFLY_APP_NAME:=${APP}}`; `dragonfly/authentication` sub-component.
-- `zeroscaler`: HPA template.
+- `zeroscaler`: HPA template; targets the StatefulSet `${APP}` unless `CONTROLLER` says otherwise.
 
 Components may use `${VAR:=default}` substitution fed by the Kustomization's `postBuild` (see `toolhive`, `auth-proxy`).
 
@@ -358,7 +358,7 @@ GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease �
 
 **StatefulSet apps** (`kopiur/statefulset`):
 
-- The controller is `type: statefulset` with a `statefulset:` block (last, below `containers`) holding `podManagementPolicy: Parallel` and one `volumeClaimTemplates` entry (`storageClass: longhorn`, `dataSourceRef` → `kopiur.home-operations.com` `Restore` `"{{ .Release.Name }}"`). The template is named `config` by default; set `KOPIUR_CLAIM` when it is named otherwise (e.g. `data`). The backed-up PVC is therefore `<claim>-<app>-0`, and the policy sets `sourcePathOverride: /pvc/${APP}` so snapshots keep the kopia path (`<app>@<ns>:/pvc/<app>`) they had as a plain `${APP}` PVC. `KOPIUR_CAPACITY` sizes only the kopia cache here; the claim size lives in the HelmRelease. Zeroscaler users set `CONTROLLER: StatefulSet`.
+- The controller is `type: statefulset` with a `statefulset:` block (last, below `containers`) holding `podManagementPolicy: Parallel` and one `volumeClaimTemplates` entry (`storageClass: longhorn`, `dataSourceRef` → `kopiur.home-operations.com` `Restore` `"{{ .Release.Name }}"`). The template is named `config` by default; set `KOPIUR_CLAIM` when it is named otherwise (e.g. `data`). The backed-up PVC is therefore `<claim>-<app>-0`, and the policy sets `sourcePathOverride: /pvc/${APP}` so snapshots keep the kopia path (`<app>@<ns>:/pvc/<app>`) they had as a plain `${APP}` PVC. `KOPIUR_CAPACITY` sizes only the kopia cache here; the claim size lives in the HelmRelease. The `zeroscaler` HPA targets a StatefulSet by default (`CONTROLLER`, set it to `Deployment` for a stateless app).
 - The Restore uses `onMissingSnapshot: Continue`, so the same manifests do the first deploy (empty volume) and disaster recovery (the populator fills a new claim from the latest snapshot while the pod stays `Pending`). Its mover writes as `KOPIUR_PUID`/`KOPIUR_PGID` (default `1000`).
 - **Moving an app from `kopiur/backup` to `kopiur/statefulset`** swaps its PVC, so the new claim is only as fresh as the last snapshot, and the old PVC is pruned (longhorn `reclaimPolicy: Delete`) unless protected. Per app, before merging:
     1. `flux suspend kustomization <app> -n <ns>`.
