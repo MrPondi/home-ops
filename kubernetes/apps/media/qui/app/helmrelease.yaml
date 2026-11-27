@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       qui:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -60,6 +61,17 @@ spec:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 5Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -98,8 +110,6 @@ spec:
           - name: envoy-internal
             namespace: network
     persistence:
-      config:
-        existingClaim: "{{ .Release.Name }}"
       media:
         type: nfs
         server: qnap.internal
