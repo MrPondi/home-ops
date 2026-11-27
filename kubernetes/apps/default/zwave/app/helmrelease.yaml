@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       zwave:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -51,6 +52,19 @@ spec:
                 memory: 512Mi
         pod:
           hostUsers: true
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 5Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
+              globalMounts:
+                - path: /usr/src/app/store
     service:
       app:
         ports:
@@ -73,10 +87,6 @@ spec:
           - name: envoy-internal
             namespace: network
     persistence:
-      config:
-        existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /usr/src/app/store
       tmp:
         type: emptyDir
       zwave-usb:
