@@ -7,7 +7,7 @@ metadata:
 spec:
   components:
     - ../../../../components/auth-proxy
-    - ../../../../components/kopiur/backup
+    - ../../../../components/kopiur/statefulset
     - ../../../../components/zeroscaler
   dependsOn:
     - name: media-postbuild
@@ -18,6 +18,7 @@ spec:
   postBuild:
     substitute:
       APP: sonarr
+      CONTROLLER: StatefulSet
     substituteFrom:
       - kind: Secret
         name: sonarr-postbuild-secret

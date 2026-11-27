@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       qbittorrent:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -49,6 +50,17 @@ spec:
                 memory: 512Mi
               limits:
                 memory: 4Gi
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 5Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
     defaultPodOptions:
       annotations:
         k8s.v1.cni.cncf.io/networks: |-
@@ -103,8 +115,6 @@ spec:
           - backendRefs:
               - identifier: app
     persistence:
-      config:
-        existingClaim: "{{ .Release.Name }}"
       media:
         type: nfs
         server: qnap.internal

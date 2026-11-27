@@ -13,6 +13,8 @@ spec:
     config:
       qbittorrent:
         base_url: http://qbittorrent.{{ .Release.Namespace }}.svc.cluster.local
+    controller:
+      type: statefulset
     extraEnv:
       - name: TZ
         value: Europe/Warsaw
@@ -23,7 +25,11 @@ spec:
       fsGroup: 1000
       fsGroupChangePolicy: OnRootMismatch
     persistence:
-      existingClaim: brrpolice
+      dataSourceRef:
+        apiGroup: kopiur.home-operations.com
+        kind: Restore
+        name: brrpolice
+      storageClass: longhorn
     monitoring:
       serviceMonitor:
         enabled: true

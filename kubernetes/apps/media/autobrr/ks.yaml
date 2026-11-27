@@ -6,7 +6,7 @@ metadata:
   name: autobrr
 spec:
   components:
-    - ../../../../components/kopiur/backup
+    - ../../../../components/kopiur/statefulset
     - ../../../../components/zeroscaler
   dependsOn:
     - name: external-secrets-store
@@ -16,6 +16,7 @@ spec:
   postBuild:
     substitute:
       APP: autobrr
+      CONTROLLER: StatefulSet
   prune: true
   sourceRef:
     kind: GitRepository
