@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       pstream-backend:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -74,6 +75,29 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 2Gi
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 5Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
+              advancedMounts:
+                init-metrics:
+                  - path: /data
+                app:
+                  - path: /app/.metrics.json
+                    subPath: .metrics.json
+                  - path: /app/.metrics_daily.json
+                    subPath: .metrics_daily.json
+                  - path: /app/.metrics_weekly.json
+                    subPath: .metrics_weekly.json
+                  - path: /app/.metrics_monthly.json
+                    subPath: .metrics_monthly.json
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -100,19 +124,3 @@ spec:
         parentRefs:
           - name: envoy-external
             namespace: network
-    persistence:
-      data:
-        existingClaim: "{{ .Release.Name }}"
-        advancedMounts:
-          pstream-backend:
-            init-metrics:
-              - path: /data
-            app:
-              - path: /app/.metrics.json
-                subPath: .metrics.json
-              - path: /app/.metrics_daily.json
-                subPath: .metrics_daily.json
-              - path: /app/.metrics_weekly.json
-                subPath: .metrics_weekly.json
-              - path: /app/.metrics_monthly.json
-                subPath: .metrics_monthly.json
