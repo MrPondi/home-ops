@@ -16,7 +16,6 @@ spec:
   postBuild:
     substitute:
       APP: seerr
-      CONTROLLER: StatefulSet
   prune: true
   sourceRef:
     kind: GitRepository

@@ -18,7 +18,6 @@ spec:
   postBuild:
     substitute:
       APP: prowlarr
-      CONTROLLER: StatefulSet
     substituteFrom:
       - kind: Secret
         name: prowlarr-postbuild-secret

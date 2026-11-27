@@ -18,7 +18,6 @@ spec:
   postBuild:
     substitute:
       APP: sonarr
-      CONTROLLER: StatefulSet
     substituteFrom:
       - kind: Secret
         name: sonarr-postbuild-secret
