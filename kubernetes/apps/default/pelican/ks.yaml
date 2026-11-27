@@ -9,7 +9,7 @@ metadata:
   name: pelican
 spec:
   components:
-    - ../../../../components/kopiur/backup
+    - ../../../../components/kopiur/statefulset
   dependsOn:
     - name: external-secrets-store
       namespace: external-secrets
@@ -21,6 +21,7 @@ spec:
   postBuild:
     substitute:
       APP: pelican
+      KOPIUR_CLAIM: data
   prune: true
   sourceRef:
     kind: GitRepository
