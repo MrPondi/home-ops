@@ -29,7 +29,7 @@ spec:
     server:
       env:
         - name: AUTHENTIK_POSTGRESQL__HOST
-          value: authentik-rw.security.svc.cluster.local
+          value: authentik-pg-rw.security.svc.cluster.local
         - name: AUTHENTIK_POSTGRESQL__NAME
           value: authentik
         - name: AUTHENTIK_POSTGRESQL__USER
@@ -37,7 +37,7 @@ spec:
         - name: AUTHENTIK_POSTGRESQL__PASSWORD
           valueFrom:
             secretKeyRef:
-              name: authentik-app
+              name: authentik-pg-app
               key: password
         - name: AUTHENTIK_WEB__BASE_URL
           value: https://auth.pondi.dev
@@ -83,7 +83,7 @@ spec:
     worker:
       env:
         - name: AUTHENTIK_POSTGRESQL__HOST
-          value: authentik-rw.security.svc.cluster.local
+          value: authentik-pg-rw.security.svc.cluster.local
         - name: AUTHENTIK_POSTGRESQL__NAME
           value: authentik
         - name: AUTHENTIK_POSTGRESQL__USER
@@ -91,7 +91,7 @@ spec:
         - name: AUTHENTIK_POSTGRESQL__PASSWORD
           valueFrom:
             secretKeyRef:
-              name: authentik-app
+              name: authentik-pg-app
               key: password
       resources:
         requests:

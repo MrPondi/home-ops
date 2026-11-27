@@ -7,6 +7,6 @@ metadata:
 spec:
   selector:
     matchLabels:
-      cnpg.io/cluster: ${APP}
+      cnpg.io/cluster: ${APP}-pg
   podMetricsEndpoints:
     - port: metrics

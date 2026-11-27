@@ -7,7 +7,7 @@ metadata:
 spec:
   backupOwnerReference: self
   cluster:
-    name: ${APP}
+    name: ${APP}-pg
   immediate: true
   method: plugin
   pluginConfiguration:

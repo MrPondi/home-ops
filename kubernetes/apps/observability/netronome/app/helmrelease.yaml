@@ -27,28 +27,28 @@ spec:
               NETRONOME__DB_HOST:
                 valueFrom:
                   secretKeyRef:
-                    name: netronome-app
+                    name: netronome-pg-app
                     key: host
               NETRONOME__DB_PORT:
                 valueFrom:
                   secretKeyRef:
-                    name: netronome-app
+                    name: netronome-pg-app
                     key: port
               NETRONOME__DB_NAME:
                 valueFrom:
                   secretKeyRef:
-                    name: netronome-app
+                    name: netronome-pg-app
                     key: dbname
               NETRONOME__DB_USER:
                 valueFrom:
                   secretKeyRef:
-                    name: netronome-app
+                    name: netronome-pg-app
                     key: username
               NETRONOME__DB_SSLMODE: require
               NETRONOME__DB_PASSWORD:
                 valueFrom:
                   secretKeyRef:
-                    name: netronome-app
+                    name: netronome-pg-app
                     key: password
               NETRONOME__GEOIP_COUNTRY_DATABASE_PATH: /geoip/GeoLite2-Country.mmdb
               NETRONOME__GEOIP_ASN_DATABASE_PATH: /geoip/GeoLite2-ASN.mmdb

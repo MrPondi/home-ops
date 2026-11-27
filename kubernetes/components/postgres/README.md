@@ -8,28 +8,32 @@ Per-app [CloudNativePG](https://cloudnative-pg.io/) `Cluster` via the **Barman C
 
 Set in the consumer `Kustomization` `postBuild.substitute` (see [Consumer snippets](#consumer-kustomization-snippets)).
 
-| Variable                | Required | Default  | Description                                                                                                                                                                                                                                                       |
-| ----------------------- | -------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `APP`                   | **yes**  | —        | App / Cluster name. Used for `Cluster.metadata.name`, `ObjectStore` name, `ExternalSecret` name (`${APP}-s3`), and backup server name (`serverName`/`barmanObjectName` `${APP}`; `destinationPath` `s3://backups/cloudnative-pg` is shared across all consumers). |
-| `POSTGRES_USERNAME`     | no       | `${APP}` | Database and owner created on first `initdb`. Referenced as `${POSTGRES_USERNAME:=${APP}}` so omitting it falls back to `APP`.                                                                                                                                    |
-| `POSTGRES_STORAGE_SIZE` | no       | `5Gi`    | PVC size for the Cluster (`spec.storage.size`). Override per app as needed. Storage class is fixed to `miroir-slow-local` (single-node).                                                                                                                          |
-| `POSTGRES_MEMORY`       | no       | `256`    | Memory request for the Cluster in megabytes (`spec.resources.requests.memory`). Bare number only — `Mi` is appended in `cluster.yaml`; do not include a unit (e.g. `512` not `512Mi`).                                                                            |
-| `POSTGRES_APP_NAME`     | no       | `${APP}` | `app.kubernetes.io/name` of the consumer pods allowed to reach :5432 (component CNP ingress). Set when the app's pod label differs from `APP`.                                                                                                                    |
+| Variable                | Required | Default  | Description                                                                                                                                                                                                                                                                                 |
+| ----------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `APP`                   | **yes**  | —        | App name. The Cluster is `${APP}-pg` (see [Naming](#naming)); `${APP}` itself names the `ObjectStore`, the `ExternalSecret` (`${APP}-s3`) and the Barman server (`serverName`/`barmanObjectName` `${APP}`; `destinationPath` `s3://backups/cloudnative-pg` is shared across all consumers). |
+| `POSTGRES_USERNAME`     | no       | `${APP}` | Database and owner created on first `initdb`. Referenced as `${POSTGRES_USERNAME:=${APP}}` so omitting it falls back to `APP`.                                                                                                                                                              |
+| `POSTGRES_STORAGE_SIZE` | no       | `5Gi`    | PVC size for the Cluster (`spec.storage.size`). Override per app as needed. Storage class is fixed to `miroir-slow-local` (single-node).                                                                                                                                                    |
+| `POSTGRES_MEMORY`       | no       | `256`    | Memory request for the Cluster in megabytes (`spec.resources.requests.memory`). Bare number only — `Mi` is appended in `cluster.yaml`; do not include a unit (e.g. `512` not `512Mi`).                                                                                                      |
+| `POSTGRES_APP_NAME`     | no       | `${APP}` | `app.kubernetes.io/name` of the consumer pods allowed to reach :5432 (component CNP ingress). Set when the app's pod label differs from `APP`.                                                                                                                                              |
 
 All other values are fixed for this homelab: single instance (`instances: 1`, `enablePDB: false`, `podAntiAffinityType: required` is best-effort on one node), image `ghcr.io/cloudnative-pg/postgresql:18.6`, QNAP S3 endpoint `http://qnap.internal:9000`.
 
+## Naming
+
+The `Cluster` is named `${APP}-pg`, not `${APP}`. CNPG names its `ServiceAccount`, `Role` and `RoleBinding` after the Cluster (only the ServiceAccount is configurable), and app charts create RBAC named after the release — usually `${APP}` too (app-template's default ServiceAccount, authentik's outpost Role). Sharing those names lets CNPG overwrite the app's RBAC. Everything CNPG derives from the Cluster name follows it: Secret `${APP}-pg-app`, Service `${APP}-pg-rw`, pod label `cnpg.io/cluster: ${APP}-pg`, PVC/pods `${APP}-pg-1`. The other component objects (`ObjectStore`, `ScheduledBackup`, `ExternalSecret`, CNP, PodMonitor) and the Barman `serverName` keep `${APP}`.
+
 ## Component files
 
-| File                                             | Kind                                        | Description                                                                                                                                                                                                                                                                                                                                                                               |
-| ------------------------------------------------ | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`cluster.yaml`](./cluster.yaml)                 | `Cluster` (`postgresql.cnpg.io/v1`)         | Single-node CNPG Cluster `name: ${APP}`, `storageClass: miroir-slow-local`, `imageName: ghcr.io/cloudnative-pg/postgresql:18.6@sha256:…`. Plugin `barman-cloud.cloudnative-pg.io` with `barmanObjectName: ${APP}` / `serverName: ${APP}` for both WAL archiving and restore. `annotations: cnpg.io/skipEmptyWalArchiveCheck: "enabled"` lets a fresh recovery Cluster start without WALs. |
-| [`objectstore.yaml`](./objectstore.yaml)         | `ObjectStore` (`barmancloud.cnpg.io/v1`)    | Per-app S3 store `name: ${APP}`. `destinationPath: s3://backups/cloudnative-pg` (shared across all consumers), `endpointURL: http://qnap.internal:9000`, `retentionPolicy: 7d`, bzip2 compression, `maxParallel: 4`. Credentials from Secret `${APP}-s3` (`MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY`). Sidecar requests `50m` / limits `300Mi`.                                              |
-| [`scheduledbackup.yaml`](./scheduledbackup.yaml) | `ScheduledBackup` (`postgresql.cnpg.io/v1`) | `name: ${APP}-daily`, `schedule: "@daily"`, `immediate: true`, `method: plugin`, `pluginConfiguration.name: barman-cloud.cloudnative-pg.io`. Creates daily base backups and drives WAL archiving via the plugin.                                                                                                                                                                          |
-| [`externalsecret.yaml`](./externalsecret.yaml)   | `ExternalSecret` (`external-secrets.io/v1`) | `name: ${APP}-s3` → `ClusterSecretStore/bitwarden-secretsmanager`, `key: cloudnative-pg` (shared Bitwarden item). Syncs `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` into Secret `${APP}-s3` in the consumer namespace. One secret per app namespace; no cross-namespace sharing.                                                                                                            |
-| [`networkpolicy.yaml`](./networkpolicy.yaml)     | `CiliumNetworkPolicy` (`cilium.io/v2`)      | `name: ${APP}-postgres`, selects `cnpg.io/cluster: ${APP}`. Ingress :5432 from same-namespace consumer pods (`app.kubernetes.io/name: ${POSTGRES_APP_NAME:=${APP}}`) and cluster peers, :5432/:8000 from the `cloudnative-pg` operator (`database`), :9187 from prometheus (`observability`). Egress :9000 to QNAP MinIO (`10.0.25.25/32`).                                               |
-| [`podmonitor.yaml`](./podmonitor.yaml)           | `PodMonitor` (`monitoring.coreos.com/v1`)   | `name: ${APP}-postgres`, scrapes the `metrics` port of `cnpg.io/cluster: ${APP}` pods.                                                                                                                                                                                                                                                                                                    |
+| File                                             | Kind                                        | Description                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`cluster.yaml`](./cluster.yaml)                 | `Cluster` (`postgresql.cnpg.io/v1`)         | Single-node CNPG Cluster `name: ${APP}-pg`, `storageClass: miroir-slow-local`, `imageName: ghcr.io/cloudnative-pg/postgresql:18.6@sha256:…`. Plugin `barman-cloud.cloudnative-pg.io` with `barmanObjectName: ${APP}` / `serverName: ${APP}` for both WAL archiving and restore. `annotations: cnpg.io/skipEmptyWalArchiveCheck: "enabled"` lets a fresh recovery Cluster start without WALs. |
+| [`objectstore.yaml`](./objectstore.yaml)         | `ObjectStore` (`barmancloud.cnpg.io/v1`)    | Per-app S3 store `name: ${APP}`. `destinationPath: s3://backups/cloudnative-pg` (shared across all consumers), `endpointURL: http://qnap.internal:9000`, `retentionPolicy: 7d`, bzip2 compression, `maxParallel: 4`. Credentials from Secret `${APP}-s3` (`MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY`). Sidecar requests `50m` / limits `300Mi`.                                                 |
+| [`scheduledbackup.yaml`](./scheduledbackup.yaml) | `ScheduledBackup` (`postgresql.cnpg.io/v1`) | `name: ${APP}-daily`, `schedule: "@daily"`, `immediate: true`, `method: plugin`, `pluginConfiguration.name: barman-cloud.cloudnative-pg.io`. Creates daily base backups and drives WAL archiving via the plugin.                                                                                                                                                                             |
+| [`externalsecret.yaml`](./externalsecret.yaml)   | `ExternalSecret` (`external-secrets.io/v1`) | `name: ${APP}-s3` → `ClusterSecretStore/bitwarden-secretsmanager`, `key: cloudnative-pg` (shared Bitwarden item). Syncs `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` into Secret `${APP}-s3` in the consumer namespace. One secret per app namespace; no cross-namespace sharing.                                                                                                               |
+| [`networkpolicy.yaml`](./networkpolicy.yaml)     | `CiliumNetworkPolicy` (`cilium.io/v2`)      | `name: ${APP}-postgres`, selects `cnpg.io/cluster: ${APP}-pg`. Ingress :5432 from same-namespace consumer pods (`app.kubernetes.io/name: ${POSTGRES_APP_NAME:=${APP}}`) and cluster peers, :5432/:8000 from the `cloudnative-pg` operator (`database`), :9187 from prometheus (`observability`). Egress :9000 to QNAP MinIO (`10.0.25.25/32`).                                               |
+| [`podmonitor.yaml`](./podmonitor.yaml)           | `PodMonitor` (`monitoring.coreos.com/v1`)   | `name: ${APP}-postgres`, scrapes the `metrics` port of `cnpg.io/cluster: ${APP}-pg` pods.                                                                                                                                                                                                                                                                                                    |
 
-**Fail-closed namespaces only.** The CNP declares egress to MinIO only and relies on the namespace `default-deny` CNP (see `AGENTS.md` › Fail-closed namespaces) for DNS and kube-API egress. In an open namespace it would isolate the CNPG pods without those routes and break the instance manager — consume the component only from fail-closed namespaces (or extend the CNP first). Consumers still declare their own egress to `${APP}-rw:5432` in their app CNP.
+**Fail-closed namespaces only.** The CNP declares egress to MinIO only and relies on the namespace `default-deny` CNP (see `AGENTS.md` › Fail-closed namespaces) for DNS and kube-API egress. In an open namespace it would isolate the CNPG pods without those routes and break the instance manager — consume the component only from fail-closed namespaces (or extend the CNP first). Consumers still declare their own egress to `${APP}-pg-rw:5432` in their app CNP.
 
 ## Bootstrap behavior
 
@@ -74,7 +78,7 @@ metadata:
     name: <app>-db
     labels:
         components.postgres/enabled: "true"
-        components.postgres/cnpg: init # TEMPORARY net-new bootstrap — remove after first backup lands (mise run //kubernetes:pg-initial-backup <ns> <app>); recovery is the default once a backup exists
+        components.postgres/cnpg: init # TEMPORARY net-new bootstrap — remove after first backup lands (mise run //kubernetes:pg-initial-backup <ns> <app>-pg); recovery is the default once a backup exists
 spec:
     components: [] # existing entries like ../../../../components/kopiur/backup are fine — root patch appends ../../../../components/postgres
     # ... dependsOn, healthCheckExprs, postBuild ...
@@ -95,14 +99,14 @@ Label `components.postgres/cnpg=init` triggers the root patch (labelSelector `co
 
 This replaces the default `bootstrap.recovery` (which always exists via the component) with `bootstrap.initdb`, creating database and owner `${POSTGRES_USERNAME:=${APP}}` (defaults to `APP`), and removes `externalClusters`.
 
-> **⚠️ WARNING — MUST remove label after first backup:** This label **MUST** be removed after the first successful base backup (`mise run //kubernetes:pg-initial-backup <ns> <app>` + verify `Backup` `Completed`); leaving it means a future full recreate (Cluster CR + PVCs deleted) would bootstrap an **EMPTY** database via `initdb` instead of recovering from Barman.
+> **⚠️ WARNING — MUST remove label after first backup:** This label **MUST** be removed after the first successful base backup (`mise run //kubernetes:pg-initial-backup <ns> <app>-pg` + verify `Backup` `Completed`); leaving it means a future full recreate (Cluster CR + PVCs deleted) would bootstrap an **EMPTY** database via `initdb` instead of recovering from Barman.
 
 **Check before removing the label — `kubectl get backup -n <ns>` must show `Completed`:**
 
 ```bash
 kubectl get backup -n <ns>
-# NAME              CLUSTER   PHASE       ...
-# pstream-initial   pstream   Completed
+# NAME                         CLUSTER              PHASE       ...
+# pstream-backend-pg-initial   pstream-backend-pg   Completed
 ```
 
 When `PHASE` is `Completed`, delete the `labels: {components.postgres/cnpg: init}` entry (and the TEMPORARY comment), commit, and Flux will reconcile. Future rebuilds use `recovery` automatically.
@@ -155,39 +159,39 @@ spec:
 After the Cluster is `Healthy`, create the first backup (or any on-demand backup):
 
 ```bash
-mise run //kubernetes:pg-initial-backup <ns> <app>
-# e.g. mise run //kubernetes:pg-initial-backup default pstream
+mise run //kubernetes:pg-initial-backup <ns> <app>-pg
+# e.g. mise run //kubernetes:pg-initial-backup default pstream-backend-pg
 ```
 
-This applies a `Backup` CR (`<app>-initial`, `method: plugin`, `pluginConfiguration.name: barman-cloud.cloudnative-pg.io`) in namespace `<ns>`:
+This applies a `Backup` CR (`<cluster>-initial`, i.e. `<app>-pg-initial`, `method: plugin`, `pluginConfiguration.name: barman-cloud.cloudnative-pg.io`) in namespace `<ns>`:
 
 ```yaml
 apiVersion: postgresql.cnpg.io/v1
 kind: Backup
 metadata:
-    name: pstream-initial
+    name: pstream-backend-pg-initial
 spec:
     cluster:
-        name: pstream
+        name: pstream-backend-pg
     method: plugin
     pluginConfiguration:
         name: barman-cloud.cloudnative-pg.io
 ```
 
-The task takes `<ns> <app>`, the same argument order as `mise run //kubernetes:apply-ks` / `browse-pvc`.
+The task takes `<ns> <cluster>` (component clusters: `<app>-pg`), the same argument order as `mise run //kubernetes:apply-ks` / `browse-pvc`.
 
 ## Backups
 
-- **Schedule:** `ScheduledBackup` `s3://backups/cloudnative-pg` (shared across all consumers) with `schedule: "@daily"` and `immediate: true` — first backup runs shortly after the Cluster becomes ready, then daily at midnight.
+- **Schedule:** `ScheduledBackup` `s3://backups/cloudnative-pg` (shared across all consumers) with `schedule: "@daily"` and `immediate: true` — first backup runs shortly after the ScheduledBackup is created, then daily at midnight. `immediate` fires only once per ScheduledBackup (while `status.lastCheckTime` is empty): after a Cluster recreate that keeps the ScheduledBackup, run `mise run //kubernetes:pg-initial-backup <ns> <app>-pg` for a base backup on the new timeline.
 - **Method:** `plugin` via `barman-cloud.cloudnative-pg.io` (Barman Cloud plugin). Both base backups and WAL archiving go through the same `ObjectStore`.
 - **WAL archiving:** continuous via the plugin sidecar (`isWALArchiver: true`, `maxParallel: 4`, bzip2). Enables PITR within the retention window.
-- **Retention:** `7d` (`retentionPolicy: 7d` on the `ObjectStore`; `ScheduledBackup` uses `backupOwnerReference: self` so old Backups are pruned with the Cluster).
+- **Retention:** `7d` (`retentionPolicy: 7d` on the `ObjectStore`; `ScheduledBackup` uses `backupOwnerReference: self` so Backups are owned by (and pruned with) the ScheduledBackup, not the Cluster).
 - **Backend:** QNAP MinIO at `http://qnap.internal:9000` (`s3://backups/cloudnative-pg`, shared; per-app isolation via `serverName` `${APP}`), credentials from Bitwarden item `cloudnative-pg` via `${APP}-s3`.
-- **On-demand:** `mise run //kubernetes:pg-initial-backup <ns> <app>` or `kubectl apply` a `Backup` CR as above. Check `kubectl get backup -n <ns>` and `kubectl cnpg status <app> -n <ns>`.
+- **On-demand:** `mise run //kubernetes:pg-initial-backup <ns> <app>-pg` or `kubectl apply` a `Backup` CR as above. Check `kubectl get backup -n <ns>` and `kubectl cnpg status <app>-pg -n <ns>`.
 
 ## Connecting
 
-CNPG creates a Secret `<cluster>-app` (here `${APP}-app`) in the Cluster namespace with connection credentials. Keys:
+CNPG creates a Secret `<cluster>-app` (here `${APP}-pg-app`) in the Cluster namespace with connection credentials. Keys:
 
 | Key        | Value                                                                 |
 | ---------- | --------------------------------------------------------------------- |
@@ -195,7 +199,7 @@ CNPG creates a Secret `<cluster>-app` (here `${APP}-app`) in the Cluster namespa
 | `jdbc-uri` | JDBC variant                                                          |
 | `username` | `${POSTGRES_USERNAME:=${APP}}`                                        |
 | `password` | generated, managed by CNPG                                            |
-| `host`     | `${APP}-rw.<ns>.svc.cluster.local` (read-write service)               |
+| `host`     | `${APP}-pg-rw.<ns>.svc.cluster.local` (read-write service)            |
 | `port`     | `5432`                                                                |
 | `dbname`   | `${POSTGRES_USERNAME:=${APP}}`                                        |
 | `pgpass`   | libpq pgpass line                                                     |
@@ -207,22 +211,22 @@ env:
     - name: DATABASE_URL
       valueFrom:
           secretKeyRef:
-              name: ${APP}-app # e.g. pstream-app
+              name: ${APP}-pg-app # e.g. pstream-backend-pg-app
               key: uri
     # or split fields:
     - name: PGHOST
       valueFrom:
           secretKeyRef:
-              name: ${APP}-app
+              name: ${APP}-pg-app
               key: host
 ```
 
-When possible use {{ .Release.Name }} instead of ${APP}
+When possible use `{{ .Release.Name }}-pg-app` instead of `${APP}-pg-app`.
 
 Services managed by CNPG (in the Cluster namespace):
 
-- `${APP}-rw` — read-write (primary) — use this for app connections.
-- `${APP}-ro` / `${APP}-r` — disabled in this component (`disabledDefaultServices: ["r","ro"]`); re-enable in `cluster.yaml` if you need read-only.
+- `${APP}-pg-rw` — read-write (primary) — use this for app connections.
+- `${APP}-pg-ro` / `${APP}-pg-r` — disabled in this component (`disabledDefaultServices: ["r","ro"]`); re-enable in `cluster.yaml` if you need read-only.
 
 ````
 
@@ -242,7 +246,7 @@ metadata:
     name: ${APP}-pooler
 spec:
     cluster:
-        name: ${APP}
+        name: ${APP}-pg
     instances: 2
     type: rw
     pgbouncer:
@@ -321,7 +325,7 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
     # e.g. mise run //kubernetes:render-local-ks default pstream-backend
     ```
 
-    Confirm rendered `Cluster` has `bootstrap.recovery.source: <app>-backup`, `serverName: <app>`, `barmanObjectName: <app>`, `size: <POSTGRES_STORAGE_SIZE>`, and `ObjectStore` `destinationPath: s3://backups/cloudnative-pg` (shared across all consumers).
+    Confirm rendered `Cluster` is named `<app>-pg` and has `bootstrap.recovery.source: <app>-backup`, `serverName: <app>`, `barmanObjectName: <app>`, `size: <POSTGRES_STORAGE_SIZE>`, and `ObjectStore` `destinationPath: s3://backups/cloudnative-pg` (shared across all consumers).
 
 2. **Hubble drops — zero policy denies:**
 
@@ -336,8 +340,8 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
 3. **CNPG status:**
 
     ```bash
-    kubectl -n <ns> get cluster <app> -o wide
-    kubectl -n <ns> cnpg status <app>   # or kubectl cnpg status <app> -n <ns>
+    kubectl -n <ns> get cluster <app>-pg -o wide
+    kubectl -n <ns> cnpg status <app>-pg   # or kubectl cnpg status <app>-pg -n <ns>
     ```
 
     `phase: Cluster in healthy state`, `instances: 1`, image `ghcr.io/cloudnative-pg/postgresql:18.6`.
@@ -345,7 +349,7 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
 4. **Backup CR:**
 
     ```bash
-    mise run //kubernetes:pg-initial-backup <ns> <app>
+    mise run //kubernetes:pg-initial-backup <ns> <app>-pg
     kubectl -n <ns> get backup -o wide
     kubectl -n <ns> get scheduledbackup <app>-daily -o yaml
     kubectl -n <ns> get objectstore <app> -o yaml
@@ -356,8 +360,8 @@ After wiring a new consumer (or after changing CNP / ObjectStore):
 5. **Secret & service:**
 
     ```bash
-    kubectl -n <ns> get secret <app>-app -o jsonpath='{.data}' | jq
-    kubectl -n <ns> get svc <app>-rw -o wide
+    kubectl -n <ns> get secret <app>-pg-app -o jsonpath='{.data}' | jq
+    kubectl -n <ns> get svc <app>-pg-rw -o wide
     ```
 
 6. **Remove temporary label** (if you used net-new `initdb`): delete the `labels: {components.postgres/cnpg: init}` entry (and TEMPORARY comment) from the consumer `ks.yaml`, commit, and re-run `mise run //kubernetes:render-local-ks <ns> <ks>` to confirm `bootstrap.recovery` is back before pushing.

@@ -5,10 +5,10 @@ kind: CiliumNetworkPolicy
 metadata:
   name: ${APP}-postgres
 spec:
-  # CNPG instance pods (${APP} cluster)
+  # CNPG instance pods (${APP}-pg cluster)
   endpointSelector:
     matchLabels:
-      cnpg.io/cluster: ${APP}
+      cnpg.io/cluster: ${APP}-pg
   ingress:
     # Same-namespace consumers (override label via POSTGRES_APP_NAME)
     - fromEndpoints:
@@ -21,7 +21,7 @@ spec:
     # Cluster peers (streaming replication for future replicas)
     - fromEndpoints:
         - matchLabels:
-            cnpg.io/cluster: ${APP}
+            cnpg.io/cluster: ${APP}-pg
       toPorts:
         - ports:
             - port: "5432"
