@@ -1,6 +1,9 @@
 resource "authentik_outpost" "rac" {
   name = "RAC Outpost"
-  protocol_providers = [authentik_provider_rac.pelican-wings.id]
+  protocol_providers = [
+    authentik_provider_rac.games.id,
+    authentik_provider_rac.pelican-wings.id,
+  ]
   service_connection = data.authentik_service_connection_kubernetes.local.id
   type = "rac"
   config = jsonencode({

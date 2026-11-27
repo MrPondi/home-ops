@@ -149,10 +149,12 @@ spec:
         - ports:
             - port: "10443"
               protocol: TCP
-    # RAC provider — VLAN 20 (SSH)
+    # RAC provider — VLAN 20 (SSH: pelican wings, VNC: game VMs)
     - toCIDRSet:
         - cidr: 10.0.20.0/24
       toPorts:
         - ports:
             - port: "22"
+              protocol: TCP
+            - port: "5900"
               protocol: TCP
