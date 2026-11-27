@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       jellyfin:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -51,6 +52,17 @@ spec:
                 memory: 512Mi
               limits:
                 memory: 8Gi
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 20Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
     defaultPodOptions:
       resourceClaims:
         - name: gpu
@@ -92,8 +104,6 @@ spec:
           - name: envoy-internal
             namespace: network
     persistence:
-      config:
-        existingClaim: "{{ .Release.Name }}"
       media:
         type: nfs
         server: qnap.internal
