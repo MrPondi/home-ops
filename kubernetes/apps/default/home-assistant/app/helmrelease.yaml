@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       home-assistant:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -52,6 +53,17 @@ spec:
                 memory: 512Mi
               limits:
                 memory: 1Gi
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: config
+              accessMode: ReadWriteOnce
+              size: 5Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -85,8 +97,6 @@ spec:
           - name: envoy-external
             namespace: network
     persistence:
-      config:
-        existingClaim: "{{ .Release.Name }}"
       config-file:
         type: secret
         name: "{{ .Release.Name }}-config"
