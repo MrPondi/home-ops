@@ -162,17 +162,17 @@ fi
 description = "Trigger an immediate CNPG base backup for a cluster (plugin method)"
 usage = '''
 arg "<ns>" help="Namespace of the CNPG cluster"
-arg "<app>" help="Name of the CNPG cluster"
+arg "<cluster>" help="Name of the CNPG cluster (postgres component: <app>-pg)"
 '''
 run = '''
 kubectl apply -n "$usage_ns" -f - <<EOF
 apiVersion: postgresql.cnpg.io/v1
 kind: Backup
 metadata:
-  name: ${usage_app}-initial
+  name: ${usage_cluster}-initial
 spec:
   cluster:
-    name: ${usage_app}
+    name: ${usage_cluster}
   method: plugin
   pluginConfiguration:
     name: barman-cloud.cloudnative-pg.io
