@@ -47,3 +47,9 @@ resource "authentik_policy_binding" "pelican-wings-ssh" {
   group  = authentik_group.pelican-wings-ssh.id
   order  = 10
 }
+
+resource "authentik_policy_binding" "pelican-wings0-ssh" {
+  target = authentik_rac_endpoint.pelican-wings0.id
+  group  = authentik_group.pelican-wings-ssh.id
+  order  = 10
+}

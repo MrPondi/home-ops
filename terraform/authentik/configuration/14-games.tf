@@ -1,15 +1,3 @@
-# Game VMs over RAC (VNC). One app/provider, one endpoint per VM.
-#
-# Access is two-layered:
-#   1. App: members of "Games Access" (assign in the authentik UI) see the Games tile.
-#   2. Endpoint: each VM carries one Roblox account, so bind ONE user per endpoint in the UI
-#      (Applications > Providers > Games RAC Provider > Endpoints > <vm> > Bindings).
-#      Terraform deliberately declares no endpoint bindings, so UI-made ones are never
-#      overwritten. An endpoint with no binding is open to every "Games Access" member.
-#
-# Do not rename an endpoint's resource address without a `moved` block: destroy+create
-# drops its UI bindings.
-
 resource "authentik_provider_rac" "games" {
   name               = "Games RAC Provider"
   authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
