@@ -16,7 +16,7 @@ resource "authentik_application" "games" {
   name              = "Games"
   slug              = "games"
   protocol_provider = authentik_provider_rac.games.id
-  meta_icon         = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/roblox.svg"
+  meta_icon         = "https://api.iconify.design/fluent-emoji-flat/video-game.svg"
 }
 
 resource "authentik_group" "games-access" {
