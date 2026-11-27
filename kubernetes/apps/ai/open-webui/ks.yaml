@@ -9,7 +9,7 @@ metadata:
   name: open-webui
 spec:
   components:
-    - ../../../../components/kopiur/backup
+    - ../../../../components/kopiur/statefulset
   dependsOn:
     - name: ai-postbuild
     - name: external-secrets-store
