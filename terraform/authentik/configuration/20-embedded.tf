@@ -16,7 +16,8 @@ resource "authentik_group" "admins" {
     authentik_group.gitops-admins.id,
     authentik_group.metrics-access.id,
     authentik_group.pelican-wings-ssh.id,
-    authentik_group.ai-admins.id
+    authentik_group.ai-admins.id,
+    authentik_group.games-vnc.id
   ]
 
   attributes = jsonencode({
