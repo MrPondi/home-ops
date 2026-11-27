@@ -178,7 +178,7 @@ spec:
               - ports:
                     - port: "<port>"
                       protocol: TCP
-    # egress: add only app-specific targets (Postgres `cnpg.io/cluster: ${APP}` :5432, Dragonfly :6379, FQDN/internet)
+    # egress: add only app-specific targets (Postgres `cnpg.io/cluster: ${APP}-pg` :5432, Dragonfly :6379, FQDN/internet)
 ```
 
 Copy each additional building block (Postgres/Dragonfly egress, FQDN pairs, CIDR/internet) from a neighboring app's `networkpolicy.yaml` rather than retyping it from memory, and comment every rule with what it matches.

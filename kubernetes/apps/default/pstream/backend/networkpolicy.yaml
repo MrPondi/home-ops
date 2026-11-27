@@ -23,7 +23,7 @@ spec:
     # PostgreSQL (pstream-backend cluster)
     - toEndpoints:
         - matchLabels:
-            cnpg.io/cluster: pstream-backend
+            cnpg.io/cluster: pstream-backend-pg
       toPorts:
         - ports:
             - port: "5432"

@@ -21,7 +21,7 @@ spec:
     # PostgreSQL cluster (security)
     - toEndpoints:
         - matchLabels:
-            cnpg.io/cluster: authentik
+            cnpg.io/cluster: authentik-pg
       toPorts:
         - ports:
             - port: "5432"
@@ -62,7 +62,7 @@ spec:
     # PostgreSQL cluster (security)
     - toEndpoints:
         - matchLabels:
-            cnpg.io/cluster: authentik
+            cnpg.io/cluster: authentik-pg
       toPorts:
         - ports:
             - port: "5432"

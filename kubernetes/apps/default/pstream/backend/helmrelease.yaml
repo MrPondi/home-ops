@@ -36,7 +36,7 @@ spec:
               DATABASE_URL:
                 valueFrom:
                   secretKeyRef:
-                    name: "{{ .Release.Name }}-app"
+                    name: "{{ .Release.Name }}-pg-app"
                     key: uri
               META_DESCRIPTION: "Backend for P-Stream, (Pondi Stream)."
               META_NAME: pondi-backend

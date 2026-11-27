@@ -24,7 +24,7 @@ spec:
               DATABASE_URL:
                 valueFrom:
                   secretKeyRef:
-                    name: open-webui-app
+                    name: open-webui-pg-app
                     key: uri
               DEFAULT_LOCALE: pl
               ENABLE_API_KEYS: "true"

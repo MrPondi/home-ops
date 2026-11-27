@@ -53,7 +53,7 @@ spec:
     - toEndpoints:
         # litellm cluster instance pods (ai)
         - matchLabels:
-            cnpg.io/cluster: ${APP}
+            cnpg.io/cluster: ${APP}-pg
       toPorts:
         - ports:
             - port: "5432"

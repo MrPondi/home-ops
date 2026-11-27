@@ -115,7 +115,7 @@ The repo is driven by [mise monorepo tasks](https://mise.jdx.dev/tasks/monorepo.
 - `mise run //kubernetes:apply-ks <ns> <ks>` / `delete-ks <ns> <ks>` — SSA-apply / delete a locally rendered Kustomization (experiment window only).
 - `mise run //kubernetes:sync ks` — force-sync every Kustomization (annotates force-sync/reconcile/forceAt).
 - `mise run //kubernetes:hubble-status|hubble-flows|hubble-drops|hubble-capture` — see "Hubble".
-- `mise run //kubernetes:pg-initial-backup <ns> <app>` — immediate CNPG base backup (required before removing `components.postgres/cnpg=init`).
+- `mise run //kubernetes:pg-initial-backup <ns> <cluster>` (component clusters: `<app>-pg`) — immediate CNPG base backup (required before removing `components.postgres/cnpg=init`).
 - `mise run //kubernetes:node-shell <node>`, `browse-pvc <ns> <claim>`, `view-secret <ns> <secret>`, `prune-pods`
 - `mise run //talos:apply-node|render-config|upgrade-node <node>`, `upgrade-k8s <version>`, `reset/reboot/shutdown-node`
 - `mise run //:template <file>` — minijinja-cli + vals, paths relative to the caller's directory (auto-unlocks Bitwarden via `bw serve` on `:8087`)
