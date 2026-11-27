@@ -163,7 +163,8 @@ Attached via a Kustomization's `spec.components` (`../../../../components/...`) 
 - `replacements/ks.yaml`: the `spec.targetNamespace` stamping list described above.
 - `generators`: ESO `Password` generator (`hex-32`) for apps needing a generated secret.
 - `kopiur/base`: kopia repository secret + the namespace-wide `kopiur-mover` CNP, attached by every kopiur-capable namespace overlay.
-- `kopiur/backup`: backup/snapshot PVC resources (SnapshotPolicy + SnapshotSchedule + Restore + PVC), attached per-app.
+- `kopiur/statefulset`: SnapshotPolicy + SnapshotSchedule + Restore for an app that runs as a StatefulSet whose `volumeClaimTemplates` entry restores from the Restore (`dataSourceRef`). The default for app-template apps with data. See "Kopiur backups".
+- `kopiur/backup`: SnapshotPolicy + SnapshotSchedule + Restore plus a standalone PVC `${APP}`, for apps that can't own their claim as a StatefulSet (charts that can't template a volumeClaimTemplate with a `dataSourceRef`, or several controllers sharing one PVC). Its Restore sets no mover security context.
 - `auth-proxy`: envoy `SecurityPolicy` wiring an app's HTTPRoute through authentik (extAuth); target overridable via `${APP_HTTPROUTE:=${APP}}`.
 - `postgres` (**label-driven**): per-app CNPG Cluster + ObjectStore + ScheduledBackup + S3 ExternalSecret + CNP + PodMonitor. Docs: `kubernetes/components/postgres/README.md`.
 - `dragonfly` (**label-driven**): per-app Dragonfly CR + CNP + podmonitor; consumer label `${DRAGONFLY_APP_NAME:=${APP}}`; `dragonfly/authentication` sub-component.
@@ -282,7 +283,7 @@ Cilium (kubeProxyReplacement, native routing, `ipv4NativeRoutingCIDR 10.42.0.0/1
     - Metrics ingress (open namespaces only): fromEndpoints `observability` ns + `k8s:app.kubernetes.io/name: prometheus`
     - kube API (open namespaces only): `toEntities: [host, remote-node]` port 6443
     - Internet: `toCIDRSet 0.0.0.0/0` except `10.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.168.0.0/16`
-    - Kopiur backup egress: shipped namespace-wide by `components/kopiur/base` — apps attaching `components/kopiur/backup` need no hand-written rules (see "Kopiur backups")
+    - Kopiur backup egress: shipped namespace-wide by `components/kopiur/base` — apps attaching `components/kopiur/statefulset` or `components/kopiur/backup` need no hand-written rules (see "Kopiur backups")
 
 ### Verifying policies (the loop)
 
@@ -349,11 +350,24 @@ GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease �
 
 ## Kopiur backups (snapshot mover jobs)
 
-`components/kopiur/backup` (SnapshotPolicy + SnapshotSchedule + Restore + PVC, attached per-app) backs the app PVC to the `qnap` ClusterRepository (S3 backend → `s3.pondi.dev` on the QNAP MinIO, plain HTTP; credentials from `components/kopiur/base`). The hourly `SnapshotSchedule` (`H * * * *`, Europe/Warsaw) runs this pipeline per app:
+`components/kopiur/statefulset` (or `components/kopiur/backup`, see Components) backs the app PVC to the `qnap` ClusterRepository (S3 backend → `s3.pondi.dev` on the QNAP MinIO, plain HTTP; credentials from `components/kopiur/base`). The hourly `SnapshotSchedule` (`H * * * *`, Europe/Warsaw) runs this pipeline per app:
 
 1. `VolumeSnapshot` `<snapshot>-snap` (class `longhorn-snapshot-vsc`) of the app PVC — must reach `readyToUse` or the run stalls (`MissingDependency`).
 2. Staged source PVC `<snapshot>-src` (longhorn) cloned from the snapshot.
 3. A **mover Job** `<snapshot>` in the app namespace runs kopia: image `ghcr.io/home-operations/kopiur-mover` (pin by digest), labels `app.kubernetes.io/managed-by: kopiur` + `kopiur.home-operations.com/config: <app>` + `app.kubernetes.io/name: kopiur-mover` (ClusterRepository `moverDefaults.podLabels`, so Hubble metrics group every mover under one `app`), kopia cache on `kopiur-cache-<app>` (`miroir-slow-local`), then applies retention (keepLatest 3, keepHourly 24, keepDaily 7, keepWeekly 4).
+
+**StatefulSet apps** (`kopiur/statefulset`):
+
+- The controller is `type: statefulset` with a `statefulset:` block (last, below `containers`) holding `podManagementPolicy: Parallel` and one `volumeClaimTemplates` entry (`storageClass: longhorn`, `dataSourceRef` → `kopiur.home-operations.com` `Restore` `"{{ .Release.Name }}"`). The template is named `config` by default; set `KOPIUR_CLAIM` when it is named otherwise (e.g. `data`). The backed-up PVC is therefore `<claim>-<app>-0`, and the policy sets `sourcePathOverride: /pvc/${APP}` so snapshots keep the kopia path (`<app>@<ns>:/pvc/<app>`) they had as a plain `${APP}` PVC. `KOPIUR_CAPACITY` sizes only the kopia cache here; the claim size lives in the HelmRelease. Zeroscaler users set `CONTROLLER: StatefulSet`.
+- The Restore uses `onMissingSnapshot: Continue`, so the same manifests do the first deploy (empty volume) and disaster recovery (the populator fills a new claim from the latest snapshot while the pod stays `Pending`). Its mover writes as `KOPIUR_PUID`/`KOPIUR_PGID` (default `1000`).
+- **Moving an app from `kopiur/backup` to `kopiur/statefulset`** swaps its PVC, so the new claim is only as fresh as the last snapshot, and the old PVC is pruned (longhorn `reclaimPolicy: Delete`) unless protected. Per app, before merging:
+    1. `flux suspend kustomization <app> -n <ns>`.
+    2. For zeroscaler apps, `kubectl delete hpa <app> -n <ns>`: with `minReplicas: 0` the HPA scales the app straight back up (flux recreates it on resume).
+    3. `kubectl scale deploy/<app> -n <ns> --replicas=0` and wait for the pod to go.
+    4. `kubectl annotate pvc <app> -n <ns> kustomize.toolkit.fluxcd.io/prune=disabled` (keeps the old PVC as a fallback).
+    5. `kubectl kopiur snapshot now -n <ns> --policy <app>` and wait for it to complete.
+    6. Merge, then `flux resume kustomization <app> -n <ns>`.
+    7. Delete the old PVC by hand once the app shows its data and a snapshot from the new claim has succeeded.
 
 **CNP: handled by `components/kopiur/base`** — it ships the namespace-wide `kopiur-mover` CNP selecting `app.kubernetes.io/managed-by: kopiur`, so apps never hand-write mover rules. Only snapshot/restore mover jobs carry that label; kopiur's own maintenance/discovery/browse jobs deliberately omit it (kopiur source, `consts.rs`), so the CNP is a no-op in namespaces without movers (including `kopiur-system`). Verified request set (2026-09, live runs + hubble):
 
@@ -361,7 +375,7 @@ GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease �
 - S3 → `s3.pondi.dev:80`. The VIP is `10.0.30.11`, but **Cilium enforces egress on the DNAT-ed backend** — hubble shows `envoy-internal` pods in `network` on port `10080`. The CNP therefore carries a `toEndpoints` rule (network ns + envoy + `envoy-internal` gateway labels, port 10080).
 - kube API → `host`/`remote-node` :6443 (low volume; progress/status).
 
-**A snapshot run must be performed whenever `components/kopiur/backup` is added or the `kopiur-mover` CNP changes**: `kubectl kopiur snapshot now -n <ns> --policy <app>` triggers a run (inspect with `kubectl kopiur logs -n <ns> snapshot <name>`); hubble must show zero `POLICY_DENIED` flows from the mover pod. Handy `kubectl kopiur` (krew plugin) commands: `status -A`, `doctor`, `snapshots`, `logs`, `maintenance`, `browse`. Restore (populator) movers share the label and the CNP — run the same verification on the first restore in a fail-closed namespace.
+**A snapshot run must be performed whenever `components/kopiur/statefulset` or `components/kopiur/backup` is added, an app moves between them, or the `kopiur-mover` CNP changes**: `kubectl kopiur snapshot now -n <ns> --policy <app>` triggers a run (inspect with `kubectl kopiur logs -n <ns> snapshot <name>`); hubble must show zero `POLICY_DENIED` flows from the mover pod. Handy `kubectl kopiur` (krew plugin) commands: `status -A`, `doctor`, `snapshots`, `logs`, `maintenance`, `browse`. Restore (populator) movers share the label and the CNP — run the same verification on the first restore in a fail-closed namespace.
 
 ## Hubble
 

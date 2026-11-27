@@ -67,11 +67,12 @@ Unless a more specific rule applies, keys within any section should be ordered a
     - `type` (if present, always first)
     - `annotations`
     - `labels` (if present)
-    - Controller-specific fields such as `cronjob` or `statefulset` (if present)
+    - `cronjob` (if present)
     - `pod`
     - Any other fields should be sorted alphabetically, except the following fields which should come last (and in this order):
     - `initContainers` (if present)
     - `containers` (if present)
+    - `statefulset` (if present, always last, below `containers`, so the `volumeClaimTemplates` sit next to `persistence`)
 
 - Items within `spec.values.controllers.*.containers.*` sections should be sorted as follows:
     - `image`
@@ -90,6 +91,15 @@ Unless a more specific rule applies, keys within any section should be ordered a
     - `annotations` (if present)
     - `labels` (if present)
     - Any other fields should be added next in alphabetical order.
+
+- Items within `spec.values.controllers.*.statefulset.volumeClaimTemplates[*]` entries should be sorted as follows (upstream's order, kept so ports diff cleanly):
+    - `name`
+    - `accessMode`
+    - `size`
+    - `storageClass`
+    - `dataSourceRef`
+    - `globalMounts` (if present)
+    - `advancedMounts` (if present)
 
 - Items within `persistence.*` sections should be sorted as follows:
     - `type` (if present)
