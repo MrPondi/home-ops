@@ -17,7 +17,7 @@ Repository-wide conventions live in `AGENTS.md` — read it first.
 - Secrets use `external-secrets` with the `bitwarden-secretsmanager` `ClusterSecretStore`
 - Fail-closed namespaces: see AGENTS.md › "Fail-closed namespaces" for the list and what the namespace `default-deny` already provides (DNS, kube-API egress, prometheus scrape ingress). A per-app `networkpolicy.yaml` is only needed for **app-specific routes** (envoy route ingress, cross-ns services, Postgres/Dragonfly, S3/internet/FQDN egress) and must **not** re-declare the inherited rules. In open namespaces (`network`, `kube-system`, `flux-system`, `longhorn-system`) do **not** scaffold a CNP unless it is complete (a CNP isolates its pods immediately)
 - Postgres and Dragonfly are attached by **labels** on the Flux Kustomization (`components.postgres/enabled: "true"`, `components.dragonfly/enabled: "true"`, see AGENTS.md › "Label-driven components") — never add `components/postgres` or `components/dragonfly` to `spec.components` by hand. A labeled `ks.yaml` must carry `spec.components`, `spec.dependsOn` and `spec.healthCheckExprs` as lists (`[]` allowed)
-- Kopiur backups: apps with a PVC to back up attach `../../../../components/kopiur/backup` via the Kustomization's `spec.components` (SnapshotPolicy + hourly SnapshotSchedule + Restore + PVC, all keyed on `${APP}`). Mover-job egress is handled namespace-wide by the overlay's `kopiur/base` component (the `kopiur-mover` CNP) — never hand-write mover rules; just confirm the overlay attaches `kopiur/base` and verify with `kubectl kopiur snapshot now -n <ns> --policy <app>` (hubble must show zero `POLICY_DENIED` from the mover pod)
+- Kopiur backups: app-template apps with data run as `type: statefulset` and attach `../../../../components/kopiur/statefulset` via the Kustomization's `spec.components` (SnapshotPolicy + hourly SnapshotSchedule + Restore, all keyed on `${APP}`). The claim comes from the controller's `statefulset.volumeClaimTemplates` (name `config`, else set `KOPIUR_CLAIM`; `storageClass: longhorn`; `dataSourceRef` → `apiGroup: kopiur.home-operations.com`, `kind: Restore`, `name: "{{ .Release.Name }}"`) with `podManagementPolicy: Parallel`; the `statefulset:` block goes last, below `containers`. Use `../../../../components/kopiur/backup` (adds a standalone `${APP}` PVC for `existingClaim`) only for charts that can't template a volumeClaimTemplate with a `dataSourceRef`, or when several controllers share the PVC. See AGENTS.md "Kopiur backups". Mover-job egress is handled namespace-wide by the overlay's `kopiur/base` component (the `kopiur-mover` CNP) — never hand-write mover rules; just confirm the overlay attaches `kopiur/base` and verify with `kubectl kopiur snapshot now -n <ns> --policy <app>` (hubble must show zero `POLICY_DENIED` from the mover pod)
 - The root `flux-system` Kustomization already patches HelmRelease defaults (crds `CreateReplace`, rollback/upgrade remediation) — do not add them to the app
 
 ## Workflow
@@ -35,7 +35,7 @@ Ask the user (via your harness's question tool, e.g. `question` / `AskUserQuesti
 7. Whether the app needs persistence
 8. Whether the app needs an ingress route (envoy-internal / envoy-external) — if yes, plan for gatus/homepage route annotations
 9. Flux `dependsOn` entries for the Kustomization (usually `external-secrets-store` in namespace `external-secrets`)
-10. Whether the app needs kopiur PVC backups (attach `components/kopiur/backup`; also confirm the namespace overlay attaches `kopiur/base`)
+10. Whether the app needs kopiur PVC backups (StatefulSet + `components/kopiur/statefulset`, or `components/kopiur/backup` for the exceptions; also confirm the namespace overlay attaches `kopiur/base`)
 11. Whether the app needs Postgres and/or Dragonfly (label-driven components — see Repository-specific assumptions)
 
 If the requested namespace does not exist under `kubernetes/apps/`, stop and ask the user how to proceed (new namespace = new overlay + `namespace.yaml`, possibly fail-closed).
@@ -293,7 +293,7 @@ Verify that:
 5. In a fail-closed namespace the CNP only adds app-specific routes (no DNS/kube-API/scrape rules); no partial CNP was added in an open namespace.
 6. Render cleanly: `mise run //kubernetes:render-local-ks <ns> <app>` (or `kubectl kustomize <dir>` before the overlay entry is added), and `uv run scripts/kustomization_order_audit.py` + `uv run scripts/cnp_prefix_audit.py` pass.
 7. No plain-text secrets were introduced.
-8. If the app attaches `components/kopiur/backup`: the namespace overlay attaches `kopiur/base`, and a verification snapshot run (`kubectl kopiur snapshot now -n <ns> --policy <app>`) completed with zero `POLICY_DENIED` flows from the mover pod in hubble.
+8. If the app attaches `components/kopiur/statefulset` or `components/kopiur/backup`: the namespace overlay attaches `kopiur/base`, and a verification snapshot run (`kubectl kopiur snapshot now -n <ns> --policy <app>`) completed with zero `POLICY_DENIED` flows from the mover pod in hubble.
 
 ## Notes
 
