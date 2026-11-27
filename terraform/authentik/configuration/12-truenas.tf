@@ -8,7 +8,7 @@ resource "authentik_application" "truenas" {
 }
 
 resource "authentik_group" "truenas-users" {
-  name         = "Truenas Users"
+  name = "Truenas Users"
 }
 
 # resource "authentik_group" "truenas-admins" {

@@ -22,14 +22,14 @@ resource "authentik_provider_oauth2" "litellm" {
   client_id     = jsondecode(data.bitwarden-secrets_secret.litellm.value)["LITELLM_OIDC_CLIENT_ID"]
   client_secret = jsondecode(data.bitwarden-secrets_secret.litellm.value)["LITELLM_OIDC_CLIENT_SECRET"]
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   allowed_redirect_uris = [
     {
-      matching_mode = "strict",
+      matching_mode     = "strict",
       redirect_uri_type = "authorization",
-      url           = "https://litellm.pondi.dev/sso/callback",
+      url               = "https://litellm.pondi.dev/sso/callback",
     }
   ]
 
@@ -63,12 +63,12 @@ resource "authentik_application" "litellm" {
 }
 
 resource "authentik_group" "ai-access" {
-  name         = "AI access"
+  name = "AI access"
 }
 
 resource "authentik_group" "ai-admins" {
-  name         = "AI Admins"
-  parents      = [authentik_group.ai-access.id]
+  name    = "AI Admins"
+  parents = [authentik_group.ai-access.id]
 }
 
 resource "authentik_application_entitlement" "litellm-admins" {

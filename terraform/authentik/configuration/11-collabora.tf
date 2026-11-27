@@ -2,14 +2,14 @@ resource "authentik_provider_proxy" "collabora" {
   name          = "Collabora Proxy Provider"
   external_host = "https://office.pondi.dev"
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   mode = "forward_single"
 
   access_token_validity = "hours=6"
 
-  basic_auth_enabled = true
+  basic_auth_enabled            = true
   basic_auth_username_attribute = "COLLABORA_ADMIN_USERNAME"
   basic_auth_password_attribute = "COLLABORA_ADMIN_PASSWORD"
 }

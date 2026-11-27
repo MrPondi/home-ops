@@ -7,14 +7,14 @@ resource "authentik_provider_oauth2" "qui" {
   client_id     = jsondecode(data.bitwarden-secrets_secret.qui.value)["QUI_OIDC_CLIENT_ID"]
   client_secret = jsondecode(data.bitwarden-secrets_secret.qui.value)["QUI_OIDC_CLIENT_SECRET"]
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   allowed_redirect_uris = [
     {
-      matching_mode = "strict",
+      matching_mode     = "strict",
       redirect_uri_type = "authorization",
-      url           = "https://qui.pondi.dev/api/auth/oidc/callback",
+      url               = "https://qui.pondi.dev/api/auth/oidc/callback",
     }
   ]
 

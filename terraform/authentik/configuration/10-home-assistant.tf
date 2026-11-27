@@ -7,14 +7,14 @@ resource "authentik_provider_oauth2" "home-assistant" {
   client_id     = jsondecode(data.bitwarden-secrets_secret.home-assistant.value)["HASS_OIDC_CLIENT_ID"]
   client_secret = jsondecode(data.bitwarden-secrets_secret.home-assistant.value)["HASS_OIDC_CLIENT_SECRET"]
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   allowed_redirect_uris = [
     {
-      matching_mode = "strict",
+      matching_mode     = "strict",
       redirect_uri_type = "authorization",
-      url           = "https://hass.pondi.dev/auth/openid/callback",
+      url               = "https://hass.pondi.dev/auth/openid/callback",
     }
   ]
 
@@ -47,12 +47,12 @@ resource "authentik_application" "home-assistant" {
 }
 
 resource "authentik_group" "hass-users" {
-  name         = "Home Assistant Users"
+  name = "Home Assistant Users"
 }
 
 resource "authentik_group" "hass-admins" {
-  name         = "Home Assistant Admins"
-  parents      = [authentik_group.hass-users.id]
+  name    = "Home Assistant Admins"
+  parents = [authentik_group.hass-users.id]
 }
 
 resource "authentik_policy_binding" "hass-access" {
