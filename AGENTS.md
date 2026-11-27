@@ -364,10 +364,10 @@ GitOps flow: `Git push → Flux source sync → Kustomization → HelmRelease �
     1. `flux suspend kustomization <app> -n <ns>`.
     2. For zeroscaler apps, `kubectl delete hpa <app> -n <ns>`: with `minReplicas: 0` the HPA scales the app straight back up (flux recreates it on resume).
     3. `kubectl scale deploy/<app> -n <ns> --replicas=0` and wait for the pod to go.
-    4. `kubectl annotate pvc <app> -n <ns> kustomize.toolkit.fluxcd.io/prune=disabled` (keeps the old PVC as a fallback).
+    4. `kubectl annotate pvc <app> -n <ns> kustomize.toolkit.fluxcd.io/prune=disabled` **and** `kubectl patch pv <pv> -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'`. The annotation alone is not enough: if flux re-applies the old PVC once more (step 6), the apply strips the annotation and the next reconcile prunes it. `Retain` keeps the volume either way (verified 2026-11, media cutover).
     5. `kubectl kopiur snapshot now -n <ns> --policy <app>` and wait for it to complete.
-    6. Merge, then `flux resume kustomization <app> -n <ns>`.
-    7. Delete the old PVC by hand once the app shows its data and a snapshot from the new claim has succeeded.
+    6. Merge, `flux reconcile kustomization flux-system -n flux-system --with-source`, and wait until `kubectl get ks <app> -n <ns> -o jsonpath='{.spec.components}'` lists `kopiur/statefulset`: the child's spec is written by the root `flux-system` Kustomization, and a child reconciled before that still renders the old PVC. Then `flux resume kustomization <app> -n <ns>`.
+    7. Once the app shows its data and a snapshot from the new claim has succeeded, delete the old PVC and set its PV back to `Delete` (a `Released` PV with `Retain` keeps its Longhorn volume until then).
 
 **CNP: handled by `components/kopiur/base`** — it ships the namespace-wide `kopiur-mover` CNP selecting `app.kubernetes.io/managed-by: kopiur`, so apps never hand-write mover rules. Only snapshot/restore mover jobs carry that label; kopiur's own maintenance/discovery/browse jobs deliberately omit it (kopiur source, `consts.rs`), so the CNP is a no-op in namespaces without movers (including `kopiur-system`). Verified request set (2026-09, live runs + hubble):
 

@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       mssql:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
@@ -36,6 +37,19 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 2Gi
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 8Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
+              globalMounts:
+                - path: /var/opt/mssql
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -56,10 +70,6 @@ spec:
           mssql:
             port: 1433
     persistence:
-      data:
-        existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /var/opt/mssql
       tmp:
         type: emptyDir
         globalMounts:

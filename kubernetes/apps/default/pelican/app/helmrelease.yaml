@@ -12,6 +12,7 @@ spec:
   values:
     controllers:
       pelican:
+        type: statefulset
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
@@ -81,6 +82,19 @@ spec:
                 memory: 256Mi
               limits:
                 memory: 2Gi
+        statefulset:
+          podManagementPolicy: Parallel
+          volumeClaimTemplates:
+            - name: data
+              accessMode: ReadWriteOnce
+              size: 5Gi
+              storageClass: longhorn
+              dataSourceRef:
+                apiGroup: kopiur.home-operations.com
+                kind: Restore
+                name: "{{ .Release.Name }}"
+              globalMounts:
+                - path: /pelican-data
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -117,10 +131,6 @@ spec:
             upload_max_filesize = 5M
             post_max_size = 8M
     persistence:
-      data:
-        existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /pelican-data
       php-config:
         type: configMap
         identifier: php-config

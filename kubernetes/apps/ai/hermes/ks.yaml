@@ -6,7 +6,7 @@ metadata:
   name: hermes
 spec:
   components:
-    - ../../../../components/kopiur/backup
+    - ../../../../components/kopiur/statefulset
   dependsOn:
     - name: ai-postbuild
     - name: external-secrets-store
@@ -20,8 +20,9 @@ spec:
   postBuild:
     substitute:
       APP: hermes
-      KOPIUR_PUID: "10000"
+      KOPIUR_CLAIM: data
       KOPIUR_PGID: "10000"
+      KOPIUR_PUID: "10000"
     substituteFrom:
       - kind: Secret
         name: hermes-postbuild-secret
