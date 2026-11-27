@@ -1,19 +1,19 @@
 resource "authentik_flow" "recovery" {
-  name           = "Password Recovery"
-  title          = "Password Recovery"
-  slug           = "password-recovery-flow"
-  designation    = "recovery"
+  name        = "Password Recovery"
+  title       = "Password Recovery"
+  slug        = "password-recovery-flow"
+  designation = "recovery"
 }
 
 resource "authentik_stage_identification" "password-recovery" {
-  name           = "password-recovery-identification"
-  user_fields    = ["username", "email"]
+  name        = "password-recovery-identification"
+  user_fields = ["username", "email"]
 }
 
 resource "authentik_stage_email" "password-recovery" {
-  name = "password-recovery-email"
-  template = "email/password_reset.html"
-  subject = "Authentik Password Reset"
+  name                     = "password-recovery-email"
+  template                 = "email/password_reset.html"
+  subject                  = "Authentik Password Reset"
   activate_user_on_success = true
 }
 

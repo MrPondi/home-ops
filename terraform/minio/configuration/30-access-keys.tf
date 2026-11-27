@@ -9,7 +9,7 @@ locals {
       policy      = "kopiur.json"
     }
     kritika-cache = {
-      name = "Kritika cache"
+      name        = "Kritika cache"
       target_user = minio_iam_user.svc-homelab.name
       policy      = "kritika-cache.json"
     }
@@ -18,7 +18,7 @@ locals {
       policy      = "mariadb.json"
     }
     mcp = {
-      name = "Minio MCP"
+      name        = "Minio MCP"
       target_user = minio_iam_user.svc-homelab.name
       policy      = "mcp.json"
     }
@@ -27,7 +27,7 @@ locals {
       policy      = "pelican.json"
     }
     terraform = {
-      name = "Terraform"
+      name        = "Terraform"
       target_user = minio_iam_user.svc-homelab.name
       policy      = "terraform.json"
     }

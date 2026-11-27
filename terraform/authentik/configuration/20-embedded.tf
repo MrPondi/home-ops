@@ -3,7 +3,7 @@ data "bitwarden-secrets_secret" "kopiur" {
 }
 
 resource "authentik_group" "admins" {
-  name = "authentik Admins"
+  name         = "authentik Admins"
   is_superuser = true
 
   parents = [
@@ -21,7 +21,7 @@ resource "authentik_group" "admins" {
   ]
 
   attributes = jsonencode({
-    "KOPIUR_WEBUI_USERNAME": jsondecode(data.bitwarden-secrets_secret.kopiur.value)["WEBUI_USERNAME"],
-    "KOPIUR_WEBUI_PASSWORD": jsondecode(data.bitwarden-secrets_secret.kopiur.value)["WEBUI_PASSWORD"]
+    "KOPIUR_WEBUI_USERNAME" : jsondecode(data.bitwarden-secrets_secret.kopiur.value)["WEBUI_USERNAME"],
+    "KOPIUR_WEBUI_PASSWORD" : jsondecode(data.bitwarden-secrets_secret.kopiur.value)["WEBUI_PASSWORD"]
   })
 }

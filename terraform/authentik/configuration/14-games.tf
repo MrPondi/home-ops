@@ -11,7 +11,7 @@ resource "authentik_rac_endpoint" "game0" {
   protocol_provider   = authentik_provider_rac.games.id
   maximum_connections = -1
   settings = jsonencode({
-      "read-only": "true",
+    "read-only" : "true",
   })
 }
 

@@ -33,28 +33,28 @@ resource "authentik_flow_stage_binding" "duo-ldap-identification-stage" {
 }
 
 resource "authentik_flow_stage_binding" "duo-ldap-mfa" {
-  target = authentik_flow.duo-ldap-authentication-flow.uuid
-  stage  = authentik_stage_authenticator_validate.ldap-duo-mfa.id
-  policy_engine_mode = "all"
-  evaluate_on_plan = false
+  target               = authentik_flow.duo-ldap-authentication-flow.uuid
+  stage                = authentik_stage_authenticator_validate.ldap-duo-mfa.id
+  policy_engine_mode   = "all"
+  evaluate_on_plan     = false
   re_evaluate_policies = true
-  order  = 20
+  order                = 20
 }
 
 resource "authentik_policy_binding" "ldapservice-bypass" {
-  target = authentik_flow_stage_binding.duo-ldap-mfa.id
-  user  = authentik_user.ldap-bind.id
+  target         = authentik_flow_stage_binding.duo-ldap-mfa.id
+  user           = authentik_user.ldap-bind.id
   failure_result = true
-  negate = true
-  order  = 10
+  negate         = true
+  order          = 10
 }
 
 resource "authentik_policy_binding" "ip-bypass" {
-  target = authentik_flow_stage_binding.duo-ldap-mfa.id
-  policy  = authentik_policy_expression.local-ip-check.id
+  target         = authentik_flow_stage_binding.duo-ldap-mfa.id
+  policy         = authentik_policy_expression.local-ip-check.id
   failure_result = true
-  negate = true
-  order  = 20
+  negate         = true
+  order          = 20
 }
 
 resource "authentik_flow_stage_binding" "duo-ldap-authentication-login" {
@@ -78,13 +78,13 @@ resource "authentik_user" "ldap-bind" {
 }
 
 resource "authentik_rbac_role" "ldap-search" {
-  name     = "LDAP search"
+  name = "LDAP search"
 }
 
 resource "authentik_group" "ldap-search" {
-  name     = "ldapsearch"
-  users    = [authentik_user.ldap-bind.id]
-  roles    = [authentik_rbac_role.ldap-search.id]
+  name  = "ldapsearch"
+  users = [authentik_user.ldap-bind.id]
+  roles = [authentik_rbac_role.ldap-search.id]
 }
 
 resource "authentik_rbac_permission_role" "duo-provider-search" {
@@ -100,42 +100,42 @@ resource "authentik_outpost" "ldap" {
   service_connection = data.authentik_service_connection_kubernetes.local.id
   type               = "ldap"
   config = jsonencode({
-    "log_level": "info",
-    "refresh_interval": "minutes=5",
-    "authentik_host": "https://auth.pondi.dev/",
-    "authentik_host_browser": "",
-    "object_naming_template": "ak-outpost-%(name)s",
-    "kubernetes_replicas": 1,
-    "kubernetes_namespace": "security",
-    "authentik_host_insecure": false,
-    "kubernetes_service_type": "LoadBalancer",
-    "kubernetes_disabled_components": ["ingress", "httproute"],
-    "kubernetes_json_patches": {
-      "service": [
+    "log_level" : "info",
+    "refresh_interval" : "minutes=5",
+    "authentik_host" : "https://auth.pondi.dev/",
+    "authentik_host_browser" : "",
+    "object_naming_template" : "ak-outpost-%(name)s",
+    "kubernetes_replicas" : 1,
+    "kubernetes_namespace" : "security",
+    "authentik_host_insecure" : false,
+    "kubernetes_service_type" : "LoadBalancer",
+    "kubernetes_disabled_components" : ["ingress", "httproute"],
+    "kubernetes_json_patches" : {
+      "service" : [
         {
-          "op"   : "add",
+          "op" : "add",
           "path" : "/metadata/annotations",
-          "value": {}
+          "value" : {}
         },
         {
-          "op"   : "add",
+          "op" : "add",
           "path" : "/metadata/annotations/external-dns.kubernetes.io~1hostname",
-          "value": "ldap.pondi.dev"
+          "value" : "ldap.pondi.dev"
         },
         {
-          "op"   : "add",
+          "op" : "add",
           "path" : "/metadata/annotations/lbipam.cilium.io~1ips",
-          "value": "10.0.30.133"
+          "value" : "10.0.30.133"
         },
         {
-          "op"   : "add",
+          "op" : "add",
           "path" : "/metadata/annotations/gatus.home-operations.com~1endpoint",
-          "value": "name: ldap outpost\ngroup: services"
+          "value" : "name: ldap outpost\ngroup: services"
         },
         {
-          "op"   : "add",
+          "op" : "add",
           "path" : "/spec/externalTrafficPolicy",
-          "value": "Local"
+          "value" : "Local"
         }
       ]
     },

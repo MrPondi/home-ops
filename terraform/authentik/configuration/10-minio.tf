@@ -25,14 +25,14 @@ resource "authentik_provider_oauth2" "minio" {
   client_id     = jsondecode(data.bitwarden-secrets_secret.minio.value)["MINIO_OIDC_CLIENT_ID"]
   client_secret = jsondecode(data.bitwarden-secrets_secret.minio.value)["MINIO_OIDC_CLIENT_SECRET"]
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   allowed_redirect_uris = [
     {
-      matching_mode = "strict",
+      matching_mode     = "strict",
       redirect_uri_type = "authorization",
-      url           = "https://minio.pondi.dev/oauth_callback",
+      url               = "https://minio.pondi.dev/oauth_callback",
     }
   ]
 
@@ -66,12 +66,12 @@ resource "authentik_application" "minio" {
 }
 
 resource "authentik_group" "minio-users" {
-  name         = "MinIO Users"
+  name = "MinIO Users"
 }
 
 resource "authentik_group" "minio-admins" {
-  name         = "MinIO Admins"
-  parents      = [authentik_group.minio-users.id]
+  name    = "MinIO Admins"
+  parents = [authentik_group.minio-users.id]
 }
 
 resource "authentik_application_entitlement" "minio-admins" {

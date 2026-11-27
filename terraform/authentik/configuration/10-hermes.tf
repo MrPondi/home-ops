@@ -8,14 +8,14 @@ resource "authentik_provider_oauth2" "hermes" {
   client_secret = jsondecode(data.bitwarden-secrets_secret.hermes.value)["HERMES_OIDC_CLIENT_SECRET"]
   client_type   = "public"
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   allowed_redirect_uris = [
     {
-      matching_mode = "strict",
+      matching_mode     = "strict",
       redirect_uri_type = "authorization",
-      url           = "https://hermes.pondi.dev/auth/callback",
+      url               = "https://hermes.pondi.dev/auth/callback",
     }
   ]
 

@@ -1,22 +1,22 @@
 locals {
-    node_name = "orion"
+  node_name = "orion"
 }
 
 resource "proxmox_download_file" "talos-orion" {
-  content_type       = "iso"
-  datastore_id       = "local"
-  file_name          = "talos-orion.img"
-  node_name          = local.node_name
-  url                = "https://factory.talos.dev/image/1187564bfca177b9386718afb882b29c8390f58451858ff64f3ceb63ea016dff/1.13.4/nocloud-amd64.iso"
+  content_type = "iso"
+  datastore_id = "local"
+  file_name    = "talos-orion.img"
+  node_name    = local.node_name
+  url          = "https://factory.talos.dev/image/1187564bfca177b9386718afb882b29c8390f58451858ff64f3ceb63ea016dff/1.13.4/nocloud-amd64.iso"
 }
 
 resource "proxmox_virtual_environment_vm" "k8s-0" {
   name        = "k8s-0"
   description = "Talos Control Plane Node - Managed by Terraform"
 
-  node_name = local.node_name
-  vm_id     = 3000
-  machine   = "q35"
+  node_name  = local.node_name
+  vm_id      = 3000
+  machine    = "q35"
   boot_order = ["scsi0", "ide2"]
 
   agent {
@@ -24,12 +24,12 @@ resource "proxmox_virtual_environment_vm" "k8s-0" {
   }
 
   cpu {
-    cores        = 16
-    type         = "host"
+    cores = 16
+    type  = "host"
   }
 
   memory {
-    dedicated = 48*1024
+    dedicated = 48 * 1024
     floating  = 0
   }
 
@@ -60,36 +60,36 @@ resource "proxmox_virtual_environment_vm" "k8s-0" {
   }
 
   network_device {
-    bridge = "Kubernet"
-    model  = "virtio"
+    bridge      = "Kubernet"
+    model       = "virtio"
     mac_address = "BC:24:11:68:28:1C"
   }
 
   network_device {
-    bridge = "VPN"
-    model  = "virtio"
+    bridge      = "VPN"
+    model       = "virtio"
     mac_address = "BC:24:11:80:CA:BE"
   }
 
   network_device {
-    bridge = "IoT"
-    model  = "virtio"
-    mac_address = "BC:24:11:F7:74:38"
+    bridge       = "IoT"
+    model        = "virtio"
+    mac_address  = "BC:24:11:F7:74:38"
     disconnected = true
   }
 
   hostpci {
-    device   = "hostpci0"
-    id       = "0000:0a:00.0" # Intel DG2 Arc A310 [8086:56a6]
-    pcie     = true
-    rombar   = true
+    device = "hostpci0"
+    id     = "0000:0a:00.0" # Intel DG2 Arc A310 [8086:56a6]
+    pcie   = true
+    rombar = true
   }
 
   hostpci {
-    device   = "hostpci1"
-    id       = "0000:09:00.0" # Intel DG2 Audio Controller [8086:4f92]
-    pcie     = true
-    rombar   = true
+    device = "hostpci1"
+    id     = "0000:09:00.0" # Intel DG2 Audio Controller [8086:4f92]
+    pcie   = true
+    rombar = true
   }
 
   usb {

@@ -9,12 +9,12 @@ resource "authentik_application" "jellyfin" {
 }
 
 resource "authentik_group" "jellyfin-users" {
-  name         = "Jellyfin Users"
+  name = "Jellyfin Users"
 }
 
 resource "authentik_group" "jellyfin-admins" {
-  name         = "Jellyfin Admins"
-  parents      = [authentik_group.jellyfin-users.id]
+  name    = "Jellyfin Admins"
+  parents = [authentik_group.jellyfin-users.id]
 }
 
 resource "authentik_policy_binding" "jellyfin-access" {

@@ -1,8 +1,8 @@
 resource "authentik_flow" "enrollment" {
-  name           = "Homelab Enrollment"
-  title          = "Enrollment"
-  slug           = "homelab-enrollment-flow"
-  designation    = "enrollment"
+  name        = "Homelab Enrollment"
+  title       = "Enrollment"
+  slug        = "homelab-enrollment-flow"
+  designation = "enrollment"
 }
 
 resource "authentik_stage_invitation" "enrollment-invitation" {
@@ -77,9 +77,9 @@ resource "authentik_stage_user_write" "enrollment-write" {
 }
 
 resource "authentik_stage_email" "email-verification" {
-  name = "homelab-email-verification"
-  template = "email/account_confirmation.html"
-  subject = "Authentik Account Confirmation"
+  name                     = "homelab-email-verification"
+  template                 = "email/account_confirmation.html"
+  subject                  = "Authentik Account Confirmation"
   activate_user_on_success = true
 }
 

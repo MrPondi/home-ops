@@ -2,8 +2,8 @@ resource "authentik_provider_proxy" "prometheus" {
   name          = "Prometheus Proxy Provider"
   external_host = "https://prometheus.pondi.dev"
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   mode = "forward_single"
 
@@ -25,7 +25,7 @@ resource "authentik_application" "prometheus" {
 }
 
 resource "authentik_group" "metrics-access" {
-  name         = "Metrics Access"
+  name = "Metrics Access"
 }
 
 resource "authentik_policy_binding" "prometheus-access" {

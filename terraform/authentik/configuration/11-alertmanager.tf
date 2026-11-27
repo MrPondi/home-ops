@@ -2,8 +2,8 @@ resource "authentik_provider_proxy" "alertmanager" {
   name          = "Alertmanager Proxy Provider"
   external_host = "https://alertmanager.pondi.dev"
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   mode = "forward_single"
 

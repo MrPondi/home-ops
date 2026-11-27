@@ -36,14 +36,14 @@ resource "authentik_provider_oauth2" "nextcloud" {
   client_id     = jsondecode(data.bitwarden-secrets_secret.nextcloud.value)["NEXTCLOUD_OIDC_CLIENT_ID"]
   client_secret = jsondecode(data.bitwarden-secrets_secret.nextcloud.value)["NEXTCLOUD_OIDC_CLIENT_SECRET"]
 
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
-  invalidation_flow   = data.authentik_flow.default-invalidation-flow.id
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  invalidation_flow  = data.authentik_flow.default-invalidation-flow.id
 
   allowed_redirect_uris = [
     {
-      matching_mode = "strict",
+      matching_mode     = "strict",
       redirect_uri_type = "authorization",
-      url           = "https://nextcloud.pondi.dev/apps/oidc_login/oidc",
+      url               = "https://nextcloud.pondi.dev/apps/oidc_login/oidc",
     }
   ]
 
@@ -65,7 +65,7 @@ resource "authentik_provider_oauth2" "nextcloud" {
   ]
 
   signing_key = data.authentik_certificate_key_pair.self-signed.id
-  sub_mode = "user_uuid"
+  sub_mode    = "user_uuid"
 }
 
 resource "authentik_application" "nextcloud" {
@@ -78,16 +78,16 @@ resource "authentik_application" "nextcloud" {
 }
 
 resource "authentik_group" "nextcloud-users" {
-  name         = "Nextcloud Users"
+  name = "Nextcloud Users"
 }
 
 resource "authentik_group" "nextcloud-admins" {
-  name         = "Nextcloud Admins"
-  parents      = [authentik_group.nextcloud-users.id]
+  name    = "Nextcloud Admins"
+  parents = [authentik_group.nextcloud-users.id]
 
   attributes = jsonencode({
-    "COLLABORA_ADMIN_USERNAME": jsondecode(data.bitwarden-secrets_secret.nextcloud.value)["COLLABORA_ADMIN_USERNAME"],
-    "COLLABORA_ADMIN_PASSWORD": jsondecode(data.bitwarden-secrets_secret.nextcloud.value)["COLLABORA_ADMIN_PASSWORD"]
+    "COLLABORA_ADMIN_USERNAME" : jsondecode(data.bitwarden-secrets_secret.nextcloud.value)["COLLABORA_ADMIN_USERNAME"],
+    "COLLABORA_ADMIN_PASSWORD" : jsondecode(data.bitwarden-secrets_secret.nextcloud.value)["COLLABORA_ADMIN_PASSWORD"]
   })
 }
 
