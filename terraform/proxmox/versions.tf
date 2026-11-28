@@ -14,14 +14,14 @@ terraform {
     }
   }
 }
-# Shared with the other stack via proxmox-access.auto.tfvars (symlinked). "admins" is static.
+
 variable "proxmox_access" {
   description = "Extra Proxmox access levels: key = authentik entitlement = PVE group \"<key>-authentik\"."
   default     = {}
   type = map(object({
-    group = string # authentik group (child of "Proxmox Users")
-    path  = string # PVE ACL path, e.g. /vms/3001 or /pool/<name>
-    role  = string # PVE role, e.g. PVEVMUser
+    group = optional(string) # new authentik group to create; omit to bind in the UI or in code
+    path  = string           # PVE ACL path, e.g. /vms/3001 or /pool/<name>
+    role  = string           # PVE role, e.g. PVEVMUser
   }))
 
   validation {
@@ -36,9 +36,9 @@ variable "proxmox_access" {
 
   validation {
     condition = (
-      length(distinct(concat(["Proxmox Admins"], [for v in values(var.proxmox_access) : v.group])))
-      == length(var.proxmox_access) + 1
+      length(distinct(concat(["Proxmox Admins"], [for v in values(var.proxmox_access) : v.group if v.group != null])))
+      == length([for v in values(var.proxmox_access) : v.group if v.group != null]) + 1
     )
-    error_message = "Each entry needs a unique authentik group name (\"Proxmox Admins\" is reserved)."
+    error_message = "Each group must be unique (\"Proxmox Admins\" is reserved)."
   }
 }

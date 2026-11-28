@@ -37,7 +37,7 @@ resource "proxmox_virtual_environment_group" "authentik" {
   for_each = var.proxmox_access
 
   group_id = "${each.key}-authentik"
-  comment  = "authentik entitlement ${each.key} (${each.value.group}) - Managed by Terraform"
+  comment  = "authentik entitlement ${each.key} - Managed by Terraform"
 }
 
 resource "proxmox_acl" "authentik" {
