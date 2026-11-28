@@ -43,4 +43,6 @@ module "configuration" {
     authentik         = authentik
     bitwarden-secrets = bitwarden-secrets
   }
+
+  proxmox_access = var.proxmox_access
 }

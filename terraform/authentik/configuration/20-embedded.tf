@@ -17,7 +17,8 @@ resource "authentik_group" "admins" {
     authentik_group.metrics-access.id,
     authentik_group.pelican-wings-ssh.id,
     authentik_group.ai-admins.id,
-    authentik_group.games-vnc.id
+    authentik_group.games-vnc.id,
+    authentik_group.proxmox["admins"].id
   ]
 
   attributes = jsonencode({
