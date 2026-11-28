@@ -50,4 +50,6 @@ module "configuration" {
     proxmox           = proxmox
     bitwarden-secrets = bitwarden-secrets
   }
+
+  proxmox_access = var.proxmox_access
 }
