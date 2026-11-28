@@ -1,4 +1,4 @@
-data "bitwarden-secrets_secret" "game0" {
+data "bitwarden-secrets_secret" "game-vnc" {
   id = "7f83df0a-c4bb-4fbd-b453-b50f014e3100"
 }
 
@@ -18,7 +18,21 @@ resource "authentik_rac_endpoint" "game0" {
   settings = jsonencode({
     "read-only" : "true",
     "username" : "game0",
-    "password" : jsondecode(data.bitwarden-secrets_secret.game0.value)["GAME0_PASSWORD"],
+    "password" : jsondecode(data.bitwarden-secrets_secret.game-vnc.value)["GAME0_PASSWORD"],
+  })
+}
+
+resource "authentik_rac_endpoint" "game1" {
+  name                = "Game1"
+  host                = "10.0.20.198:5900"
+  protocol            = "vnc"
+  protocol_provider   = authentik_provider_rac.games.id
+  maximum_connections = -1
+  # wayvnc offers RSA-AES (TigerVNC) + Apple DH; guacd can only do the latter (username/password).
+  settings = jsonencode({
+    "read-only" : "true",
+    "username" : "game1",
+    "password" : jsondecode(data.bitwarden-secrets_secret.game-vnc.value)["GAME1_PASSWORD"],
   })
 }
 
