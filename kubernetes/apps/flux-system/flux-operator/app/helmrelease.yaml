@@ -24,7 +24,7 @@ spec:
               - email
               - openid
               - profile
-              - admin
+              - gitops
             variables:
               - name: groups
                 expression: "has(claims.admin) ? ['flux-admin'] : ['flux-user']"

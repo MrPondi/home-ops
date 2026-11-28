@@ -2,7 +2,7 @@ data "bitwarden-secrets_secret" "litellm" {
   id = "63923a43-e89c-4a97-a4a0-b489011d8b3f"
 }
 
-resource "authentik_property_mapping_provider_scope" "litellm-scope" {
+resource "authentik_property_mapping_provider_scope" "litellm" {
   name       = "LiteLLM Role"
   scope_name = "litellm_role"
   expression = <<EOF
@@ -44,7 +44,7 @@ resource "authentik_provider_oauth2" "litellm" {
   ]
 
   property_mappings = [
-    authentik_property_mapping_provider_scope.litellm-scope.id,
+    authentik_property_mapping_provider_scope.litellm.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,

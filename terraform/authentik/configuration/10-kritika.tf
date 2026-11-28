@@ -29,7 +29,7 @@ resource "authentik_provider_oauth2" "kritika" {
   ]
 
   property_mappings = [
-    authentik_property_mapping_provider_scope.gitops-admin.id,
+    authentik_property_mapping_provider_scope.gitops.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
