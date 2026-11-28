@@ -53,9 +53,3 @@ module "configuration" {
 
   proxmox_access = var.proxmox_access
 }
-
-# Pre-existing realm (created by hand); adopted into state on the next apply.
-import {
-  to = module.configuration.proxmox_realm_openid.authentik
-  id = "authentik"
-}

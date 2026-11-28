@@ -16,12 +16,12 @@ terraform {
 }
 
 variable "proxmox_access" {
-  description = "Extra Proxmox access levels: key = authentik entitlement = PVE group \"<key>-authentik\"."
+  description = "PVE group \"<key>-authentik\" ACLs, granted via authentik."
   default     = {}
   type = map(object({
-    group = optional(string) # new authentik group to create; omit to bind in the UI or in code
-    path  = string           # PVE ACL path, e.g. /vms/3001 or /pool/<name>
-    role  = string           # PVE role, e.g. PVEVMUser
+    group = optional(string)
+    path  = string
+    role  = string
   }))
 
   validation {

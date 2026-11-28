@@ -23,7 +23,7 @@ resource "proxmox_realm_openid" "authentik" {
 
 resource "proxmox_virtual_environment_group" "admins" {
   group_id = "admins-authentik"
-  comment  = "authentik entitlement admins (Proxmox Admins) - Managed by Terraform"
+  comment  = "Managed by Terraform"
 }
 
 resource "proxmox_acl" "admins" {
@@ -33,11 +33,19 @@ resource "proxmox_acl" "admins" {
   propagate = true
 }
 
+resource "proxmox_virtual_environment_role" "power" {
+  role_id = "VMPower"
+  privileges = [
+    "VM.Audit",
+    "VM.PowerMgmt",
+  ]
+}
+
 resource "proxmox_virtual_environment_group" "authentik" {
   for_each = var.proxmox_access
 
   group_id = "${each.key}-authentik"
-  comment  = "authentik entitlement ${each.key} - Managed by Terraform"
+  comment  = "Managed by Terraform"
 }
 
 resource "proxmox_acl" "authentik" {
@@ -47,4 +55,6 @@ resource "proxmox_acl" "authentik" {
   path      = each.value.path
   role_id   = each.value.role
   propagate = true
+
+  depends_on = [proxmox_virtual_environment_role.power]
 }

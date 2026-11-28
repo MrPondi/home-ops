@@ -2,8 +2,6 @@ data "bitwarden-secrets_secret" "proxmox" {
   id = "b2579e58-9838-4556-b613-b3ee0000fa21"
 }
 
-# PVE groups granted by RAC endpoint access (bindings managed on the endpoint, e.g. per user
-# in the UI); keys match proxmox-access.auto.tfvars. Every other key is an app entitlement.
 locals {
   proxmox-rac-endpoints = {
     game0         = authentik_rac_endpoint.game0.id
@@ -12,7 +10,6 @@ locals {
   }
 }
 
-# RAC check mirrors authentik's endpoint listing: app policies, then endpoint policies.
 resource "authentik_property_mapping_provider_scope" "proxmox" {
   name       = "Proxmox Groups"
   scope_name = "proxmox"
