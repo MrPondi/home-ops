@@ -2,9 +2,9 @@ data "bitwarden-secrets_secret" "minio" {
   id = "bf6713b4-8ae0-4100-9208-b3dc00d6a8ae"
 }
 
-resource "authentik_property_mapping_provider_scope" "minio-scope" {
+resource "authentik_property_mapping_provider_scope" "minio" {
   name       = "MinIO Policy"
-  scope_name = "policy"
+  scope_name = "minio"
   expression = <<EOF
 entitlement_names = {
   entitlement.name
@@ -47,7 +47,7 @@ resource "authentik_provider_oauth2" "minio" {
   ]
 
   property_mappings = [
-    authentik_property_mapping_provider_scope.minio-scope.id,
+    authentik_property_mapping_provider_scope.minio.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,

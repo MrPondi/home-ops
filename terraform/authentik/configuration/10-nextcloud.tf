@@ -1,4 +1,4 @@
-resource "authentik_property_mapping_provider_scope" "nextcloud-scope" {
+resource "authentik_property_mapping_provider_scope" "nextcloud" {
   name       = "Nextcloud Profile"
   scope_name = "nextcloud"
   expression = <<EOF
@@ -58,7 +58,7 @@ resource "authentik_provider_oauth2" "nextcloud" {
   ]
 
   property_mappings = [
-    authentik_property_mapping_provider_scope.nextcloud-scope.id,
+    authentik_property_mapping_provider_scope.nextcloud.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,

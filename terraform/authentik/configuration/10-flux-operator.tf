@@ -2,9 +2,9 @@ data "bitwarden-secrets_secret" "flux-operator" {
   id = "283d4479-b085-4a96-bf42-b3fd00123cb3"
 }
 
-resource "authentik_property_mapping_provider_scope" "gitops-admin" {
+resource "authentik_property_mapping_provider_scope" "gitops" {
   name       = "GitOps Admin"
-  scope_name = "admin"
+  scope_name = "gitops"
   expression = <<EOF
 entitlement_names = {
   entitlement.name
@@ -42,7 +42,7 @@ resource "authentik_provider_oauth2" "flux-operator" {
   ]
 
   property_mappings = [
-    authentik_property_mapping_provider_scope.gitops-admin.id,
+    authentik_property_mapping_provider_scope.gitops.id,
     data.authentik_property_mapping_provider_scope.scope-email.id,
     data.authentik_property_mapping_provider_scope.scope-openid.id,
     data.authentik_property_mapping_provider_scope.scope-profile.id,
