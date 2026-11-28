@@ -2,8 +2,6 @@ data "bitwarden-secrets_secret" "proxmox" {
   id = "b2579e58-9838-4556-b613-b3ee0000fa21"
 }
 
-# Entitlement names become PVE groups "<name>-authentik" (realm groups-claim, managed in
-# terraform/proxmox). Both sides are driven by the shared proxmox-access.auto.tfvars.
 resource "authentik_property_mapping_provider_scope" "proxmox" {
   name       = "Proxmox Groups"
   scope_name = "proxmox"
@@ -63,9 +61,24 @@ resource "authentik_application" "proxmox" {
   open_in_new_tab   = true
 }
 
-# Login only: membership alone grants nothing inside PVE.
 resource "authentik_group" "proxmox-users" {
   name = "Proxmox Users"
+}
+
+resource "authentik_group" "proxmox-admins" {
+  name    = "Proxmox Admins"
+  parents = [authentik_group.proxmox-users.id]
+}
+
+resource "authentik_application_entitlement" "proxmox-admins" {
+  name        = "admins"
+  application = authentik_application.proxmox.uuid
+}
+
+resource "authentik_policy_binding" "proxmox-admins-entitlement" {
+  target = authentik_application_entitlement.proxmox-admins.id
+  group  = authentik_group.proxmox-admins.id
+  order  = 10
 }
 
 resource "authentik_group" "proxmox" {

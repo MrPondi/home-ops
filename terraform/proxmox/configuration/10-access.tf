@@ -2,9 +2,6 @@ data "bitwarden-secrets_secret" "proxmox" {
   id = "b2579e58-9838-4556-b613-b3ee0000fa21"
 }
 
-# authentik OIDC login. The "proxmox" scope (terraform/authentik 10-proxmox.tf) emits the
-# user's Proxmox app entitlements as proxmox_groups; PVE maps each to "<name>-authentik".
-# groups_autocreate is off, so only the groups declared below are ever joined.
 resource "proxmox_realm_openid" "authentik" {
   realm      = "authentik"
   issuer_url = "https://auth.pondi.dev/application/o/proxmox/"
@@ -24,7 +21,18 @@ resource "proxmox_realm_openid" "authentik" {
   groups_overwrite  = true
 }
 
-# One PVE group + ACL per entry in the shared proxmox-access.auto.tfvars.
+resource "proxmox_virtual_environment_group" "admins" {
+  group_id = "admins-authentik"
+  comment  = "authentik entitlement admins (Proxmox Admins) - Managed by Terraform"
+}
+
+resource "proxmox_acl" "admins" {
+  group_id  = proxmox_virtual_environment_group.admins.group_id
+  path      = "/"
+  role_id   = "Administrator"
+  propagate = true
+}
+
 resource "proxmox_virtual_environment_group" "authentik" {
   for_each = var.proxmox_access
 
